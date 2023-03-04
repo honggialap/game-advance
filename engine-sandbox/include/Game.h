@@ -13,13 +13,14 @@ public:
 			window_title,
 			sf::Style::Titlebar | sf::Style::Close
 		);
-		window.setFramerateLimit(framerate_limit);
+		window.setFramerateLimit(0);
+		float tick_per_frame = 1000.0f / framerate_limit;
+		float elapsedMs = 0.0f;
 
 		Scene scene;
 		scene.Load();
 
-		sf::Clock clock;
-		clock.restart();
+		b2Timer clock;
 
 		while (window.isOpen()) {
 			sf::Event window_event;
@@ -35,11 +36,22 @@ public:
 				}
 			}
 
-			scene.Update(clock.getElapsedTime().asMilliseconds());
+			elapsedMs += clock.GetMilliseconds();
+			clock.Reset();
 
-			window.clear(sf::Color::Black);
-			scene.Render(window);
-			window.display();
+			if (elapsedMs >= tick_per_frame) {
+				scene.Update(elapsedMs);
+
+				window.clear(sf::Color::Black);
+				scene.Render(window);
+				window.display();
+
+				elapsedMs = 0.0f;
+			}
+			else {
+				Sleep((DWORD)tick_per_frame - elapsedMs);
+			}
+
 		}
 	}
 };

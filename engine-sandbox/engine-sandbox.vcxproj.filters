@@ -505,4 +505,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="external\box2d-2.4.1\lib\box2d.lib" />
+  </ItemGroup>
 </Project>

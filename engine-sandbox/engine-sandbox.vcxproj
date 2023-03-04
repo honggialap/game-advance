@@ -307,6 +307,9 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Scene.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="external\box2d-2.4.1\lib\box2d.lib" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

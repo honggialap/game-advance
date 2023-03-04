@@ -42,32 +42,34 @@ public:
 	}
 
 	void Update(float elapsed) {
+		printf("%f\n", elapsed);
+
 		// Camera movement
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-			camera.move(sf::Vector2f(0, -0.001f) * elapsed);
+			camera.move(sf::Vector2f(0, -1.0f) * elapsed);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-			camera.move(sf::Vector2f(0, 0.001f) * elapsed);
+			camera.move(sf::Vector2f(0, 1.0f) * elapsed);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-			camera.move(sf::Vector2f(-0.001f, 0) * elapsed);
+			camera.move(sf::Vector2f(-1.0f, 0) * elapsed);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-			camera.move(sf::Vector2f(0.001f, 0) * elapsed);
+			camera.move(sf::Vector2f(1.0f, 0) * elapsed);
 		}
 
 		// Sprite movement
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-			sprite.move(sf::Vector2f(0, -0.005f) * elapsed);
+			sprite.move(sf::Vector2f(0, -1.0f) * elapsed);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-			sprite.move(sf::Vector2f(0, 0.005f) * elapsed);
+			sprite.move(sf::Vector2f(0, 1.0f) * elapsed);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-			sprite.move(sf::Vector2f(-0.005f, 0) * elapsed);
+			sprite.move(sf::Vector2f(-1.0f, 0) * elapsed);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-			sprite.move(sf::Vector2f(0.005f, 0) * elapsed);
+			sprite.move(sf::Vector2f(1.0f, 0) * elapsed);
 		}
 
 		// Sound control

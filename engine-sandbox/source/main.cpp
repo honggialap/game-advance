@@ -5,7 +5,7 @@ int main() {
 	game.Run(
 		sf::VideoMode(800, 600),
 		"SFML Testing Game class",
-		60
+		144
 	);
 	return 0;
 }
