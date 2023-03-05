@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="data\game_data.json" />
     <None Include="external\SFML-2.5.1\include\SFML\Audio\SoundFileFactory.inl" />
     <None Include="external\SFML-2.5.1\include\SFML\Graphics\Glsl.inl" />
     <None Include="external\SFML-2.5.1\include\SFML\Graphics\Rect.inl" />

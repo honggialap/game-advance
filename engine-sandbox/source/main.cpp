@@ -2,10 +2,6 @@
 
 int main() {
 	Game game;
-	game.Run(
-		sf::VideoMode(800, 600),
-		"SFML Testing Game class",
-		144
-	);
+	game.Run("data/game_data.json");
 	return 0;
 }

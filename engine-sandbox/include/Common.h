@@ -10,6 +10,10 @@
 
 #include <box2d/box2d.h>
 
+#include <json.hpp>
+
 #include <memory>
+#include <fstream>
+#include <utility>
 
 #endif // !__PONG_COMMON_H__
