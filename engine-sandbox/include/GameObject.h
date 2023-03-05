@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __PONG_GAMEOBJECT_H__
-#define __PONG_GAMEOBJECT_H__
+#ifndef __ENGINE_GAMEOBJECT_H__
+#define __ENGINE_GAMEOBJECT_H__
 
 #include "Common.h"
 
@@ -15,31 +15,17 @@ protected:
 	Game* game;
 	Scene* scene;
 
-protected:
-	sf::Texture texture;
-	sf::Sprite sprite;
-
-	sf::Font font;
-	sf::Text text;
-
-	sf::SoundBuffer sfx_buffer;
-	sf::Sound sfx;
-	sf::Music music;
-
 public:
 	GameObject(Game* pGame, Scene* pScene);
 	~GameObject();
 
 public:
-	void Load();
-
-	void Update(float elapsed);
-	
-	void Render(sf::RenderWindow& window);
-
-	void Unload();
+	virtual void Load() = 0;
+	virtual void Update(float elapsed) = 0;
+	virtual void Render(sf::RenderWindow& window) = 0;
+	virtual void Unload() = 0;
 };
+typedef GameObject* pGameObject;
 
 
-
-#endif // !__PONG_GAMEOBJECT_H__
+#endif // !__ENGINE_GAMEOBJECT_H__

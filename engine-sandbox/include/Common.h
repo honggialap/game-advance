@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __PONG_COMMON_H__
-#define __PONG_COMMON_H__
+#ifndef __ENGINE_COMMON_H__
+#define __ENGINE_COMMON_H__
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -16,4 +16,4 @@
 #include <fstream>
 #include <utility>
 
-#endif // !__PONG_COMMON_H__
+#endif // !__ENGINE_COMMON_H__

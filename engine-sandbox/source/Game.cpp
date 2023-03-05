@@ -26,6 +26,10 @@ void Game::Initialize(std::string data_path) {
 	tick_per_frame = 1000.0f / framerate;
 }
 
+void Game::Shutdown() {
+	if (scene) scene->Unload();
+}
+
 void Game::PlayScene(unsigned int scene_id) {
 	if (scene_list.find(scene_id) == scene_list.end()) {
 		printf("Scene [%d] not found!\n", scene_id);
@@ -51,20 +55,6 @@ void Game::LoadScene() {
 
 	scene->Load(next_scene.second);
 }
-
-pScene Game::CreateScene(unsigned int scene_type) {
-	switch (scene_type) {
-	case 0: {
-		return new Scene(this);
-		break;
-	}
-
-	default:
-		return nullptr;
-		break;
-	}
-}
-
 
 void Game::Run(std::string data_path) {
 	Initialize(data_path);
@@ -105,4 +95,6 @@ void Game::Run(std::string data_path) {
 			Sleep((DWORD)tick_per_frame - elapsedMs);
 		}
 	}
+
+	Shutdown();
 }

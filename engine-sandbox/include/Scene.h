@@ -1,34 +1,30 @@
 #pragma once
-#ifndef __PONG_SCENE_H__
-#define __PONG_SCENE_H__
+#ifndef __ENGINE_SCENE_H__
+#define __ENGINE_SCENE_H__
 
 #include "Common.h"
 #include "GameObject.h"
 
-// Forward declaration
 class Game;
 typedef Game* pGame;
 
 class Scene {
 protected:
 	pGame game;
-	std::unique_ptr<GameObject> gameObject;
-
-	sf::View camera;
 
 public:
 	Scene(pGame game);
 	~Scene();
 
 public:
-	sf::View& GetCamera();
+	virtual void Load(std::string data_path) = 0;
+	virtual void Unload() = 0;
 
-	void Load(std::string data_path);
-	void Unload();
+	virtual void Update(float elapsed) = 0;
+	virtual void Render(sf::RenderWindow& window) = 0;
 
-	void Update(float elapsed);
-	void Render(sf::RenderWindow& window);
+	virtual pGameObject CreateGameObject() = 0;
 };
 typedef Scene* pScene;
 
-#endif // !__PONG_SCENE_H__
+#endif // !__ENGINE_SCENE_H__

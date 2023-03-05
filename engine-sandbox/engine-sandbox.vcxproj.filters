@@ -13,6 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{c04c86ec-a1bc-4a0a-bc7d-edc646386d38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sample">
+      <UniqueIdentifier>{99ed432f-ad52-4677-ac97-e446f1559dd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Game">
+      <UniqueIdentifier>{0a8daec6-cb06-40b9-b4ab-96d5056b85c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Scene">
+      <UniqueIdentifier>{82ccccea-1710-4255-a267-45c3f9c501fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GameObject">
+      <UniqueIdentifier>{a9ff33ae-c574-448f-901f-1c64d7e17906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sample\Game">
+      <UniqueIdentifier>{da4f70f2-3ed4-48c6-8dd7-b9a6e0fc8513}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sample\Game\Lobby">
+      <UniqueIdentifier>{0583b609-cb00-46d6-a913-2f4802cc359f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sample\Game\World">
+      <UniqueIdentifier>{f0bc2201-4cac-4ea6-b081-89cc1d09b6cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sample\Game\World\GameObject">
+      <UniqueIdentifier>{2a231cd9-bfdf-4475-8dd0-b58c726bda61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.md" />
@@ -43,10 +70,9 @@
     <None Include="external\SFML-2.5.1\include\SFML\System\Vector3.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="data\game_data.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="data\arial.ttf" />
+    <None Include="data\game_data.json">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="data\audio.wav">
@@ -479,34 +505,63 @@
     <ClInclude Include="external\SFML-2.5.1\include\SFML\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Game.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine\Game</Filter>
     </ClInclude>
     <ClInclude Include="include\GameObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SampleGame.h">
+      <Filter>Sample\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Common.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SampleLobbyScene.h">
+      <Filter>Sample\Game\Lobby</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SampleWorldScene.h">
+      <Filter>Sample\Game\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SampleGameObject.h">
+      <Filter>Sample\Game\World\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\Game.cpp">
+      <Filter>Engine\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GameObject.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
     <ClCompile Include="source\Scene.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SampleGame.cpp">
+      <Filter>Sample\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SampleLobbyScene.cpp">
+      <Filter>Sample\Game\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SampleWorldScene.cpp">
+      <Filter>Sample\Game\World</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SampleGameObject.cpp">
+      <Filter>Sample\Game\World\GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="external\box2d-2.4.1\lib\box2d.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="data\arial.ttf">
+      <Filter>Resource Files</Filter>
+    </Font>
   </ItemGroup>
 </Project>

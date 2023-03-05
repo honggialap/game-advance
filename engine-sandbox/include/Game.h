@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __PONG_GAME_H__
-#define __PONG_GAME_H__
+#ifndef __ENGINE_GAME_H__
+#define __ENGINE_GAME_H__
 
 #include "Common.h"
 #include "Scene.h"
@@ -20,10 +20,12 @@ public:
 	void PlayScene(unsigned int scene_id);
 
 protected:
-	void Initialize(std::string data_path);
+	virtual void Initialize(std::string data_path);
+	virtual void Shutdown();
+
 	void LoadScene();
-	virtual pScene CreateScene(unsigned int scene_type);
+	virtual pScene CreateScene(unsigned int scene_type) = 0;
 };
 typedef Game* pGame;
 
-#endif // !__PONG_GAME_H__
+#endif // !__ENGINE_GAME_H__
