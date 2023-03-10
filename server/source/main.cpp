@@ -1,10 +1,15 @@
-#include "game_server.h"
-#include <Windows.h>
+#include "remote_connection.h"
 
 int main() {
-	Server::GameServer game_server;
-	game_server.Run();
+
+	Engine::RemoteConnection connection;
+	if (connection.Listen("27015")) {
+		while (connection.Accept()) {
+		}
+		connection.Shutdown();
+	}
 
 	system("pause");
+
 	return 0;
 }

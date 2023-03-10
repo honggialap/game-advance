@@ -147,26 +147,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\bullet.h" />
-    <ClInclude Include="include\game_server.h" />
-    <ClInclude Include="include\lobby.h" />
-    <ClInclude Include="include\tank.h" />
-    <ClInclude Include="include\wall.h" />
-    <ClInclude Include="include\world.h" />
-    <ClInclude Include="source\lobby.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="source\bullet.cpp" />
-    <ClCompile Include="source\game_server.cpp" />
-    <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\tank.cpp" />
-    <ClCompile Include="source\wall.cpp" />
-    <ClCompile Include="source\world.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\engine\engine.vcxproj">
       <Project>{e6eff5d6-2628-4ebc-8d87-6784327d6f27}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

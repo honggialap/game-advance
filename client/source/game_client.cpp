@@ -22,11 +22,13 @@ namespace Client {
 
 	void GameClient::Initialize(std::string data_path) {
 		Engine::Game::Initialize(data_path);
+		host_connection.Connect("localhost", "27015");
 		//
 	}
 
 	void GameClient::Shutdown() {
 		//
+		host_connection.Disconnect();
 		Engine::Game::Shutdown();
 	}
 
