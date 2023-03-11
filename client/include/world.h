@@ -11,6 +11,7 @@
 
 namespace Client {
 
+	// Forward declaration
 	class GameClient;
 	typedef GameClient* pGameClient;
 

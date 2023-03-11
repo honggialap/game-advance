@@ -1,22 +1,32 @@
 #pragma once
-#ifndef __CLIENT_GAMECSERVER_H__
-#define __CLIENT_GAMECSERVER_H__
+#ifndef __SERVER_GAMECSERVER_H__
+#define __SERVER_GAMECSERVER_H__
 
 #include "game.h"
+#include "remote_connection.h"
+
+#define SCENE_TYPE_LOBBY	1
+#define SCENE_TYPE_WORLD	2
 
 namespace Server {
 
 	class GameServer : public Engine::Game {
 	protected:
-		void Initialize() override;
+		Engine::RemoteConnection remote_connection;
+		std::thread listening_thread;
+
+	public:
+		Engine::pScene CreateScene(unsigned int scene_type) override;
+
+	protected:
+		void Initialize(std::string data_path) override;
 		void Shutdown() override;
 
-		void Update() override;
-		void Render() override;
-
-		void CreateScene() override;
+		void Update(float elapsedMs) override;
+		void Render(sf::RenderWindow& window) override;
 	};
+	typedef GameServer* pGameServer;
 
 }
 
-#endif // !__CLIENT_GAMECSERVER_H__
+#endif // !__SERVER_GAMECSERVER_H__

@@ -1,15 +1,9 @@
-#include "remote_connection.h"
+#include "game_server.h"
 
 int main() {
-
-	Engine::RemoteConnection connection;
-	if (connection.Listen("27015")) {
-		while (connection.Accept()) {
-		}
-		connection.Shutdown();
-	}
+	Server::GameServer game_server;
+	game_server.Run("data/game_data.json");
 
 	system("pause");
-
 	return 0;
 }
