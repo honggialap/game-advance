@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\animation.h" />
     <ClInclude Include="include\common.h" />
     <ClInclude Include="include\engine.h" />
     <ClInclude Include="include\game.h" />
@@ -28,6 +29,7 @@
     <ClInclude Include="include\scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\animation.cpp" />
     <ClCompile Include="source\game.cpp" />
     <ClCompile Include="source\game_object.cpp" />
     <ClCompile Include="source\host_connection.cpp" />

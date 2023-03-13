@@ -21,6 +21,9 @@ namespace Client {
 
 	protected:
 		sf::View camera;
+		
+		b2Vec2 gravity;
+		b2World* physics;
 
 		std::unique_ptr<Engine::GameObject> tank;
 		std::unique_ptr<Engine::GameObject> bullet;
@@ -41,6 +44,7 @@ namespace Client {
 
 	public:
 		sf::View& GetCamera();
+		b2World* GetPhysics();
 	};
 	typedef World* pWorld;
 

@@ -37,6 +37,9 @@ namespace Client {
 		std::ifstream data_file(data_path);
 		nlohmann::json data = nlohmann::json::parse(data_file);
 
+		gravity = b2Vec2(0, 0);
+		physics = new b2World(gravity);
+
 		camera.reset(sf::FloatRect(0, 0, 800, 600));
 		camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
@@ -59,9 +62,29 @@ namespace Client {
 		
 		wall->Unload();
 		wall.reset();
+
+		if (physics != nullptr) {
+			delete physics;
+			physics = nullptr;
+		}
 	}
 
 	void World::Update(float elapsed) {
+
+		// Camera movement
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+			camera.move(sf::Vector2f(0, -1.0f) * elapsed);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+			camera.move(sf::Vector2f(0, 1.0f) * elapsed);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+			camera.move(sf::Vector2f(-1.0f, 0) * elapsed);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+			camera.move(sf::Vector2f(1.0f, 0) * elapsed);
+		}
+
 		tank->Update(elapsed);
 		bullet->Update(elapsed);
 		wall->Update(elapsed);
@@ -69,6 +92,7 @@ namespace Client {
 
 	void World::Render(sf::RenderWindow& window) {
 		window.setView(camera);
+
 		tank->Render(window);
 		bullet->Render(window);
 		wall->Render(window);
@@ -76,6 +100,10 @@ namespace Client {
 
 	sf::View& World::GetCamera() {
 		return camera;
+	}
+
+	b2World* World::GetPhysics() {
+		return physics;
 	}
 
 }

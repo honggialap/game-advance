@@ -3,6 +3,7 @@
 #define __CLIENT_TANK_H__
 
 #include "game_object.h"
+#include "animation.h"
 
 namespace Client {
 	
@@ -18,8 +19,7 @@ namespace Client {
 		pWorld world;
 
 	protected:
-		sf::Texture texture;
-		sf::Sprite sprite;
+		Engine::Animation animation;
 
 	public:
 		Tank(Engine::pGame game, Engine::pScene scene);
