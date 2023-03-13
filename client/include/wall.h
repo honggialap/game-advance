@@ -18,9 +18,16 @@ namespace Client {
 		pWorld world;
 
 	protected:
-		sf::SoundBuffer sfx_buffer;
-		sf::Sound sfx;
-		sf::Music music;
+		sf::Texture texture;
+		sf::Sprite sprite;
+
+		b2BodyDef body_def;
+		b2Body* body = nullptr;
+
+		b2PolygonShape collider;
+
+		b2FixtureDef fixture_def;
+		b2Fixture* fixture = nullptr;
 
 	public:
 		Wall(Engine::pGame game, Engine::pScene scene);

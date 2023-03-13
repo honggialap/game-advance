@@ -19,7 +19,16 @@ namespace Client {
 		pWorld world;
 
 	protected:
-		Engine::Animation animation;
+		sf::Texture texture;
+		sf::Sprite sprite;
+
+		b2BodyDef body_def;
+		b2Body* body = nullptr;
+
+		b2PolygonShape collider;
+
+		b2FixtureDef fixture_def;
+		b2Fixture* fixture = nullptr;
 
 	public:
 		Tank(Engine::pGame game, Engine::pScene scene);

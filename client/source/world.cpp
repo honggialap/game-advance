@@ -38,7 +38,7 @@ namespace Client {
 		nlohmann::json data = nlohmann::json::parse(data_file);
 
 		gravity = b2Vec2(0, 0);
-		physics = new b2World(gravity);
+		physics_world = new b2World(gravity);
 
 		camera.reset(sf::FloatRect(0, 0, 800, 600));
 		camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
@@ -63,9 +63,9 @@ namespace Client {
 		wall->Unload();
 		wall.reset();
 
-		if (physics != nullptr) {
-			delete physics;
-			physics = nullptr;
+		if (physics_world != nullptr) {
+			delete physics_world;
+			physics_world = nullptr;
 		}
 	}
 
@@ -85,9 +85,12 @@ namespace Client {
 			camera.move(sf::Vector2f(1.0f, 0) * elapsed);
 		}
 
+		physics_world->Step(elapsed, 8, 3);
+
 		tank->Update(elapsed);
 		bullet->Update(elapsed);
 		wall->Update(elapsed);
+
 	}
 
 	void World::Render(sf::RenderWindow& window) {
@@ -103,7 +106,7 @@ namespace Client {
 	}
 
 	b2World* World::GetPhysics() {
-		return physics;
+		return physics_world;
 	}
 
 }

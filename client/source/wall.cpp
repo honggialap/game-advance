@@ -17,29 +17,51 @@ namespace Client {
 		//std::ifstream data_file(data_path);
 		//nlohmann::json data = nlohmann::json::parse(data_file);
 
-		sfx_buffer.loadFromFile("data/resources/audios/sfx.wav");
-		sfx.setBuffer(sfx_buffer);
+		texture.loadFromFile("data/resources/textures/test_wall.png");
+		sprite.setTexture(texture);
+		sprite.setOrigin(32, 32);
 
-		music.openFromFile("data/resources/audios/audio.wav");
+		setPosition(0, 0);
+
+		body_def.position.Set(0, 0);
+		body_def.type = b2_kinematicBody;
+
+		body = world->GetPhysics()->CreateBody(&body_def);
+
+		collider.SetAsBox(32.0f / 30, 32.0f / 30);
+
+		fixture_def.shape = &collider;
+		fixture_def.density = 100.0f;
+		fixture_def.friction = 0.0f;
+
+		fixture = body->CreateFixture(&fixture_def);
 	}
 
 	void Wall::Unload() {
+		if (body != nullptr) {
+			if (fixture != nullptr) {
+				body->DestroyFixture(fixture);
+				fixture = nullptr;
+			}
+			world->GetPhysics()->DestroyBody(body);
+			body = nullptr;
+		}
 	}
 
 	void Wall::Update(float elapsed) {
-		// Sound control
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
-			sfx.play();
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
-			music.play();
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
-			music.stop();
-		}
+		setPosition(
+			body->GetPosition().x * 30,
+			body->GetPosition().y * 30
+		);
 	}
 
 	void Wall::Render(sf::RenderWindow& window) {
+		sprite.setPosition(
+			getPosition().x,
+			-getPosition().y + window.getSize().y
+		);
+
+		window.draw(sprite);
 	}
 
 }

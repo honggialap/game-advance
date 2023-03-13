@@ -17,53 +17,73 @@ namespace Client {
 		//std::ifstream data_file(data_path);
 		//nlohmann::json data = nlohmann::json::parse(data_file);
 
-		animation.LoadTexture("data/resources/textures/test.png");
-		animation.AddFrame(sf::IntRect(0, 0, 32, 32), 1000);
-		animation.AddFrame(sf::IntRect(32, 0, 32, 32), 1000);
-		animation.AddFrame(sf::IntRect(0, 32, 32, 32), 1000);
-		animation.AddFrame(sf::IntRect(32, 32, 32, 32), 1000);
+		texture.loadFromFile("data/resources/textures/test.png");
+		sprite.setTexture(texture);
+		sprite.setOrigin(32, 32);
+
+		setPosition(0, 0);
+
+		body_def.position.Set(0, 0);
+		body_def.type = b2_dynamicBody;
+
+		body = world->GetPhysics()->CreateBody(&body_def);
+
+		collider.SetAsBox(32.0f / 30, 32.0f / 30);
+
+		fixture_def.shape = &collider;
+		fixture_def.density = 100.0f;
+		fixture_def.friction = 0.0f;
+
+		fixture = body->CreateFixture(&fixture_def);
 	}
 
 	void Tank::Unload() {
+		if (body != nullptr) {
+			if (fixture != nullptr) {
+				body->DestroyFixture(fixture);
+				fixture = nullptr;
+			}
+			world->GetPhysics()->DestroyBody(body);
+			body = nullptr;
+		}
 	}
 
 	void Tank::Update(float elapsed) {
+		setPosition(
+			body->GetPosition().x * 30,
+			body->GetPosition().y * 30
+		);
 
-		animation.Update(elapsed);
-
-		// Animation control
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::B)) {
-			animation.Play(true);
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::N)) {
-			animation.Play();
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::M)) {
-			animation.Stop();
-		}
-
-		// Sprite movement
+		// Movement control
+		b2Vec2 movement(0, 0);
+		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-			move(sf::Vector2f(0, 1.0f) * elapsed);
+			movement.y += 0.01f / 30 * elapsed;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-			move(sf::Vector2f(0, -1.0f) * elapsed);
+			movement.y += -0.01f / 30 * elapsed;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-			move(sf::Vector2f(-1.0f, 0) * elapsed);
+			movement.x += -0.01f / 30 * elapsed;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-			move(sf::Vector2f(1.0f, 0) * elapsed);
+			movement.x += 0.01f / 30 * elapsed;
 		}
+
+		body->SetLinearVelocity(movement);
+
+		b2Vec2 position = body->GetPosition();
+		printf("%4.2f %4.2f\n", position.x, position.y);
+
 	}
 
 	void Tank::Render(sf::RenderWindow& window) {
-		animation.setPosition(
+		sprite.setPosition(
 			getPosition().x,
 			-getPosition().y + window.getSize().y
 		);
 
-		window.draw(animation);
+		window.draw(sprite);
 	}
 
 }
