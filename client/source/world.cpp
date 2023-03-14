@@ -39,6 +39,7 @@ namespace Client {
 
 		gravity = b2Vec2(0, 0);
 		physics_world = new b2World(gravity);
+		physics_world->SetContactListener(this);
 
 		camera.reset(sf::FloatRect(0, 0, 800, 600));
 		camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
@@ -85,12 +86,11 @@ namespace Client {
 			camera.move(sf::Vector2f(1.0f, 0) * elapsed);
 		}
 
-		physics_world->Step(elapsed, 8, 3);
-
 		tank->Update(elapsed);
 		bullet->Update(elapsed);
 		wall->Update(elapsed);
 
+		physics_world->Step(elapsed, 8, 3);
 	}
 
 	void World::Render(sf::RenderWindow& window) {
@@ -107,6 +107,28 @@ namespace Client {
 
 	b2World* World::GetPhysics() {
 		return physics_world;
+	}
+
+	void World::BeginContact(b2Contact* contact) {
+		auto dataA = (void*)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+		auto dataB = (void*)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+		if (dataA && dataB) {
+			auto objectA = static_cast<Engine::pGameObject>(dataA);
+			auto objectB = static_cast<Engine::pGameObject>(dataB);
+			objectA->OnCollisionEnter(objectB);
+			objectB->OnCollisionEnter(objectA);
+		}
+	}
+
+	void World::EndContact(b2Contact* contact) {
+		auto dataA = (void*)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+		auto dataB = (void*)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+		if (dataA && dataB) {
+			auto objectA = static_cast<Engine::pGameObject>(dataA);
+			auto objectB = static_cast<Engine::pGameObject>(dataB);
+			objectA->OnCollisionExit(objectB);
+			objectB->OnCollisionExit(objectA);
+		}
 	}
 
 }

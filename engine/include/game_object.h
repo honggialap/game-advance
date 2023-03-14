@@ -27,6 +27,9 @@ namespace Engine {
 
 		virtual void Update(float elapsed) = 0;
 		virtual void Render(sf::RenderWindow& window) = 0;
+
+		virtual void OnCollisionEnter(GameObject* other) = 0;
+		virtual void OnCollisionExit(GameObject* other) = 0;
 	};
 	typedef GameObject* pGameObject;
 

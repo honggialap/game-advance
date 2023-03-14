@@ -15,7 +15,7 @@ namespace Client {
 	class GameClient;
 	typedef GameClient* pGameClient;
 
-	class World : public Engine::Scene {
+	class World : public Engine::Scene, public b2ContactListener {
 	protected:
 		pGameClient game_client;
 
@@ -44,7 +44,10 @@ namespace Client {
 
 	public:
 		sf::View& GetCamera();
+		
 		b2World* GetPhysics();
+		void BeginContact(b2Contact* contact) override;
+		void EndContact(b2Contact* contact) override;
 	};
 	typedef World* pWorld;
 

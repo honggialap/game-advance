@@ -31,6 +31,9 @@ namespace Client {
 
 		void Update(float elapsed) override;
 		void Render(sf::RenderWindow& window) override;
+
+		void OnCollisionEnter(GameObject* other) override;
+		void OnCollisionExit(GameObject* other) override;
 	};
 	typedef Bullet* pBullet;
 

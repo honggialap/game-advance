@@ -2,6 +2,8 @@
 #include "game_client.h"
 #include "world.h"
 
+#include "wall.h"
+
 namespace Client {
 	
 	Tank::Tank(Engine::pGame game, Engine::pScene scene)
@@ -25,6 +27,7 @@ namespace Client {
 
 		body_def.position.Set(0, 0);
 		body_def.type = b2_dynamicBody;
+		body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
 		body = world->GetPhysics()->CreateBody(&body_def);
 
@@ -71,10 +74,6 @@ namespace Client {
 		}
 
 		body->SetLinearVelocity(movement);
-
-		b2Vec2 position = body->GetPosition();
-		printf("%4.2f %4.2f\n", position.x, position.y);
-
 	}
 
 	void Tank::Render(sf::RenderWindow& window) {
@@ -84,6 +83,18 @@ namespace Client {
 		);
 
 		window.draw(sprite);
+	}
+
+	void Tank::OnCollisionEnter(Engine::pGameObject other) {
+		if (dynamic_cast<pWall>(other)) {
+			printf("TANK hit WALL.\n");
+		}
+	}
+
+	void Tank::OnCollisionExit(Engine::pGameObject other) {
+		if (dynamic_cast<pWall>(other)) {
+			printf("TANK stop hit WALL.\n");
+		}
 	}
 
 }

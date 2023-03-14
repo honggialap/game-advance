@@ -39,4 +39,10 @@ namespace Client {
 		window.draw(text);
 	}
 
+	void Bullet::OnCollisionEnter(Engine::pGameObject other) {
+	}
+
+	void Bullet::OnCollisionExit(Engine::pGameObject other) {
+	}
+
 }

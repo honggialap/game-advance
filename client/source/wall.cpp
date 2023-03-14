@@ -2,6 +2,8 @@
 #include "game_client.h"
 #include "world.h"
 
+#include "tank.h"
+
 namespace Client {
 
 	Wall::Wall(Engine::pGame game, Engine::pScene scene)
@@ -25,6 +27,7 @@ namespace Client {
 
 		body_def.position.Set(0, 0);
 		body_def.type = b2_kinematicBody;
+		body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
 		body = world->GetPhysics()->CreateBody(&body_def);
 
@@ -62,6 +65,18 @@ namespace Client {
 		);
 
 		window.draw(sprite);
+	}
+
+	void Wall::OnCollisionEnter(Engine::pGameObject other) {
+		if (dynamic_cast<pTank>(other)) {
+			printf("WALL block TANK.\n");
+		}
+	}
+
+	void Wall::OnCollisionExit(Engine::pGameObject other) {
+		if (dynamic_cast<pTank>(other)) {
+			printf("WALL stop block TANK.\n");
+		}
 	}
 
 }

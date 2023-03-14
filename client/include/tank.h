@@ -40,6 +40,9 @@ namespace Client {
 		
 		void Update(float elapsed) override;
 		void Render(sf::RenderWindow& window) override;
+
+		void OnCollisionEnter(Engine::pGameObject other) override;
+		void OnCollisionExit(Engine::pGameObject other) override;
 	};
 	typedef Tank* pTank;
 
