@@ -18,11 +18,18 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "Mswsock.lib")
+#pragma comment (lib, "AdvApi32.lib")
+
 #include <memory>
 #include <fstream>
 #include <string>
 #include <iostream>
 #include <utility>
 #include <thread>
+
+#define PIXEL_PER_METER 30.0f
+#define MAX_PACKET_SIZE 65535
 
 #endif // !__ENGINE_COMMON_H__

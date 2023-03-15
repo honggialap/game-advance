@@ -61,4 +61,10 @@ namespace Server {
 		window.draw(sprite);
 	}
 
+	void Tank::OnCollisionEnter(Engine::pGameObject other) {
+	}
+
+	void Tank::OnCollisionExit(Engine::pGameObject other) {
+	}
+
 }

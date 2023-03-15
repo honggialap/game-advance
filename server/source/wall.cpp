@@ -42,4 +42,10 @@ namespace Server {
 	void Wall::Render(sf::RenderWindow& window) {
 	}
 
+	void Wall::OnCollisionEnter(Engine::pGameObject other) {
+	}
+
+	void Wall::OnCollisionExit(Engine::pGameObject other) {
+	}
+
 }

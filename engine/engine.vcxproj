@@ -21,19 +21,19 @@
   <ItemGroup>
     <ClInclude Include="include\animation.h" />
     <ClInclude Include="include\common.h" />
+    <ClInclude Include="include\connection.h" />
     <ClInclude Include="include\engine.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\game_object.h" />
-    <ClInclude Include="include\host_connection.h" />
-    <ClInclude Include="include\remote_connection.h" />
+    <ClInclude Include="include\packet.h" />
     <ClInclude Include="include\scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\connection.cpp" />
     <ClCompile Include="source\animation.cpp" />
     <ClCompile Include="source\game.cpp" />
     <ClCompile Include="source\game_object.cpp" />
-    <ClCompile Include="source\host_connection.cpp" />
-    <ClCompile Include="source\remote_connection.cpp" />
+    <ClCompile Include="source\packet.cpp" />
     <ClCompile Include="source\scene.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

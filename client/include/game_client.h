@@ -3,7 +3,6 @@
 #define __CLIENT_GAMECLIENT_H__
 
 #include "game.h"
-#include "host_connection.h"
 
 #define SCENE_TYPE_LOBBY 1
 #define SCENE_TYPE_WORLD 2
@@ -11,9 +10,6 @@
 namespace Client {
 
 	class GameClient : public Engine::Game {
-	protected:
-		Engine::HostConnection host_connection;
-
 	public:
 		Engine::pScene CreateScene(unsigned int scene_type) override;
 

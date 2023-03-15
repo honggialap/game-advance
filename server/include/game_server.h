@@ -3,7 +3,6 @@
 #define __SERVER_GAMECSERVER_H__
 
 #include "game.h"
-#include "remote_connection.h"
 
 #define SCENE_TYPE_LOBBY	1
 #define SCENE_TYPE_WORLD	2
@@ -11,10 +10,6 @@
 namespace Server {
 
 	class GameServer : public Engine::Game {
-	protected:
-		Engine::RemoteConnection remote_connection;
-		std::thread listening_thread;
-
 	public:
 		Engine::pScene CreateScene(unsigned int scene_type) override;
 

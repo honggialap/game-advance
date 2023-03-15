@@ -24,12 +24,6 @@
     <ClInclude Include="include\game_object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\host_connection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\remote_connection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,6 +31,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\connection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\packet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,13 +50,13 @@
     <ClCompile Include="source\game_object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\host_connection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\remote_connection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\packet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

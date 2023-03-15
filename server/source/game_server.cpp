@@ -22,20 +22,9 @@ namespace Server {
 
 	void GameServer::Initialize(std::string data_path) {
 		Engine::Game::Initialize(data_path);
-		listening_thread = std::thread(
-			[this]() {
-				if (remote_connection.Listen("27015")) {
-					while (remote_connection.Accept()) {
-					}
-					remote_connection.Shutdown();
-				}
-			}
-		);
 	}
 
 	void GameServer::Shutdown() {
-		if (listening_thread.joinable())
-			listening_thread.join();
 		Engine::Game::Shutdown();
 	}
 
