@@ -28,6 +28,7 @@
 #include <iostream>
 #include <utility>
 #include <thread>
+#include <queue>
 
 #define PIXEL_PER_METER 30.0f
 #define MAX_PACKET_SIZE 65535
