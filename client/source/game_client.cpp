@@ -3,6 +3,14 @@
 #include "world.h"
 
 namespace Client {
+	
+	void GameClient::Initialize(std::string data_path) {
+		Engine::Game::Initialize(data_path);
+	}
+
+	void GameClient::Shutdown() {
+		Engine::Game::Shutdown();
+	}
 
 	Engine::pScene GameClient::CreateScene(unsigned int scene_type) {
 		switch (scene_type) {
@@ -20,26 +28,30 @@ namespace Client {
 		}
 	}
 
-	void GameClient::Initialize(std::string data_path) {
-		Engine::Game::Initialize(data_path);
-		//
+	void GameClient::OnConnect() {
 	}
 
-	void GameClient::Shutdown() {
-		//
-		Engine::Game::Shutdown();
+	void GameClient::OnDisconnect() {
 	}
 
-	void GameClient::Update(float elapsedMs) {
-		//
-		Engine::Game::Update(elapsedMs);
-		//
+	void GameClient::OnConnectFail() {
 	}
 
-	void GameClient::Render(sf::RenderWindow& window) {
-		//
-		Engine::Game::Render(window);
-		//
+	bool GameClient::ProcessPacket(std::shared_ptr<Engine::Packet> packet) {
+		switch (packet->GetPacketType()) {
+		case Engine::PacketType::Welcome:
+			*packet >> id;
+			return true;
+			break;
+
+		default:
+			break;
+		}
+
+
+
+
+		return false;
 	}
 
 }

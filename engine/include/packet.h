@@ -7,9 +7,12 @@
 namespace Engine {
 
 	enum PacketType : uint16_t {
+		Welcome,
+		GameObject_Position,
 		Invalid,
 		ChatMessage,
 		IntArray,
+		FloatArray,
 	};
 
 	class Packet {
@@ -30,6 +33,9 @@ namespace Engine {
 
 		Packet& operator << (const std::string &data);
 		Packet& operator >> (std::string& data);
+
+		Packet& operator << (float data);
+		Packet& operator >> (float& data);
 	};
 
 	class PacketException {

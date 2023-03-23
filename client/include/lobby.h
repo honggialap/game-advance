@@ -3,9 +3,10 @@
 #define __CLIENT_LOBBY_H__
 
 #include "scene.h"
+#include "game_object.h"
 
 namespace Client {
-	
+
 	// Forward declaration
 	class GameClient;
 	typedef GameClient* pGameClient;
@@ -24,6 +25,8 @@ namespace Client {
 
 		void Update(float elapsed) override;
 		void Render(sf::RenderWindow& window) override;
+
+		Engine::pGameObject CreateGameObject(unsigned int game_object_type);
 	};
 	typedef Lobby* pLobby;
 

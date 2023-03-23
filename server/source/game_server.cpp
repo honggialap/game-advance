@@ -20,24 +20,27 @@ namespace Server {
 		}
 	}
 
+	void GameServer::OnConnect(Engine::Connection& connection) {
+	}
+
+	void GameServer::OnDisconnect(Engine::Connection& connection) {
+	}
+
+	bool GameServer::ProcessPacket(std::shared_ptr<Engine::Packet> packet) {
+		return false;
+	}
+
 	void GameServer::Initialize(std::string data_path) {
 		Engine::Game::Initialize(data_path);
+
+		std::ifstream data_file(data_path);
+		nlohmann::json data = nlohmann::json::parse(data_file);
+
+
 	}
 
 	void GameServer::Shutdown() {
 		Engine::Game::Shutdown();
-	}
-
-	void GameServer::Update(float elapsedMs) {
-		//
-		Engine::Game::Update(elapsedMs);
-		//
-	}
-
-	void GameServer::Render(sf::RenderWindow& window) {
-		//
-		Engine::Game::Render(window);
-		//
 	}
 
 }

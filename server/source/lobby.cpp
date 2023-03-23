@@ -29,4 +29,11 @@ namespace Server {
 		//
 	}
 
+	Engine::pGameObject Lobby::CreateGameObject(unsigned int game_object_type) {
+		switch (game_object_type) {
+		default:
+			return nullptr;
+			break;
+		}
+	}
 }

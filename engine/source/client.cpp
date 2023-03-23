@@ -47,15 +47,6 @@ namespace Engine {
 		WSACleanup();
 	}
 
-	void Client::OnConnect() {
-	}
-
-	void Client::OnDisconnect() {
-	}
-
-	void Client::OnConnectFail() {
-	}
-
 	bool Client::ProcessNetworks() {
 		if (connection.outgoing_packets.HasPending()) {
 			master_fd.events = POLLRDNORM | POLLWRNORM;

@@ -68,4 +68,21 @@ namespace Engine {
 		return *this;
 	}
 
+	Packet& Packet::operator<<(float data) {
+		data = htonf(data);
+		Append(&data, sizeof(uint32_t));
+		return *this;
+	}
+
+	Packet& Packet::operator>>(float& data) {
+		if ((offset + sizeof(float)) > buffer.size()) {
+			throw PacketException("[Packet::operator>>(float&)] - Extraction offset exceeded buffer size.");
+		}
+
+		data = *reinterpret_cast<float*>(&buffer[offset]);
+		data = ntohf(data);
+		offset += sizeof(float);
+		return *this;
+	}
+
 }

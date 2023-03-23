@@ -3,22 +3,25 @@
 #define __CLIENT_GAMECLIENT_H__
 
 #include "game.h"
-
-#define SCENE_TYPE_LOBBY 1
-#define SCENE_TYPE_WORLD 2
+#include "client.h"
 
 namespace Client {
 
-	class GameClient : public Engine::Game {
-	public:
-		Engine::pScene CreateScene(unsigned int scene_type) override;
+	class GameClient : public Engine::Game, public Engine::Client {
+	protected:
+		uint32_t id;
 
 	protected:
 		void Initialize(std::string data_path) override;
 		void Shutdown() override;
 
-		void Update(float elapsedMs) override;
-		void Render(sf::RenderWindow& window) override;
+	public:
+		Engine::pScene CreateScene(unsigned int scene_type) override;
+
+		void OnConnect() override;
+		void OnDisconnect() override;
+		void OnConnectFail() override;
+		bool ProcessPacket(std::shared_ptr<Engine::Packet> packet) override;
 	};
 	typedef GameClient* pGameClient;
 

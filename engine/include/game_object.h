@@ -17,6 +17,8 @@ namespace Engine {
 		pGame game;
 		pScene scene;
 
+		uint32_t networks_id;
+
 	public:
 		GameObject(pGame game, pScene scene);
 		~GameObject();

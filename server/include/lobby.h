@@ -24,6 +24,8 @@ namespace Server {
 
 		void Update(float elapsed) override;
 		void Render(sf::RenderWindow& window) override;
+
+		Engine::pGameObject CreateGameObject(unsigned int game_object_type) override;
 	};
 	typedef Lobby* pLobby;
 

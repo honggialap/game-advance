@@ -22,14 +22,12 @@ namespace Engine {
 		bool Listen(IPEndPoint ip_endpoint);
 		void CleanUp();
 
-		virtual void OnConnect(Connection& connection);
-		virtual void OnDisconnect(Connection& connection);
-		
 		void ProcessNetworks();
-
 		void CloseConnection(int connection_index);
-		virtual bool ProcessPacket(std::shared_ptr<Packet> packet);
-		
+
+		virtual void OnConnect(Connection& connection) = 0;
+		virtual void OnDisconnect(Connection& connection) = 0;
+		virtual bool ProcessPacket(std::shared_ptr<Packet> packet) = 0;
 	};
 
 }

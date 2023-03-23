@@ -45,12 +45,6 @@ namespace Engine {
 		WSACleanup();
 	}
 
-	void Server::OnConnect(Connection& connection) {
-	}
-
-	void Server::OnDisconnect(Connection& connection) {
-	}
-
 	void Server::ProcessNetworks() {
 
 		for (int i = 0; i < connections.size(); i++) {

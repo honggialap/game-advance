@@ -16,20 +16,18 @@ namespace Engine {
 		WSAPOLLFD temp_fd;
 
 	public:
-
 		bool IsConnecting() { return is_connecting; }
 
 		bool Connect(IPEndPoint ip_endpoint);
 		void CleanUp();
 
-		virtual void OnConnect();
-		virtual void OnDisconnect();
-		virtual void OnConnectFail();
-
 		bool ProcessNetworks();
-
 		void CloseConnection();
-		virtual bool ProcessPacket(std::shared_ptr<Packet> packet);
+
+		virtual void OnConnect() = 0;
+		virtual void OnDisconnect() = 0;
+		virtual void OnConnectFail() = 0;
+		virtual bool ProcessPacket(std::shared_ptr<Packet> packet) = 0;
 	};
 
 }

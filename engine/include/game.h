@@ -8,7 +8,7 @@
 namespace Engine {
 
 	class Game {
-	protected:
+	public:
 		sf::RenderWindow window;
 		float tick_per_frame;
 
@@ -18,18 +18,14 @@ namespace Engine {
 		std::unique_ptr<Scene> scene;
 
 	public:
-		void Run(std::string data_path);
-		void PlayScene(unsigned int scene_id);
-		virtual pScene CreateScene(unsigned int scene_type) = 0;
-
-	protected:
 		virtual void Initialize(std::string data_path);
 		virtual void Shutdown();
 
-		virtual void Update(float elapsedMs);
-		virtual void Render(sf::RenderWindow& window);
+		void Run(std::string data_path);
 
+		void PlayScene(unsigned int scene_id);
 		void LoadScene();
+		virtual pScene CreateScene(unsigned int scene_type) = 0;
 	};
 	typedef Game* pGame;
 
