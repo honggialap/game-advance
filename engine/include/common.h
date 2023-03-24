@@ -29,6 +29,8 @@
 #include <utility>
 #include <thread>
 #include <queue>
+#include <tuple>
+#include <map>
 
 #define PIXEL_PER_METER 30.0f
 #define MAX_PACKET_SIZE 65535
