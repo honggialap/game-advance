@@ -2,22 +2,30 @@
 #ifndef __SERVER_GAMECSERVER_H__
 #define __SERVER_GAMECSERVER_H__
 
-#include "game.h"
+#include "common.h"
 #include "server.h"
 
 namespace Server {
 
-	class GameServer : public Engine::Game, public Engine::Server {
+	class GameServer : public Engine::Server {
 	public:
-		Engine::pScene CreateScene(unsigned int scene_type) override;
+		sf::RenderWindow window;
+		float tick_per_frame;
+		float elapsed_ms;
+		b2Timer clock;
 
-		void OnConnect(Engine::Connection& connection) override;
-		void OnDisconnect(Engine::Connection& connection) override;
+		void Initialize();
+		void Shutdown();
+
+		void Run();
+
+		void Update(float elapsed_ms);
+		void Render(sf::RenderWindow& window);
+
+		void OnConnect(uint32_t connection_id) override;
+		void OnDisconnect(uint32_t connection_id) override;
 		bool ProcessPacket(std::shared_ptr<Engine::Packet> packet) override;
 
-	protected:
-		void Initialize(std::string data_path) override;
-		void Shutdown() override;
 	};
 	typedef GameServer* pGameServer;
 

@@ -2,7 +2,7 @@
 
 int main() {
 	Client::GameClient game_client;
-	game_client.Run("data/game_data.json");
+	game_client.Run();
 
 	system("pause");
 	return 0;

@@ -2,7 +2,7 @@
 
 int main() {
 	Server::GameServer game_server;
-	game_server.Run("data/game_data.json");
+	game_server.Run();
 
 	system("pause");
 	return 0;

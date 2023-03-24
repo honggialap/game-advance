@@ -9,20 +9,25 @@ namespace Engine {
 
 	class Client {
 	protected:
-		bool is_connecting = false;
 		WSADATA wsa_data;
-		Connection connection;		
+		bool is_initialized = false;
+
+		Connection connection;
+		bool is_connecting = false;
+				
 		WSAPOLLFD master_fd;
 		WSAPOLLFD temp_fd;
 
 	public:
-		bool IsConnecting() { return is_connecting; }
+		bool Initialize();
+		bool Shutdown();
+		bool IsInitialized() { return is_initialized; }
 
 		bool Connect(IPEndPoint ip_endpoint);
-		void CleanUp();
+		bool Disconnect();
+		bool IsConnecting() { return is_connecting; }
 
 		bool ProcessNetworks();
-		void CloseConnection();
 
 		virtual void OnConnect() = 0;
 		virtual void OnDisconnect() = 0;

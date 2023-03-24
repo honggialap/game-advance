@@ -2,34 +2,71 @@
 
 namespace Engine {
 
-	bool Client::Connect(IPEndPoint ip_endpoint) {
-		is_connecting = false;
-
-		int result = WSAStartup(MAKEWORD(2, 2), &wsa_data);
-		if (result != 0) {
+	bool Client::Initialize() {
+		if (is_initialized) {
+			printf("[Client::Initialize()] - Function called while networks have been initialized.\n");
 			return false;
 		}
 
-		if (LOBYTE(wsa_data.wVersion) != 2 || HIBYTE(wsa_data.wVersion) != 2) {
+		if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
+			printf("[Client::Initialize()] - WSAStartup failed with error code: %d.\n", WSAGetLastError());
+			return false;
+		}
+
+		is_initialized = true;
+		printf("[Client::Initialize()] - Success.\n");
+		return true;
+	}
+
+	bool Client::Shutdown() {
+		if (!is_initialized) {
+			printf("[Client::Shutdown()] - Function called while networks have not been initialized.\n");
+			return false;
+		}
+
+		if (WSACleanup() != 0) {
+			printf("[Client::Shutdown()] - WSACleanup failed with error code: %d.\n", WSAGetLastError());
+			return true;
+		}
+
+		is_initialized = false;
+		printf("[Client::Shutdown()] - Success.\n");
+		return true;
+	}
+
+	bool Client::Connect(IPEndPoint ip_endpoint) {
+		if (!is_initialized) {
+			printf("[Client::Connect(IPEndPoint)] - Function called while networks have not been initialized.\n");
+			return false;
+		}
+
+		if (is_connecting) {
+			printf("[Client::Connect(IPEndPoint)] - Function called while being connected.\n");
 			return false;
 		}
 
 		Socket connection_socket = Socket(ip_endpoint.GetIPVersion());
 		if (!connection_socket.Create()) {
+			printf("[Client::Connect(IPEndPoint)] - Failed to create connection socket.\n");
 			return false;
 		}
 
 		if (!connection_socket.SetSocketBlocking(true)) {
+			printf("[Client::Connect(IPEndPoint)] - Failed to set connection socket blocking option pre-connecting.\n");
 			return false;
 		}
 
 		if (!connection_socket.Connect(ip_endpoint)) {
 			connection_socket.Close();
 			OnConnectFail();
+			printf("[Client::Connect(IPEndPoint)] - Failed to connect to server.\n");
 			return false;
 		}
 
 		if (!connection_socket.SetSocketBlocking(false)) {
+			connection_socket.Close();
+			OnConnectFail();
+			printf("[Client::Connect(IPEndPoint)] - Failed to set connection socket blocking option post-connecting.\n");
 			return false;
 		}
 
@@ -38,16 +75,45 @@ namespace Engine {
 		master_fd.fd = connection.socket.GetSocketHandle();
 		master_fd.events = POLLRDNORM;
 		master_fd.revents = 0;
+
 		is_connecting = true;
 		OnConnect();
+		printf("[Client::Connect(IPEndPoint)] - Success.\n");
 		return true;
 	}
 
-	void Client::CleanUp() {
-		WSACleanup();
+	bool Client::Disconnect() {
+		if (!is_initialized) {
+			printf("[Client::Disconnect()] - Function called while networks have not been initialized.\n");
+			return false;
+		}
+
+		if (!is_connecting) {
+			printf("[Client::Disconnect()] - Function called while not being connected.\n");
+			return false;
+		}
+
+		master_fd.fd = 0;
+		connection.Close();
+
+		is_connecting = false;
+		OnDisconnect();
+		printf("[Client::Disconnect()] - Success.\n");
+		return true;
 	}
 
 	bool Client::ProcessNetworks() {
+		if (!is_initialized) {
+			printf("[Client::ProcessNetworks()] - Function called while networks have not been initialized.\n");
+			return false;
+		}
+
+		if (!is_connecting) {
+			printf("[Client::ProcessNetworks()] - Function called while not being connected.\n");
+			return false;
+		}
+
+
 		if (connection.outgoing_packets.HasPending()) {
 			master_fd.events = POLLRDNORM | POLLWRNORM;
 		}
@@ -58,15 +124,15 @@ namespace Engine {
 
 			// Error
 			if (temp_fd.revents & POLLERR) {
-				CloseConnection();
+				Disconnect();
 				return false;
 			}
 			if (temp_fd.revents & POLLHUP) {
-				CloseConnection();
+				Disconnect();
 				return false;
 			}
 			if (temp_fd.revents & POLLNVAL) {
-				CloseConnection();
+				Disconnect();
 				return false;
 			}
 			// End of Error
@@ -93,14 +159,14 @@ namespace Engine {
 				}
 
 				if (received_bytes == 0) {
-					CloseConnection();
+					Disconnect();
 					return false;
 				}
 
 				if (received_bytes == SOCKET_ERROR) {
 					int error = WSAGetLastError();
 					if (error != WSAEWOULDBLOCK) {
-						CloseConnection();
+						Disconnect();
 						return false;
 					}
 				}
@@ -111,7 +177,7 @@ namespace Engine {
 						if (incomming.extraction_offset == sizeof(uint16_t)) {
 							incomming.packet_size = ntohs(incomming.packet_size);
 							if (incomming.packet_size > MAX_PACKET_SIZE) {
-								CloseConnection();
+								Disconnect();
 								return false;
 							}
 							incomming.extraction_offset = 0;
@@ -196,48 +262,12 @@ namespace Engine {
 		while (connection.imcomming_packets.HasPending()) {
 			std::shared_ptr<Packet> packet = connection.imcomming_packets.Retrive();
 			if (!ProcessPacket(packet)) {
-				CloseConnection();
+				Disconnect();
 				return false;
 			}
 			connection.imcomming_packets.Pop();
 		}
 
-		return true;
-	}
-
-	void Client::CloseConnection() {
-		OnDisconnect();
-		master_fd.fd = 0;
-		is_connecting = false;
-		connection.Close();
-	}
-
-	bool Client::ProcessPacket(std::shared_ptr<Packet> packet) {
-		switch (packet->GetPacketType())
-		{
-		case Engine::ChatMessage: {
-			std::string message;
-			*packet >> message;
-			std::cout << message << std::endl;
-			break;
-		}
-
-		case Engine::IntArray: {
-			uint32_t array_size = 0;
-			*packet >> array_size;
-			std::cout << "Array size: " << array_size << std::endl;
-			for (uint32_t it = 0; it < array_size; it++) {
-				uint32_t element = 0;
-				*packet >> element;
-				std::cout << "Element[" << it << "] - " << element << std::endl;
-			}
-			break;
-		}
-
-		case Engine::Invalid:
-		default:
-			return false;
-		}
 		return true;
 	}
 

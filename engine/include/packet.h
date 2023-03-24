@@ -8,6 +8,7 @@ namespace Engine {
 
 	enum PacketType : uint16_t {
 		Welcome,
+		Ping,
 		GameObject_Position,
 		Invalid,
 		ChatMessage,
