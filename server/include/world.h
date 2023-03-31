@@ -9,40 +9,42 @@
 #define ACTOR_TYPE_BULLET	2
 #define ACTOR_TYPE_WALL		3
 
-namespace Server {
+// Forward declaration
+class Game;
+typedef Game* pGame;
 
-	// Forward declaration
-	class GameServer;
-	typedef GameServer* pGameServer;
+class World : public Scene, b2ContactListener {
+protected:
+	sf::View camera;
 
-	class World : public Engine::Scene {
-	protected:
-		pGameServer game_server;
+	b2Vec2 gravity;
+	b2World* physics_world = nullptr;
 
-	protected:
-		sf::View camera;
+	std::unique_ptr<GameObject> tank;
+	std::unique_ptr<GameObject> bullet;
+	std::unique_ptr<GameObject> wall;
 
-		std::unique_ptr<Engine::GameObject> tank;
-		std::unique_ptr<Engine::GameObject> bullet;
-		std::unique_ptr<Engine::GameObject> wall;
+public:
+	World(pGame game) : Scene(game) {};
 
-	public:
-		World(Engine::pGame game);
-		~World();
+	void Load(std::string data_path) override;
+	void Unload() override;
 
-	public:
-		Engine::pGameObject CreateGameObject(unsigned int game_object_type);
+	void Update(float elapsed) override;
+	void Render(sf::RenderWindow& window) override;
 
-		void Load(std::string data_path) override;
-		void Unload() override;
+	pGameObject CreateGameObject(unsigned int game_object_type);
 
-		void Update(float elapsed) override;
-		void Render(sf::RenderWindow& window) override;
+	sf::View& GetCamera();
 
-	public:
-		sf::View& GetCamera();
-	};
+	b2World* GetPhysics();
+	void BeginContact(b2Contact* contact) override;
+	void EndContact(b2Contact* contact) override;
 
-}
+	void OnConnect(uint32_t connection_id) override;
+	void OnDisconnect(uint32_t connection_id) override;
+	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
+};
+typedef World* pWorld;
 
 #endif // !__SERVER_WORLD_H__

@@ -4,40 +4,37 @@
 
 #include "game_object.h"
 
-namespace Server {
+// Forward declaration
+class Game;
+typedef Game* pGame;
+class World;
+typedef World* pWorld;
 
-	// Forward declaration
-	class GameServer;
-	typedef GameServer* pGameServer;
-	class World;
-	typedef World* pWorld;
+class Wall : public GameObject {
+protected:
+	sf::Texture texture;
+	sf::Sprite sprite;
 
-	class Wall : public Engine::GameObject {
-	protected:
-		pGameServer game_server;
-		pWorld world;
+	b2BodyDef body_def;
+	b2Body* body = nullptr;
 
-	public:
-		Wall(Engine::pGame game, Engine::pScene scene);
-		~Wall();
+	b2PolygonShape collider;
 
-	protected:
-		sf::SoundBuffer sfx_buffer;
-		sf::Sound sfx;
-		sf::Music music;
+	b2FixtureDef fixture_def;
+	b2Fixture* fixture = nullptr;
 
-	public:
-		void Load(std::string data_path) override;
-		void Unload() override;
+public:
+	Wall(pGame game, pWorld world) : GameObject(game, world) {};
 
-		void Update(float elapsed) override;
-		void Render(sf::RenderWindow& window) override;
+	void Load(std::string data_path) override;
+	void Unload() override;
 
-		void OnCollisionEnter(Engine::pGameObject other) override;
-		void OnCollisionExit(Engine::pGameObject other) override;
-	};
-	typedef Wall* pWall;
+	void Update(float elapsed) override;
+	void Render(sf::RenderWindow& window) override;
 
-}
+	void OnCollisionEnter(pGameObject other) override;
+	void OnCollisionExit(pGameObject other) override;
+};
+typedef Wall* pWall;
 
 #endif // !__SERVER_WALL_H__

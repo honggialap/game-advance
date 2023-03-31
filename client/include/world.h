@@ -9,48 +9,43 @@
 #define ACTOR_TYPE_BULLET	2
 #define ACTOR_TYPE_WALL		3
 
-namespace Client {
+// Forward declaration
+class Game;
+typedef Game* pGame;
 
-	// Forward declaration
-	class GameClient;
-	typedef GameClient* pGameClient;
+class World : public Scene, public b2ContactListener {
+protected:
+	sf::View camera;
 
-	class World : public Engine::Scene, public b2ContactListener {
-	protected:
-		pGameClient game_client;
+	b2Vec2 gravity;
+	b2World* physics_world = nullptr;
 
-	protected:
-		sf::View camera;
+	std::unique_ptr<GameObject> tank;
+	std::unique_ptr<GameObject> bullet;
+	std::unique_ptr<GameObject> wall;
 
-		b2Vec2 gravity;
-		b2World* physics_world = nullptr;
+public:
+	World(pGame game) : Scene(game) {};
 
-		std::unique_ptr<Engine::GameObject> tank;
-		std::unique_ptr<Engine::GameObject> bullet;
-		std::unique_ptr<Engine::GameObject> wall;
+	void Load(std::string data_path) override;
+	void Unload() override;
 
-	public:
-		World(Engine::pGame game);
-		~World();
+	void Update(float elapsed) override;
+	void Render(sf::RenderWindow& window) override;
 
-	public:
-		Engine::pGameObject CreateGameObject(unsigned int game_object_type);
+	pGameObject CreateGameObject(unsigned int game_object_type);
 
-		void Load(std::string data_path) override;
-		void Unload() override;
+	sf::View& GetCamera();
 
-		void Update(float elapsed) override;
-		void Render(sf::RenderWindow& window) override;
+	b2World* GetPhysics();
+	void BeginContact(b2Contact* contact) override;
+	void EndContact(b2Contact* contact) override;
 
-	public:
-		sf::View& GetCamera();
-		
-		b2World* GetPhysics();
-		void BeginContact(b2Contact* contact) override;
-		void EndContact(b2Contact* contact) override;
-	};
-	typedef World* pWorld;
-
-}
+	void OnConnect() override;
+	void OnDisconnect() override;
+	void OnConnectFail() override;
+	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
+};
+typedef World* pWorld;
 
 #endif // !__CLIENT_WORLD_H__

@@ -1,82 +1,69 @@
 #include "wall.h"
-#include "game_client.h"
+#include "game.h"
 #include "world.h"
 
 #include "tank.h"
 
-namespace Client {
+void Wall::Load(std::string data_path) {
+	//std::ifstream data_file(data_path);
+	//nlohmann::json data = nlohmann::json::parse(data_file);
 
-	Wall::Wall(Engine::pGame game, Engine::pScene scene)
-		: Engine::GameObject(game, scene) {
-		game_client = static_cast<pGameClient>(game);
-		world = static_cast<pWorld>(scene);
-	}
+	texture.loadFromFile("data/resources/textures/test_wall.png");
+	sprite.setTexture(texture);
+	sprite.setOrigin(32, 32);
 
-	Wall::~Wall() {
-	}
+	setPosition(0, 0);
 
-	void Wall::Load(std::string data_path) {
-		//std::ifstream data_file(data_path);
-		//nlohmann::json data = nlohmann::json::parse(data_file);
+	body_def.position.Set(0, 0);
+	body_def.type = b2_kinematicBody;
+	body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
-		texture.loadFromFile("data/resources/textures/test_wall.png");
-		sprite.setTexture(texture);
-		sprite.setOrigin(32, 32);
+	body = world->GetPhysics()->CreateBody(&body_def);
 
-		setPosition(0, 0);
+	collider.SetAsBox(32.0f / 30, 32.0f / 30);
 
-		body_def.position.Set(0, 0);
-		body_def.type = b2_kinematicBody;
-		body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
+	fixture_def.shape = &collider;
+	fixture_def.density = 100.0f;
+	fixture_def.friction = 0.0f;
 
-		body = world->GetPhysics()->CreateBody(&body_def);
+	fixture = body->CreateFixture(&fixture_def);
+}
 
-		collider.SetAsBox(32.0f / 30, 32.0f / 30);
-
-		fixture_def.shape = &collider;
-		fixture_def.density = 100.0f;
-		fixture_def.friction = 0.0f;
-
-		fixture = body->CreateFixture(&fixture_def);
-	}
-
-	void Wall::Unload() {
-		if (body != nullptr) {
-			if (fixture != nullptr) {
-				body->DestroyFixture(fixture);
-				fixture = nullptr;
-			}
-			world->GetPhysics()->DestroyBody(body);
-			body = nullptr;
+void Wall::Unload() {
+	if (body != nullptr) {
+		if (fixture != nullptr) {
+			body->DestroyFixture(fixture);
+			fixture = nullptr;
 		}
+		world->GetPhysics()->DestroyBody(body);
+		body = nullptr;
 	}
+}
 
-	void Wall::Update(float elapsed) {
-		setPosition(
-			body->GetPosition().x * 30,
-			body->GetPosition().y * 30
-		);
+void Wall::Update(float elapsed) {
+	setPosition(
+		body->GetPosition().x * 30,
+		body->GetPosition().y * 30
+	);
+}
+
+void Wall::Render(sf::RenderWindow& window) {
+	sprite.setPosition(
+		getPosition().x,
+		-getPosition().y + window.getSize().y
+	);
+
+	window.draw(sprite);
+}
+
+void Wall::OnCollisionEnter(pGameObject other) {
+	if (dynamic_cast<pTank>(other)) {
+		printf("WALL block TANK.\n");
 	}
+}
 
-	void Wall::Render(sf::RenderWindow& window) {
-		sprite.setPosition(
-			getPosition().x,
-			-getPosition().y + window.getSize().y
-		);
-
-		window.draw(sprite);
+void Wall::OnCollisionExit(pGameObject other) {
+	if (dynamic_cast<pTank>(other)) {
+		printf("WALL stop block TANK.\n");
 	}
-
-	void Wall::OnCollisionEnter(Engine::pGameObject other) {
-		if (dynamic_cast<pTank>(other)) {
-			printf("WALL block TANK.\n");
-		}
-	}
-
-	void Wall::OnCollisionExit(Engine::pGameObject other) {
-		if (dynamic_cast<pTank>(other)) {
-			printf("WALL stop block TANK.\n");
-		}
-	}
-
 }

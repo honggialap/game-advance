@@ -5,31 +5,25 @@
 #include "scene.h"
 #include "game_object.h"
 
-namespace Client {
+// Forward declaration
+class Game;
+typedef Game* pGame;
 
-	// Forward declaration
-	class GameClient;
-	typedef GameClient* pGameClient;
+class Lobby : public Scene {
+public:
+	Lobby(pGame game) : Scene(game) {};
 
-	class Lobby : public Engine::Scene {
-	protected:
-		pGameClient game_client;
+	void Load(std::string data_path) override;
+	void Unload() override;
 
-	public:
-		Lobby(Engine::pGame game);
-		~Lobby();
+	void Update(float elapsed) override;
+	void Render(sf::RenderWindow& window) override;
 
-	public:
-		void Load(std::string data_path) override;
-		void Unload() override;
-
-		void Update(float elapsed) override;
-		void Render(sf::RenderWindow& window) override;
-
-		Engine::pGameObject CreateGameObject(unsigned int game_object_type);
-	};
-	typedef Lobby* pLobby;
-
-}
+	void OnConnect() override;
+	void OnDisconnect() override;
+	void OnConnectFail() override;
+	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
+};
+typedef Lobby* pLobby;
 
 #endif // !__CLIENT_LOBBY_H__

@@ -152,11 +152,25 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\game_server.cpp" />
+    <ClCompile Include="source\bullet.cpp" />
+    <ClCompile Include="source\game.cpp" />
+    <ClCompile Include="source\lobby.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\server.cpp" />
+    <ClCompile Include="source\tank.cpp" />
+    <ClCompile Include="source\wall.cpp" />
+    <ClCompile Include="source\world.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\game_server.h" />
+    <ClInclude Include="include\bullet.h" />
+    <ClInclude Include="include\game_object.h" />
+    <ClInclude Include="include\game.h" />
+    <ClInclude Include="include\lobby.h" />
+    <ClInclude Include="include\scene.h" />
+    <ClInclude Include="include\server.h" />
+    <ClInclude Include="include\tank.h" />
+    <ClInclude Include="include\wall.h" />
+    <ClInclude Include="include\world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,8 +1,8 @@
-#include "game_server.h"
+#include "game.h"
 
 int main() {
-	Server::GameServer game_server;
-	game_server.Run();
+	Game server;
+	server.Run("");
 
 	system("pause");
 	return 0;

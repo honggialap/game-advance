@@ -1,51 +1,31 @@
 #include "wall.h"
-#include "game_server.h"
+#include "game.h"
 #include "world.h"
 
-namespace Server {
+#include "tank.h"
 
-	Wall::Wall(Engine::pGame game, Engine::pScene scene)
-		: Engine::GameObject(game, scene) {
-		game_server = static_cast<pGameServer>(game);
-		world = static_cast<pWorld>(scene);
-	}
+void Wall::Load(std::string data_path) {
+	//std::ifstream data_file(data_path);
+	//nlohmann::json data = nlohmann::json::parse(data_file);
 
-	Wall::~Wall() {
-	}
+}
 
-	void Wall::Load(std::string data_path) {
-		//std::ifstream data_file(data_path);
-		//nlohmann::json data = nlohmann::json::parse(data_file);
+void Wall::Unload() {
 
-		sfx_buffer.loadFromFile("data/resources/audios/sfx.wav");
-		sfx.setBuffer(sfx_buffer);
+}
 
-		music.openFromFile("data/resources/audios/audio.wav");
-	}
+void Wall::Update(float elapsed) {
 
-	void Wall::Unload() {
-	}
+}
 
-	void Wall::Update(float elapsed) {
-		// Sound control
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
-			sfx.play();
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
-			music.play();
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
-			music.stop();
-		}
-	}
+void Wall::Render(sf::RenderWindow& window) {
 
-	void Wall::Render(sf::RenderWindow& window) {
-	}
+}
 
-	void Wall::OnCollisionEnter(Engine::pGameObject other) {
-	}
+void Wall::OnCollisionEnter(pGameObject other) {
 
-	void Wall::OnCollisionExit(Engine::pGameObject other) {
-	}
+}
+
+void Wall::OnCollisionExit(pGameObject other) {
 
 }
