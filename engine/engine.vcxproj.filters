@@ -24,16 +24,10 @@
     <ClInclude Include="include\packet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ip_endpoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\packet_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\socket.h">
@@ -47,16 +41,10 @@
     <ClCompile Include="source\packet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\ip_endpoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\packet_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\socket.cpp">

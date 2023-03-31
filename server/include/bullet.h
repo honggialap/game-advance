@@ -4,39 +4,30 @@
 
 #include "game_object.h"
 
-namespace Server {
+// Forward declaration
+class Game;
+typedef Game* pGame;
+class World;
+typedef World* pWorld;
 
-	// Forward declaration
-	class GameServer;
-	typedef GameServer* pGameServer;
-	class World;
-	typedef World* pWorld;
+class Bullet : public GameObject {
+protected:
+	sf::Font font;
+	sf::Text text;
 
-	class Bullet : public Engine::GameObject {
-	protected:
-		pGameServer game_server;
-		pWorld world;
+public:
+	Bullet(pGame game, pWorld world) : GameObject(game, world) {};
 
-	protected:
-		sf::Font font;
-		sf::Text text;
+public:
+	void Load(std::string data_path) override;
+	void Unload() override;
 
-	public:
-		Bullet(Engine::pGame game, Engine::pScene scene);
-		~Bullet();
+	void Update(float elapsed) override;
+	void Render(sf::RenderWindow& window) override;
 
-	public:
-		void Load(std::string data_path) override;
-		void Unload() override;
-
-		void Update(float elapsed) override;
-		void Render(sf::RenderWindow& window) override;
-
-		void OnCollisionEnter(Engine::pGameObject other) override;
-		void OnCollisionExit(Engine::pGameObject other) override;
-	};
-	typedef Bullet* pBullet;
-
-}
+	void OnCollisionEnter(pGameObject other) override;
+	void OnCollisionExit(pGameObject other) override;
+};
+typedef Bullet* pBullet;
 
 #endif // !__SERVER_BULLET_H__

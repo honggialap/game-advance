@@ -6,23 +6,19 @@
 #include "socket.h"
 #include "packet_manager.h"
 
-namespace Engine {
-	
-	class Connection {
-	private:
-		IPEndPoint ip_endpoint;
+class Connection {
+private:
+	IPEndPoint ip_endpoint;
 
-	public:
-		Socket socket;
-		char buffer[MAX_PACKET_SIZE];
-		PacketManager imcomming_packets;
-		PacketManager outgoing_packets;
-		
-		Connection() : socket(Socket()) {}
-		Connection(Socket socket, IPEndPoint ip_endpoint);
-		void Close();
-	};
+public:
+	Socket socket;
+	char buffer[MAX_PACKET_SIZE];
+	PacketManager imcomming_packets;
+	PacketManager outgoing_packets;
 
-}
+	Connection() : socket(Socket()) {}
+	Connection(Socket socket, IPEndPoint ip_endpoint);
+	void Close();
+};
 
 #endif // !__ENGINE_CONNECTION_H__

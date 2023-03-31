@@ -1,8 +1,8 @@
-#include "game_client.h"
+#include "game.h"
 
 int main() {
-	Client::GameClient game_client;
-	game_client.Run();
+	Game client;
+	client.Run("");
 
 	system("pause");
 	return 0;

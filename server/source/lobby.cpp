@@ -1,39 +1,33 @@
 #include "lobby.h"
-#include "game_server.h"
+#include "game.h"
 
-namespace Server {
+void Lobby::Load(std::string data_path) {
+	std::ifstream data_file(data_path);
+	nlohmann::json data = nlohmann::json::parse(data_file);
+}
 
-	Lobby::Lobby(Engine::pGame game) : Engine::Scene(game) {
-		game_server = static_cast<pGameServer>(game);
+void Lobby::Unload() {
+	//
+}
+
+void Lobby::Update(float elapsed) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num9)) {
+		game->PlayScene(1);
 	}
+}
 
-	Lobby::~Lobby() {
-	}
+void Lobby::Render(sf::RenderWindow& window) {
+	//
+}
 
-	void Lobby::Load(std::string data_path) {
-		std::ifstream data_file(data_path);
-		nlohmann::json data = nlohmann::json::parse(data_file);
-	}
+void Lobby::OnConnect(uint32_t connection_id) {
 
-	void Lobby::Unload() {
-		//
-	}
+}
 
-	void Lobby::Update(float elapsed) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num9)) {
-			game->PlayScene(1);
-		}
-	}
+void Lobby::OnDisconnect(uint32_t connection_id) {
 
-	void Lobby::Render(sf::RenderWindow& window) {
-		//
-	}
+}
 
-	Engine::pGameObject Lobby::CreateGameObject(unsigned int game_object_type) {
-		switch (game_object_type) {
-		default:
-			return nullptr;
-			break;
-		}
-	}
+bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
+	return true;
 }
