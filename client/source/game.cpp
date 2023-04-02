@@ -64,6 +64,13 @@ void Game::Run(std::string data_path) {
 
 		if (elapsed_ms >= tick_per_frame) {
 			ProcessIncomming();
+
+			if (is_approved) {
+				auto ping_packet = std::make_shared<Packet>(PacketType::Ping);
+				*ping_packet << id << elapsed_ms;
+				Send(ping_packet);
+			}
+
 			scene->Update(elapsed_ms);
 
 			window.clear(sf::Color::Black);
@@ -128,17 +135,48 @@ pScene Game::CreateScene(unsigned int scene_type) {
 }
 
 void Game::OnConnect() {
-	scene->OnConnect();
+	if (scene) {
+		scene->OnConnect();
+	}
 }
 
 void Game::OnDisconnect() {
-	scene->OnDisconnect();
+	if (scene) {
+		scene->OnDisconnect();
+	}
 }
 
 void Game::OnConnectFail() {
-	scene->OnConnectFail();
+	if (scene) {
+		scene->OnConnectFail();
+	}
 }
 
 bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
-	return scene->ProcessPacket(packet);
+	switch (packet->GetPacketType()) {
+	case PacketType::Welcome: {
+		uint32_t id;
+		*packet >> id;
+		AssignId(id);
+		printf("Get ID: %d\n", id);
+		return true;
+	}
+
+	case PacketType::NotWelcome: {
+		Disconnect();
+		return true;
+	}
+
+	case PacketType::Ping: {
+		float reply_total_elapsed_ms;
+		*packet >> reply_total_elapsed_ms;
+		printf("Reply ping: %f", reply_total_elapsed_ms);
+		return true;
+	}
+
+	default: {
+		return scene->ProcessPacket(packet);
+	}
+
+	}
 }

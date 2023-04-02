@@ -5,13 +5,10 @@
 #include "common.h"
 
 enum PacketType : uint16_t {
-	Welcome,
-	Ping,
-	GameObject_Position,
 	Invalid,
-	ChatMessage,
-	IntArray,
-	FloatArray,
+	Welcome,
+	NotWelcome,
+	Ping
 };
 
 class Packet {

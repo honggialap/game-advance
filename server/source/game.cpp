@@ -129,13 +129,39 @@ pScene Game::CreateScene(unsigned int scene_type) {
 }
 
 void Game::OnConnect(uint32_t connection_id) {
-	scene->OnConnect(connection_id);
+	auto welcome_packet = std::make_shared<Packet>(PacketType::Welcome);
+	*welcome_packet << connection_id;
+	Send(connection_id, welcome_packet);
+
+	if (scene) {
+		scene->OnConnect(connection_id);
+	}
 }
 
 void Game::OnDisconnect(uint32_t connection_id) {
-	scene->OnDisconnect(connection_id);
+	if (scene) {
+		scene->OnDisconnect(connection_id);
+	}
 }
 
 bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
-	return scene->ProcessPacket(packet);
+	switch (packet->GetPacketType()) {
+	
+	case PacketType::Ping: {
+		uint32_t id;
+		float reply_total_elapsed_ms;
+		*packet >> id >> reply_total_elapsed_ms;
+
+		auto reply_ping_packet = std::make_shared<Packet>(PacketType::Ping);
+		*reply_ping_packet << reply_total_elapsed_ms;
+		Send(id, reply_ping_packet);
+
+		return true;
+	}
+	
+	default: {
+		return scene->ProcessPacket(packet);
+	}
+
+	}
 }

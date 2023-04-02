@@ -80,7 +80,6 @@ Packet& Packet::operator>>(float& data) {
 
 	data = *reinterpret_cast<float*>(&buffer[offset]);
 	//data = ntohf(data);
-	printf("%f \n", data);
 	offset += sizeof(float);
 	return *this;
 }

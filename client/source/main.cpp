@@ -2,7 +2,7 @@
 
 int main() {
 	Game client;
-	client.Run("");
+	client.Run("data/game_data.json");
 
 	system("pause");
 	return 0;
