@@ -1,19 +1,28 @@
 {
-  "title": "Testing scene",
-  "width": 800,
-  "height": 600,
-  "framerate": 64.0,
-  "start_scene_id" : 0,
-  "scene_list": [
-    {
-      "id": 0,
-      "type": 1,
-      "data_path": "data/scenes/lobby.json"
-    },
-    {
-      "id": 1,
-      "type": 2,
-      "data_path": "data/scenes/world.json"
-    }
-  ]
+  "window": {
+    "title": "Client",
+    "width": 800,
+    "height": 600,
+    "framerate": 64.0
+  },
+  "networks": {
+    "address": "::1",
+    "port": 27015,
+    "tick_per_ping": 8
+  },
+  "scenes": {
+    "start_scene_id": 0,
+    "scene_list": [
+      {
+        "id": 0,
+        "type": 1,
+        "data_path": "data/scenes/lobby.json"
+      },
+      {
+        "id": 1,
+        "type": 2,
+        "data_path": "data/scenes/world.json"
+      }
+    ]
+  }
 }

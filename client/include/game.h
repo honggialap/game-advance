@@ -18,6 +18,7 @@ protected:
 	float total_elapsed_ms;
 	uint32_t tick_per_ping;
 	uint32_t tick_per_ping_count;
+	uint32_t tick_count;
 	float ping;
 
 	std::map<unsigned int, std::pair<unsigned int, std::string>> scene_list;

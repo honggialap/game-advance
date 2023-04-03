@@ -12,9 +12,10 @@
 class Game : public Server {
 protected:
 	sf::RenderWindow window;
-	float tick_per_frame;
-	float elapsed_ms;
 	b2Timer clock;
+	float elapsed_ms_per_tick;
+	float elapsed_ms;
+	uint32_t tick_count;
 
 	std::map<unsigned int, std::pair<unsigned int, std::string>> scene_list;
 	unsigned int next_scene_id = -1;

@@ -6,28 +6,36 @@ void Game::Initialize(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
 
-	unsigned int window_width = data.at("width");
-	unsigned int window_height = data.at("height");
-	std::string window_title = data.at("title");
+	auto& window_settings = data.at("window");
+	std::string window_title = window_settings.at("title");
+	unsigned int window_width = window_settings.at("width");
+	unsigned int window_height = window_settings.at("height");
+	float framerate = window_settings.at("framerate");
+
 	window.create(
 		sf::VideoMode(window_width, window_height),
 		window_title,
 		sf::Style::Titlebar | sf::Style::Close
 	);
 	window.setFramerateLimit(0);
+	elapsed_ms_per_tick = 1000.0f / framerate;
 
-	for (auto& scene : data.at("scene_list")) {
+	auto& scenes = data.at("scenes");
+	for (auto& scene : scenes.at("scene_list")) {
 		unsigned int id = scene.at("id");
 		unsigned int type = scene.at("type");
 		std::string data_path = scene.at("data_path");
 		scene_list[id] = std::make_pair(type, data_path);
 	}
-	PlayScene(data.at("start_scene_id"));
+	PlayScene(scenes.at("start_scene_id"));
 
-	float framerate = data.at("framerate");
-	tick_per_frame = 1000.0f / framerate;
+	auto& networks_settings = data.at("networks");
+	std::string address = networks_settings.at("address");
+	uint32_t port = networks_settings.at("port");
+	uint32_t max_connection = networks_settings.at("max_connection");
+	IPEndPoint host_address = IPEndPoint(address.c_str(), port);
 
-	Server::Initialize(IPEndPoint("::1", 27015), 3);
+	Server::Initialize(host_address, max_connection);
 }
 
 void Game::Shutdown() {
@@ -55,19 +63,20 @@ void Game::Run(std::string data_path) {
 
 		if (load_scene) LoadScene();
 
-		ProcessNetworks();
-
 		elapsed_ms += clock.GetMilliseconds();
 		clock.Reset();
 
-		if (elapsed_ms >= tick_per_frame) {
-			scene->Update(elapsed_ms);
+		ProcessNetworks();
+
+		if (elapsed_ms >= elapsed_ms_per_tick) {
+			tick_count += 1;
+			scene->Update(elapsed_ms_per_tick);
 
 			window.clear(sf::Color::Black);
 			scene->Render(window);
 			window.display();
 
-			elapsed_ms = 0.0f;
+			elapsed_ms -= elapsed_ms_per_tick;
 		}
 	}
 
@@ -98,6 +107,8 @@ void Game::LoadScene() {
 	scene.reset(CreateScene(next_scene.first));
 
 	scene->Load(next_scene.second);
+
+	tick_count = 0;
 }
 
 pScene Game::CreateScene(unsigned int scene_type) {
@@ -145,7 +156,7 @@ void Game::OnDisconnect(uint32_t connection_id) {
 
 bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
-	
+
 	case PacketType::Ping: {
 		uint32_t id;
 		float reply_total_elapsed_ms;
@@ -157,9 +168,12 @@ bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 		return true;
 	}
-	
+
 	default: {
-		return scene->ProcessPacket(packet);
+		if (scene) {
+			return scene->ProcessPacket(packet);
+		}
+		return false;
 	}
 
 	}

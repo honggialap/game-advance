@@ -6,30 +6,36 @@ void Game::Initialize(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
 
-	unsigned int window_width = data.at("width");
-	unsigned int window_height = data.at("height");
-	std::string window_title = data.at("title");
+	auto& window_settings = data.at("window");
+	std::string window_title = window_settings.at("title");
+	unsigned int window_width = window_settings.at("width");
+	unsigned int window_height = window_settings.at("height");
+	float framerate = window_settings.at("framerate");
+
 	window.create(
 		sf::VideoMode(window_width, window_height),
 		window_title,
 		sf::Style::Titlebar | sf::Style::Close
 	);
 	window.setFramerateLimit(0);
+	elapsed_ms_per_tick = 1000.0f / framerate;
 
-	for (auto& scene : data.at("scene_list")) {
+	auto& scenes = data.at("scenes");
+	for (auto& scene : scenes.at("scene_list")) {
 		unsigned int id = scene.at("id");
 		unsigned int type = scene.at("type");
 		std::string data_path = scene.at("data_path");
 		scene_list[id] = std::make_pair(type, data_path);
 	}
-	PlayScene(data.at("start_scene_id"));
+	PlayScene(scenes.at("start_scene_id"));
 
-	float framerate = data.at("framerate");
-	elapsed_ms_per_tick = 1000.0f / framerate;
+	auto& networks_settings = data.at("networks");
+	std::string address = networks_settings.at("address");
+	uint32_t port = networks_settings.at("port");
+	tick_per_ping = networks_settings.at("tick_per_ping");
 
-	tick_per_ping = 4;
-
-	Client::Initialize(IPEndPoint("::1", 27015));
+	IPEndPoint host_address = IPEndPoint(address.c_str(), port);
+	Client::Initialize(host_address);
 	Client::Connect();
 }
 
@@ -81,6 +87,7 @@ void Game::Run(std::string data_path) {
 				}
 			}
 
+			tick_count += 1;
 			scene->Update(elapsed_ms_per_tick);
 
 			window.clear(sf::Color::Black);
@@ -121,9 +128,10 @@ void Game::LoadScene() {
 
 	elapsed_ms = 0.0f;
 	total_elapsed_ms = 0.0f;
+	tick_count = 0;
 	
 	tick_per_ping_count = tick_per_ping;
-	ping = 0;;
+	ping = 0;
 }
 
 pScene Game::CreateScene(unsigned int scene_type) {
@@ -184,10 +192,8 @@ bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 		float reply_total_elapsed_ms;
 		*packet >> reply_total_elapsed_ms;
 		ping = total_elapsed_ms - reply_total_elapsed_ms;
-		
-		//system("cls");
-		printf("ping: %f \n", ping);
-		
+		system("cls");
+		printf("PING: %f \n", ping);
 		return true;
 	}
 
