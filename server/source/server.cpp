@@ -1,63 +1,33 @@
 #include "server.h"
 
-bool Server::Initialize() {
+bool Server::Initialize(IPEndPoint ip_endpoint, uint32_t connection_count) {
 	if (is_initialized) {
-		printf("[bool Server::Initialize()] - Function called while networks have been initialized.\n");
+		printf("[bool Server::Initialize(IPEndPoint,uint32t)] - Already initialized.\n");
 		return false;
 	}
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
-		printf("[bool Server::Initialize()] - WSAStartup failed with error code: %d.\n", WSAGetLastError());
-		return false;
-	}
-
-	is_initialized = true;
-	printf("[bool Server::Initialize()] - Success.\n");
-	return true;
-}
-
-bool Server::Shutdown() {
-	if (!is_initialized) {
-		printf("[bool Server::Shutdown()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	if (WSACleanup() != 0) {
-		printf("[bool Server::Shutdown()] - WSACleanup failed with error code: %d.\n", WSAGetLastError());
-		return true;
-	}
-
-	is_initialized = false;
-	printf("[bool Server::Shutdown()] - Success.\n");
-	return true;
-}
-
-bool Server::StartListening(IPEndPoint ip_endpoint, uint32_t connection_count) {
-	if (!is_initialized) {
-		printf("[bool Server::StartListening(IPEndPoint, uint32_t)] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	if (is_listening) {
-		printf("[bool Server::StartListening(IPEndPoint, uint32_t)] - Function called while being listening.\n");
+		printf("[bool Server::Initialize(IPEndPoint,uint32t)] - WSAStartup failed with error code: %d.\n", WSAGetLastError());
 		return false;
 	}
 
 	Socket listening_socket = Socket(IPVersion::IPv6);
 	if (!listening_socket.Create()) {
-		printf("[bool Server::StartListening(IPEndPoint, uint32_t)] - Failed to create listening socket.\n");
+		printf("[bool Server::Initialize(IPEndPoint,uint32_t)] - Failed to create listening socket.\n");
 		return false;
 	}
 
 	if (!listening_socket.SetSocketBlocking(false)) {
 		listening_socket.Close();
-		printf("[bool StartListening(IPEndPoint, uint32_t)] - Failed to set listening socket blocking.\n");
+
+		printf("[bool Server::Initialize(IPEndPoint,uint32_t)] - Failed to set listening socket blocking.\n");
 		return false;
 	}
 
 	if (!listening_socket.Listen(ip_endpoint)) {
 		listening_socket.Close();
-		printf("[bool StartListening(IPEndPoint, uint32_t)] - Failed to listen for connection.\n");
+
+		printf("[bool Server::Initialize(IPEndPoint,uint32_t)] - Failed to listen for connection.\n");
 		return false;
 	}
 
@@ -67,51 +37,75 @@ bool Server::StartListening(IPEndPoint ip_endpoint, uint32_t connection_count) {
 	listening_master_fd.revents = 0;
 
 	listener = std::make_pair(listening_socket, listening_master_fd);
-	max_connection_count = connection_count;
 
-	is_listening = true;
-	printf("[bool StartListening(IPEndPoint, uint32_t)] - Success.\n");
+	max_connection_count = connection_count;
+	is_initialized = true;
+
+	printf("[bool Server::Initialize(IPEndPoint,uint32t)] - Success.\n");
 	return true;
 }
 
-bool Server::StopListening() {
+bool Server::Shutdown() {
 	if (!is_initialized) {
-		printf("[bool Server::StopListening()] - Function called while networks have not been initialized.\n");
+		printf("[bool Server::Shutdown()] - Not initialized yet.\n");
 		return false;
 	}
 
-	if (!is_listening) {
-		printf("[bool Server::StopListening()] - Function called while not being listening.\n");
-		return false;
+	if (WSACleanup() != 0) {
+		printf("[bool Server::Shutdown()] - WSACleanup failed with error code: %d.\n", WSAGetLastError());
+		return true;
 	}
 
 	listener.first.Close();
 	listener.second = {};
 
-	is_listening = false;
-	printf("[bool Server::StopListening()] - Function called while not being listening.\n");
+	max_connection_count = 0;
+	is_initialized = false;
+
+	printf("[bool Server::Shutdown()] - Success.\n");
 	return true;
 }
 
-bool Server::Listening() {
+bool Server::Accept(uint32_t id, Connection connection, WSAPOLLFD master_fd) {
 	if (!is_initialized) {
-		printf("[Server::Listening()] - Function called while networks have not been initialized.\n");
+		printf("[bool Server::Accept(uint32_t,Connection,WSAPOLLFD)] - Not initialized yet.\n");
 		return false;
 	}
 
-	if (!is_listening) {
-		printf("[Server::Listening()] - Function called while not being listening.\n");
+	connections[id] = std::make_tuple(connection, master_fd, true);
+	OnConnect(id);
+
+	printf("[bool Server::Accept(uint32_t,Connection,WSAPOLLFD)] - Success.\n");
+	return false;
+}
+
+bool Server::Disconnect(uint32_t connection_id) {
+	if (!is_initialized) {
+		printf("[bool Server::Disconnect(uint32_t)] - Not initialized yet.\n");
 		return false;
 	}
 
-	if (connections.size() >= max_connection_count) {
-		printf("[Server::Listening()] - Max connection count accepted.\n");
+	auto& disconnected_connection = std::get<0>(connections.at(connection_id));
+	disconnected_connection.Close();
+
+	auto& client_is_connecting = std::get<2>(connections.at(connection_id));
+	client_is_connecting = false;
+
+	OnDisconnect(connection_id);
+
+	printf("[bool Server::Disconnect(uint32_t)] - Success.\n");
+	return true;
+}
+
+bool Server::ProcessNetworks() {
+	if (!is_initialized) {
+		printf("[bool Server::ProcessNetworks()] - Not initialized yet.\n");
 		return false;
 	}
 
+	// Listening
 	WSAPOLLFD listening_temp_fd = listener.second;
 	Socket& listening_socket = listener.first;
-
 	if (WSAPoll(&listening_temp_fd, 1, 1) > 0) {
 		if (listening_temp_fd.revents & POLLRDNORM) {
 			Socket new_connection_socket;
@@ -129,120 +123,7 @@ bool Server::Listening() {
 		}
 	}
 
-	return true;
-}
-
-bool Server::Accept(uint32_t id, Connection connection, WSAPOLLFD master_fd) {
-	if (!is_initialized) {
-		printf("[bool Server::Accept(uint32_t, Connection, WSAPOLLFD)] - Function called without being initialized.\n");
-		return false;
-	}
-
-	connections[id] = std::make_tuple(connection, master_fd, true);
-	OnConnect(id);
-
-	printf("[bool Server::Accept(uint32_t, Connection, WSAPOLLFD)] - Success.\n");
-	return false;
-}
-
-bool Server::Disconnect(uint32_t connection_id) {
-	if (!is_initialized) {
-		printf("[Server::Disconnect(uint32_t)] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	auto& disconnected_connection = std::get<0>(connections[connection_id]);
-	disconnected_connection.Close();
-
-	auto& client_is_connecting = std::get<2>(connections[connection_id]);
-	client_is_connecting = false;
-
-	OnDisconnect(connection_id);
-
-	printf("[Server::Disconnect(uint32_t)] - Success.\n");
-	return true;
-}
-
-bool Server::DisconnectAll() {
-	if (!is_initialized) {
-		printf("[Server::DisconnectAll()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	for (auto& connection : connections) {
-		auto& disconnected_connection = std::get<0>(connection.second);
-		disconnected_connection.Close();
-
-		auto& client_is_connecting = std::get<2>(connection.second);
-		client_is_connecting = false;
-
-		OnDisconnect(connection.first);
-	}
-
-	printf("[Server::DisconnectAll()] - Success.\n");
-	return true;
-}
-
-bool Server::CleanUpDisconnected() {
-	if (!is_initialized) {
-		printf("[Server::CleanUpDisconnected()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	for (auto it = connections.begin(); it != connections.end();) {
-		auto& client_is_connecting = std::get<2>(it->second);
-		if (!client_is_connecting) {
-			it = connections.erase(it);
-		}
-		else {
-			it++;
-		}
-	}
-	return true;
-}
-
-bool Server::ProcessIncomming() {
-	if (!is_initialized) {
-		printf("[Server::ProcessConnection()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	for (auto& client : connections) {
-		auto& client_connection = std::get<0>(client.second);
-		PacketManager& incomming = client_connection.imcomming_packets;
-		while (incomming.HasPending()) {
-			std::shared_ptr<Packet> packet = incomming.Retrive();
-			if (!ProcessPacket(packet)) {
-				Disconnect(client.first);
-				break;
-			}
-			incomming.Pop();
-		}
-	}
-	return true;
-}
-
-bool Server::Send(uint32_t id, std::shared_ptr<Packet> packet) {
-	if (!is_initialized) {
-		printf("[Server::ProcessConnection()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	if (!std::get<2>(connections[id])) {
-		printf("[Server::ProcessConnection()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-	
-	std::get<0>(connections[id]).outgoing_packets.Append(packet);
-	return true;
-}
-
-bool Server::ProcessNetworks() {
-	if (!is_initialized) {
-		printf("[Server::ProcessConnection()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
+	// Connections
 	for (auto& client : connections) {
 		auto client_id = client.first;
 		auto& client_connection = std::get<0>(client.second);
@@ -391,5 +272,46 @@ bool Server::ProcessNetworks() {
 
 		}
 	}
+
+	// Clean up disconnected
+	for (auto it = connections.begin(); it != connections.end();) {
+		auto& client_is_connecting = std::get<2>(it->second);
+		if (!client_is_connecting) {
+			it = connections.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+
+	// Process incomming packets
+	for (auto& client : connections) {
+		auto& client_connection = std::get<0>(client.second);
+		PacketManager& incomming = client_connection.imcomming_packets;
+		while (incomming.HasPending()) {
+			std::shared_ptr<Packet> packet = incomming.Retrive();
+			if (!ProcessPacket(packet)) {
+				Disconnect(client.first);
+				break;
+			}
+			incomming.Pop();
+		}
+	}
+
+	return true;
+}
+
+bool Server::Send(uint32_t id, std::shared_ptr<Packet> packet) {
+	if (!is_initialized) {
+		printf("[bool Server::Send(uint32_t, std::shared_ptr<Packet>)] - Not initialized yet.\n");
+		return false;
+	}
+
+	if (!std::get<2>(connections.at(id))) {
+		printf("[bool Server::Send(uint32_t, std::shared_ptr<Packet>)] - Connection already disconnected.\n");
+		return false;
+	}
+
+	std::get<0>(connections.at(id)).outgoing_packets.Append(packet);
 	return true;
 }

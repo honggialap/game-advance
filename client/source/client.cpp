@@ -1,74 +1,80 @@
 #include "client.h"
 
-bool Client::Initialize() {
+bool Client::Initialize(IPEndPoint ip_endpoint) {
 	if (is_initialized) {
-		printf("[Client::Initialize()] - Function called while networks have been initialized.\n");
+		printf("[bool Client::Initialize(IPEndPoint)] - Already initialized.\n");
 		return false;
 	}
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
-		printf("[Client::Initialize()] - WSAStartup failed with error code: %d.\n", WSAGetLastError());
+		printf("[bool Client::Initialize(IPEndPoint)] - WSAStartup failed with error code: %d.\n", WSAGetLastError());
 		return false;
 	}
 
+	host_address = ip_endpoint;
 	is_initialized = true;
-	printf("[Client::Initialize()] - Success.\n");
+	
+	printf("[bool Client::Initialize(IPEndPoint)] - Success.\n");
 	return true;
 }
 
 bool Client::Shutdown() {
 	if (!is_initialized) {
-		printf("[Client::Shutdown()] - Function called while networks have not been initialized.\n");
+		printf("[bool Client::Shutdown()] - Not initialized yet.\n");
 		return false;
 	}
 
 	if (WSACleanup() != 0) {
-		printf("[Client::Shutdown()] - WSACleanup failed with error code: %d.\n", WSAGetLastError());
+		printf("[bool Client::Shutdown()] - WSACleanup failed with error code: %d.\n", WSAGetLastError());
 		return true;
 	}
 
+	host_address = {};
 	is_initialized = false;
-	printf("[Client::Shutdown()] - Success.\n");
+
+	printf("[bool Client::Shutdown()] - Success.\n");
 	return true;
 }
 
-bool Client::Connect(IPEndPoint ip_endpoint) {
+bool Client::Connect() {
 	if (!is_initialized) {
-		printf("[Client::Connect(IPEndPoint)] - Function called while networks have not been initialized.\n");
+		printf("[bool Client::Connect()] - Not initialized yet.\n");
 		return false;
 	}
 
 	if (is_connecting) {
-		printf("[Client::Connect(IPEndPoint)] - Function called while being connected.\n");
+		printf("[bool Client::Connect()] - Already connecting.\n");
 		return false;
 	}
 
-	Socket connection_socket = Socket(ip_endpoint.GetIPVersion());
+	Socket connection_socket = Socket(host_address.GetIPVersion());
 	if (!connection_socket.Create()) {
-		printf("[Client::Connect(IPEndPoint)] - Failed to create connection socket.\n");
+		printf("[bool Client::Connect()] - Failed to create connection socket.\n");
 		return false;
 	}
 
 	if (!connection_socket.SetSocketBlocking(true)) {
-		printf("[Client::Connect(IPEndPoint)] - Failed to set connection socket blocking option pre-connecting.\n");
+		printf("[bool Client::Connect()] - Failed to set connection socket blocking option pre-connecting.\n");
 		return false;
 	}
 
-	if (!connection_socket.Connect(ip_endpoint)) {
+	if (!connection_socket.Connect(host_address)) {
 		connection_socket.Close();
 		OnConnectFail();
-		printf("[Client::Connect(IPEndPoint)] - Failed to connect to server.\n");
+
+		printf("[bool Client::Connect()] - Failed to connect to server.\n");
 		return false;
 	}
 
 	if (!connection_socket.SetSocketBlocking(false)) {
 		connection_socket.Close();
 		OnConnectFail();
-		printf("[Client::Connect(IPEndPoint)] - Failed to set connection socket blocking option post-connecting.\n");
+
+		printf("[bool Client::Connect()] - Failed to set connection socket blocking option post-connecting.\n");
 		return false;
 	}
 
-	Connection connection = Connection(connection_socket, ip_endpoint);
+	Connection connection = Connection(connection_socket, host_address);
 
 	WSAPOLLFD master_fd = {};
 	master_fd.fd = connection.socket.GetSocketHandle();
@@ -77,79 +83,44 @@ bool Client::Connect(IPEndPoint ip_endpoint) {
 
 	host_connection = std::make_pair(connection, master_fd);
 
+	is_approved = false;
 	is_connecting = true;
 	OnConnect();
 
-	printf("[Client::Connect(IPEndPoint)] - Success.\n");
+	printf("[bool Client::Connect()] - Success.\n");
 	return true;
 }
 
 bool Client::Disconnect() {
 	if (!is_initialized) {
-		printf("[Client::Disconnect()] - Function called while networks have not been initialized.\n");
+		printf("[bool Client::Disconnect()] - Not initialized yet.\n");
 		return false;
 	}
 
 	if (!is_connecting) {
-		printf("[Client::Disconnect()] - Function called while not being connected.\n");
+		printf("[bool Client::Disconnect()] - Not connected yet.\n");
 		return false;
 	}
 
-	host_connection.second = {};
 	host_connection.first.Close();
+	host_connection.second = {};
 
+	is_approved = false;
 	is_connecting = false;
 	OnDisconnect();
 
-	printf("[Client::Disconnect()] - Success.\n");
-	return true;
-}
-
-bool Client::ProcessIncomming() {
-	if (!is_initialized) {
-		printf("[Client::ProcessNetworks()] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	if (!is_connecting) {
-		printf("[Client::ProcessNetworks()] - Function called while not being connected.\n");
-		return false;
-	}
-
-	while (host_connection.first.imcomming_packets.HasPending()) {
-		std::shared_ptr<Packet> packet = host_connection.first.imcomming_packets.Retrive();
-		if (!ProcessPacket(packet)) {
-			Disconnect();
-			return false;
-		}
-		host_connection.first.imcomming_packets.Pop();
-	}
-	return true;
-}
-
-bool Client::Send(std::shared_ptr<Packet> packet) {
-	if (!is_initialized) {
-		printf("[Client::Send(std::shared_ptr<Packet>)] - Function called while networks have not been initialized.\n");
-		return false;
-	}
-
-	if (!is_connecting) {
-		printf("[Client::Send(std::shared_ptr<Packet>)] - Function called while not being connected.\n");
-		return false;
-	}
-
-	host_connection.first.outgoing_packets.Append(packet);
+	printf("[bool Client::Disconnect()] - Success.\n");
 	return true;
 }
 
 bool Client::ProcessNetworks() {
 	if (!is_initialized) {
-		printf("[Client::ProcessNetworks()] - Function called while networks have not been initialized.\n");
+		printf("[bool Client::ProcessNetworks()] - Not initialized yet.\n");
 		return false;
 	}
 
 	if (!is_connecting) {
-		printf("[Client::ProcessNetworks()] - Function called while not being connected.\n");
+		printf("[bool Client::ProcessNetworks()] - Not connected yet.\n");
 		return false;
 	}
 
@@ -299,5 +270,29 @@ bool Client::ProcessNetworks() {
 
 	}
 
+	while (connection.imcomming_packets.HasPending()) {
+		std::shared_ptr<Packet> packet = connection.imcomming_packets.Retrive();
+		if (!ProcessPacket(packet)) {
+			Disconnect();
+			return false;
+		}
+		connection.imcomming_packets.Pop();
+	}
+
+	return true;
+}
+
+bool Client::Send(std::shared_ptr<Packet> packet) {
+	if (!is_initialized) {
+		printf("[bool Client::Send(std::shared_ptr<Packet>)] - Not initialized yet.\n");
+		return false;
+	}
+
+	if (!is_connecting) {
+		printf("[bool Client::Send(std::shared_ptr<Packet>)] - Not connected yet.\n");
+		return false;
+	}
+
+	host_connection.first.outgoing_packets.Append(packet);
 	return true;
 }

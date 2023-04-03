@@ -27,14 +27,12 @@ void Game::Initialize(std::string data_path) {
 	float framerate = data.at("framerate");
 	tick_per_frame = 1000.0f / framerate;
 
-	Server::Initialize();
-	Server::StartListening(IPEndPoint("::1", 27015), 3);
+	Server::Initialize(IPEndPoint("::1", 27015), 3);
 }
 
 void Game::Shutdown() {
 	if (scene) scene->Unload();
 
-	Server::StopListening();
 	Server::Shutdown();
 }
 
@@ -57,14 +55,12 @@ void Game::Run(std::string data_path) {
 
 		if (load_scene) LoadScene();
 
-		Listening();
 		ProcessNetworks();
 
 		elapsed_ms += clock.GetMilliseconds();
 		clock.Reset();
 
 		if (elapsed_ms >= tick_per_frame) {
-			ProcessIncomming();
 			scene->Update(elapsed_ms);
 
 			window.clear(sf::Color::Black);
@@ -72,9 +68,6 @@ void Game::Run(std::string data_path) {
 			window.display();
 
 			elapsed_ms = 0.0f;
-		}
-		else {
-			Sleep((DWORD)tick_per_frame - elapsed_ms);
 		}
 	}
 
@@ -129,9 +122,15 @@ pScene Game::CreateScene(unsigned int scene_type) {
 }
 
 void Game::OnConnect(uint32_t connection_id) {
-	auto welcome_packet = std::make_shared<Packet>(PacketType::Welcome);
-	*welcome_packet << connection_id;
-	Send(connection_id, welcome_packet);
+	if (connections.size() > max_connection_count) {
+		auto not_welcome_packet = std::make_shared<Packet>(PacketType::NotWelcome);
+		Send(connection_id, not_welcome_packet);
+	}
+	else {
+		auto welcome_packet = std::make_shared<Packet>(PacketType::Welcome);
+		*welcome_packet << connection_id;
+		Send(connection_id, welcome_packet);
+	}
 
 	if (scene) {
 		scene->OnConnect(connection_id);

@@ -25,10 +25,12 @@ void Game::Initialize(std::string data_path) {
 	PlayScene(data.at("start_scene_id"));
 
 	float framerate = data.at("framerate");
-	tick_per_frame = 1000.0f / framerate;
+	elapsed_ms_per_tick = 1000.0f / framerate;
 
-	Client::Initialize();
-	Client::Connect(IPEndPoint("::1", 27015));
+	tick_per_ping = 4;
+
+	Client::Initialize(IPEndPoint("::1", 27015));
+	Client::Connect();
 }
 
 void Game::Shutdown() {
@@ -57,30 +59,35 @@ void Game::Run(std::string data_path) {
 
 		if (load_scene) LoadScene();
 
-		ProcessNetworks();
-
-		elapsed_ms += clock.GetMilliseconds();
+		float temp_elapsed_ms = clock.GetMilliseconds();
 		clock.Reset();
 
-		if (elapsed_ms >= tick_per_frame) {
-			ProcessIncomming();
+		elapsed_ms += temp_elapsed_ms;
+		total_elapsed_ms += temp_elapsed_ms;
 
-			if (is_approved) {
-				auto ping_packet = std::make_shared<Packet>(PacketType::Ping);
-				*ping_packet << id << elapsed_ms;
-				Send(ping_packet);
+		ProcessNetworks();
+		
+		if (elapsed_ms >= elapsed_ms_per_tick) {
+			if (IsApproved()) {
+				if (tick_per_ping_count > 0) {
+					tick_per_ping_count -= 1;
+				}
+				else {
+					tick_per_ping_count = tick_per_ping;
+
+					auto ping_packet = std::make_shared<Packet>(PacketType::Ping);
+					*ping_packet << id << total_elapsed_ms;
+					Send(ping_packet);
+				}
 			}
 
-			scene->Update(elapsed_ms);
+			scene->Update(elapsed_ms_per_tick);
 
 			window.clear(sf::Color::Black);
 			scene->Render(window);
 			window.display();
 
-			elapsed_ms = 0.0f;
-		}
-		else {
-			Sleep((DWORD)tick_per_frame - elapsed_ms);
+			elapsed_ms -= elapsed_ms_per_tick;
 		}
 	}
 
@@ -111,6 +118,12 @@ void Game::LoadScene() {
 	scene.reset(CreateScene(next_scene.first));
 
 	scene->Load(next_scene.second);
+
+	elapsed_ms = 0.0f;
+	total_elapsed_ms = 0.0f;
+	
+	tick_per_ping_count = tick_per_ping;
+	ping = 0;;
 }
 
 pScene Game::CreateScene(unsigned int scene_type) {
@@ -170,12 +183,19 @@ bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 	case PacketType::Ping: {
 		float reply_total_elapsed_ms;
 		*packet >> reply_total_elapsed_ms;
-		printf("Reply ping: %f", reply_total_elapsed_ms);
+		ping = total_elapsed_ms - reply_total_elapsed_ms;
+		
+		//system("cls");
+		printf("ping: %f \n", ping);
+		
 		return true;
 	}
 
 	default: {
-		return scene->ProcessPacket(packet);
+		if (scene) {
+			return scene->ProcessPacket(packet);
+		}
+		return false;
 	}
 
 	}

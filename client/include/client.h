@@ -9,22 +9,22 @@ class Client {
 protected:
 	bool is_initialized = false;
 	WSADATA wsa_data;
+	IPEndPoint host_address;
 
 	bool is_connecting = false;
-	bool is_approved = false;
-	uint32_t id;
 	std::pair<Connection, WSAPOLLFD> host_connection;
 
+	bool is_approved = false;
+	uint32_t id;
+
 public:
-	bool Initialize();
+	bool Initialize(IPEndPoint ip_endpoint);
 	bool Shutdown();
 
-	bool Connect(IPEndPoint ip_endpoint);
+	bool Connect();
 	bool Disconnect();
 
-	bool ProcessIncomming();
 	bool ProcessNetworks();
-
 	bool Send(std::shared_ptr<Packet> packet);
 
 	void AssignId(uint32_t id) { this->id = id; is_approved = true; }
