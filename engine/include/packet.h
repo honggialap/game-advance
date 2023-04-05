@@ -8,7 +8,9 @@ enum PacketType : uint16_t {
 	Invalid,
 	Welcome,
 	NotWelcome,
-	Ping
+	Ping,
+	PlayerConfirm,
+	StartGame,
 };
 
 class Packet {

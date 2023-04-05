@@ -23,6 +23,8 @@ public:
 
 	bool ProcessNetworks();	
 	bool Send(uint32_t id, std::shared_ptr<Packet> packet);
+	bool SendAll(std::shared_ptr<Packet> packet);
+	bool SendAllExcept(uint32_t id, std::shared_ptr<Packet> packet);
 
 	virtual void OnConnect(uint32_t connection_id) = 0;
 	virtual void OnDisconnect(uint32_t connection_id) = 0;

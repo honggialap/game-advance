@@ -10,8 +10,12 @@ class Game;
 typedef Game* pGame;
 
 class Lobby : public Scene {
+protected:
+	uint32_t ready_players;
+
 public:
-	Lobby(pGame game) : Scene(game) {};
+	Lobby(pGame game);
+	~Lobby();
 
 	void Load(std::string data_path) override;
 	void Unload() override;

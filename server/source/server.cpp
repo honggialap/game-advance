@@ -315,3 +315,38 @@ bool Server::Send(uint32_t id, std::shared_ptr<Packet> packet) {
 	std::get<0>(connections.at(id)).outgoing_packets.Append(packet);
 	return true;
 }
+
+bool Server::SendAll(std::shared_ptr<Packet> packet) {
+	if (!is_initialized) {
+		printf("[bool Server::SendAll(std::shared_ptr<Packet>)] - Not initialized yet.\n");
+		return false;
+	}
+
+	for (auto& client : connections) {
+		if (std::get<2>(client.second)) {
+			std::get<0>(client.second).outgoing_packets.Append(packet);
+		}
+	}
+	
+	return true;
+}
+
+bool Server::SendAllExcept(uint32_t id, std::shared_ptr<Packet> packet) {
+	if (!is_initialized) {
+		printf("[bool Server::SendAllExcept(uint32_t,std::shared_ptr<Packet>)] - Not initialized yet.\n");
+		return false;
+	}
+
+	for (auto& client : connections) {
+		if (client.first == id) {
+			continue;
+		}
+
+		if (std::get<2>(client.second)) {
+			std::get<0>(client.second).outgoing_packets.Append(packet);
+		}
+	}
+
+	return true;
+}
+

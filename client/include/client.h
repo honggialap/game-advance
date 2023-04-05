@@ -29,6 +29,7 @@ public:
 
 	void AssignId(uint32_t id) { this->id = id; is_approved = true; }
 	bool IsApproved() { return is_approved; }
+	uint32_t GetId() { return id; }
 
 	virtual void OnConnect() = 0;
 	virtual void OnDisconnect() = 0;
