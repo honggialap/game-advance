@@ -7,6 +7,7 @@
 pGameObject World::CreateGameObject(unsigned int game_object_type) {
 	switch (game_object_type) {
 	case ACTOR_TYPE_TANK:
+		printf("SPAWN!!!");
 		return new Tank(game, this);
 		break;
 
@@ -28,6 +29,11 @@ void World::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
 
+	font.loadFromFile("data/resources/fonts/arial.ttf");
+	text.setFont(font);
+
+	text.setString(game->GetId());
+
 	gravity = b2Vec2(0, 0);
 	physics_world = new b2World(gravity);
 	physics_world->SetContactListener(this);
@@ -35,25 +41,30 @@ void World::Load(std::string data_path) {
 	camera.reset(sf::FloatRect(0, 0, 800, 600));
 	camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
-	tank.reset(CreateGameObject(ACTOR_TYPE_TANK));
-	tank->Load("");
+	uint32_t game_object_id = this->game_object_id;
+	this->game_object_id++;
+	uint32_t game_object_type = ACTOR_TYPE_TANK;
+	gameObjects[game_object_id].reset(CreateGameObject(game_object_type));
+	gameObjects[game_object_id]->Load("");
+	gameObjects[game_object_id]->SetId(game_object_id);
+	gameObjects[game_object_id]->SetSync(false);
+	pTank tank = static_cast<pTank>(gameObjects[game_object_id].get());
+	tank->SetPlayerControl(true);
 
-	bullet.reset(CreateGameObject(ACTOR_TYPE_BULLET));
-	bullet->Load("");
-
-	wall.reset(CreateGameObject(ACTOR_TYPE_WALL));
-	wall->Load("");
+	auto local_player_spawn = std::make_shared<Packet>(PacketType::LocalPlayerSpawn);
+	uint32_t id = game->GetId();
+	*local_player_spawn << id << game_object_id << game_object_type;
+	game->Send(local_player_spawn);
 }
 
 void World::Unload() {
-	tank->Unload();
-	tank.reset();
 
-	bullet->Unload();
-	bullet.reset();
+	for (auto& game_object : gameObjects) {
+		game_object.second->Unload();
+		game_object.second.reset();
+	}
 
-	wall->Unload();
-	wall.reset();
+	gameObjects.clear();
 
 	if (physics_world != nullptr) {
 		delete physics_world;
@@ -64,22 +75,23 @@ void World::Unload() {
 void World::Update(float elapsed) {
 
 	// Camera movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 		camera.move(sf::Vector2f(0, -1.0f) * elapsed);
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 		camera.move(sf::Vector2f(0, 1.0f) * elapsed);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 		camera.move(sf::Vector2f(-1.0f, 0) * elapsed);
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 		camera.move(sf::Vector2f(1.0f, 0) * elapsed);
 	}
 
-	tank->Update(elapsed);
-	bullet->Update(elapsed);
-	wall->Update(elapsed);
+	for (auto& game_object : gameObjects) {
+		game_object.second->Update(elapsed);
+	}
+
 
 	physics_world->Step(elapsed, 8, 3);
 }
@@ -87,9 +99,11 @@ void World::Update(float elapsed) {
 void World::Render(sf::RenderWindow& window) {
 	window.setView(camera);
 
-	tank->Render(window);
-	bullet->Render(window);
-	wall->Render(window);
+	window.draw(text);
+
+	for (auto& game_object : gameObjects) {
+		game_object.second->Render(window);
+	}
 }
 
 sf::View& World::GetCamera() {
@@ -135,5 +149,50 @@ void World::OnConnectFail() {
 }
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
-	return true;
+	switch (packet->GetPacketType()) {
+
+	case PacketType::LocalPlayerSpawn: {
+		uint32 game_object_id;
+		uint32 networks_id;
+		*packet >> game_object_id >> networks_id;
+		networksObjects[networks_id] = game_object_id;
+		gameObjects[game_object_id]->SetNetworksId(networks_id);
+		gameObjects[game_object_id]->SetSync(true);
+		return true;
+	}
+
+	case PacketType::RemotePlayerSpawn: {
+		uint32 game_object_id = this->game_object_id;
+		uint32 networks_id;
+		uint32 game_object_type;
+
+		*packet >> networks_id >> game_object_type;
+		gameObjects[game_object_id].reset(CreateGameObject(game_object_type));
+		gameObjects[game_object_id]->Load("");
+		networksObjects[networks_id] = game_object_id;
+		gameObjects[game_object_id]->SetId(game_object_id);
+		gameObjects[game_object_id]->SetNetworksId(networks_id);
+		gameObjects[game_object_id]->SetSync(true);
+		
+		this->game_object_id++;
+		return true;
+	}
+
+	case PacketType::PlayerMove: {
+		uint32_t networks_id = 0;
+		int32_t movement_x = 0;
+		int32_t movement_y = 0;
+
+		*packet >> networks_id >> movement_x >> movement_y;
+		pTank tank = static_cast<pTank>(gameObjects[networksObjects[networks_id]].get());
+		tank->SetMovement(movement_x, movement_y);
+		printf("ID: %d, %d, %d \n", networks_id, movement_x, movement_y);
+		return true;
+	}
+
+	default: {
+		return false;
+	}
+
+	}
 }

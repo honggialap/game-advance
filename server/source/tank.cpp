@@ -17,33 +17,6 @@ void Tank::Unload() {
 }
 
 void Tank::Update(float elapsed) {
-	// Camera movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-		world->GetCamera().move(sf::Vector2f(0, -1.0f) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-		world->GetCamera().move(sf::Vector2f(0, 1.0f) * elapsed);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		world->GetCamera().move(sf::Vector2f(-1.0f, 0) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		world->GetCamera().move(sf::Vector2f(1.0f, 0) * elapsed);
-	}
-
-	// Sprite movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		sprite.move(sf::Vector2f(0, -1.0f) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		sprite.move(sf::Vector2f(0, 1.0f) * elapsed);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-		sprite.move(sf::Vector2f(-1.0f, 0) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-		sprite.move(sf::Vector2f(1.0f, 0) * elapsed);
-	}
 }
 
 void Tank::Render(sf::RenderWindow& window) {

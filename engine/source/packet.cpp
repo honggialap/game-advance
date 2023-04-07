@@ -46,6 +46,23 @@ Packet& Packet::operator>>(uint32_t& data) {
 	return *this;
 }
 
+Packet& Packet::operator<<(int32_t data) {
+	data = htonl(data);
+	Append(&data, sizeof(int32_t));
+	return *this;
+}
+
+Packet& Packet::operator>>(int32_t& data) {
+	if ((offset + sizeof(int32_t)) > buffer.size()) {
+		throw PacketException("[Packet::operator>>(int32_t&)] - Extraction offset exceeded buffer size.");
+	}
+
+	data = *reinterpret_cast<int32_t*>(&buffer[offset]);
+	data = ntohl(data);
+	offset += sizeof(int32_t);
+	return *this;
+}
+
 Packet& Packet::operator<<(const std::string& data) {
 	*this << (uint32_t)data.size();
 	Append(data.data(), data.size());

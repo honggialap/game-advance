@@ -30,26 +30,16 @@ void World::Load(std::string data_path) {
 
 	camera.reset(sf::FloatRect(0, 0, 800, 600));
 	camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
-
-	tank.reset(CreateGameObject(ACTOR_TYPE_TANK));
-	tank->Load("");
-
-	bullet.reset(CreateGameObject(ACTOR_TYPE_BULLET));
-	bullet->Load("");
-
-	wall.reset(CreateGameObject(ACTOR_TYPE_WALL));
-	wall->Load("");
 }
 
 void World::Unload() {
-	tank->Unload();
-	tank.reset();
 
-	bullet->Unload();
-	bullet.reset();
+	for (auto& game_object : gameObjects) {
+		game_object.second->Unload();
+		game_object.second.reset();
+	}
 
-	wall->Unload();
-	wall.reset();
+	gameObjects.clear();
 
 	if (physics_world != nullptr) {
 		delete physics_world;
@@ -58,16 +48,30 @@ void World::Unload() {
 }
 
 void World::Update(float elapsed) {
-	tank->Update(elapsed);
-	bullet->Update(elapsed);
-	wall->Update(elapsed);
+	// Camera movement
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+		camera.move(sf::Vector2f(0, -1.0f) * elapsed);
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		camera.move(sf::Vector2f(0, 1.0f) * elapsed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+		camera.move(sf::Vector2f(-1.0f, 0) * elapsed);
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+		camera.move(sf::Vector2f(1.0f, 0) * elapsed);
+	}
+
+	for (auto& game_object : gameObjects) {
+		game_object.second->Update(elapsed);
+	}
 }
 
 void World::Render(sf::RenderWindow& window) {
 	window.setView(camera);
-	tank->Render(window);
-	bullet->Render(window);
-	wall->Render(window);
+	for (auto& game_object : gameObjects) {
+		game_object.second->Render(window);
+	}
 }
 
 sf::View& World::GetCamera() {
@@ -109,5 +113,49 @@ void World::OnDisconnect(uint32_t connection_id) {
 }
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
-	return true;
+	switch (packet->GetPacketType()) {
+
+	case PacketType::LocalPlayerSpawn: {
+		uint32_t client_id = 0;
+		uint32_t game_object_id = 0;
+		uint32_t game_object_type = 0;
+		uint32_t networks_object_id = this->game_object_id;
+		this->game_object_id++;
+
+		*packet >> client_id >> game_object_id >> game_object_type;
+		gameObjects[networks_object_id].reset(CreateGameObject(game_object_type));
+		gameObjects[networks_object_id]->Load("");
+		
+		auto local_spawn_reply_packet = std::make_shared<Packet>(PacketType::LocalPlayerSpawn);
+		*local_spawn_reply_packet << game_object_id << networks_object_id;
+		game->Send(client_id, local_spawn_reply_packet);
+
+		auto remote_spawn_reply_packet = std::make_shared<Packet>(PacketType::RemotePlayerSpawn);
+		*remote_spawn_reply_packet << networks_object_id << game_object_type;
+		game->SendAllExcept(client_id, remote_spawn_reply_packet);
+
+		return true;
+	}
+
+	case PacketType::PlayerMove: {
+		uint32_t client_id = 0;
+		uint32_t networks_id = 0;
+		int32_t movement_x = 0;
+		int32_t movement_y = 0;
+		
+		*packet >> client_id >> networks_id >> movement_x >> movement_y;
+		gameObjects[networks_id];
+
+		auto player_move_packet = std::make_shared<Packet>(PacketType::PlayerMove);
+		*player_move_packet << networks_id << movement_x << movement_y;
+		game->SendAllExcept(client_id, player_move_packet);
+		
+		return true;
+	}
+
+	default: {
+		return false;
+	}
+
+	}
 }

@@ -11,6 +11,9 @@ enum PacketType : uint16_t {
 	Ping,
 	PlayerConfirm,
 	StartGame,
+	LocalPlayerSpawn,
+	RemotePlayerSpawn,
+	PlayerMove,
 };
 
 class Packet {
@@ -28,6 +31,9 @@ public:
 
 	Packet& operator << (uint32_t data);
 	Packet& operator >> (uint32_t& data);
+
+	Packet& operator << (int32_t data);
+	Packet& operator >> (int32_t& data);
 
 	Packet& operator << (const std::string& data);
 	Packet& operator >> (std::string& data);

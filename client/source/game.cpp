@@ -192,8 +192,8 @@ bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 		float reply_total_elapsed_ms;
 		*packet >> reply_total_elapsed_ms;
 		ping = total_elapsed_ms - reply_total_elapsed_ms;
-		system("cls");
-		printf("PING: %f \n", ping);
+		//system("cls");
+		//printf("PING: %f \n", ping);
 		return true;
 	}
 

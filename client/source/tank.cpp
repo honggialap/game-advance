@@ -48,18 +48,93 @@ void Tank::Update(float elapsed) {
 
 	// Movement control
 	b2Vec2 movement(0, 0);
+	if (player_control) {
+		int32_t current_movement_x = 0;
+		int32_t current_movement_y = 0;
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		movement.y += 0.01f / 30 * elapsed;
+		switch (game->GetId()) {
+		case 1000: {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+				current_movement_y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+				current_movement_y = -1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+				current_movement_x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+				current_movement_x = 1;
+			}
+			break;
+		}
+
+		case 1001: {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
+				current_movement_y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
+				current_movement_y = -1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+				current_movement_x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) {
+				current_movement_x = 1;
+			}
+			break;
+		}
+
+		case 1002: {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {
+				current_movement_y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
+				current_movement_y = -1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) {
+				current_movement_x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
+				current_movement_x = 1;
+			}
+			break;
+		}
+
+		default: {
+			break;
+		}
+
+		}
+
+		if (
+			(movement_x != current_movement_x)
+			|| (movement_y != current_movement_y)
+			) {
+			movement_x = current_movement_x;
+			movement_y = current_movement_y;
+
+			if (sync) {
+				auto player_move_packet = std::make_shared<Packet>(PacketType::PlayerMove);
+				*player_move_packet << game->GetId() << networks_id << movement_x << movement_y;
+				game->Send(player_move_packet);
+			}
+		}
+
+		movement = b2Vec2(
+			movement_x * 0.01f / 30 * elapsed, 
+			movement_y * 0.01f / 30 * elapsed
+		);
+
+		
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		movement.y += -0.01f / 30 * elapsed;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-		movement.x += -0.01f / 30 * elapsed;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-		movement.x += 0.01f / 30 * elapsed;
+	else {
+		if (sync) {
+			movement = b2Vec2(
+				movement_x * 0.01f / 30 * elapsed,
+				movement_y * 0.01f / 30 * elapsed
+			);
+		}
 	}
 
 	body->SetLinearVelocity(movement);

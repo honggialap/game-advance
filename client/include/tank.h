@@ -12,6 +12,10 @@ typedef World* pWorld;
 
 class Tank : public GameObject {
 protected:
+	bool player_control = false;
+	int32_t movement_x = 0;
+	int32_t movement_y = 0;
+
 	sf::Texture texture;
 	sf::Sprite sprite;
 
@@ -25,6 +29,9 @@ protected:
 
 public:
 	Tank(pGame game, pWorld world) : GameObject(game, world) {};
+
+	void SetPlayerControl(bool player_control) { this->player_control = player_control; }
+	void SetMovement(int32_t x, int32_t y) { movement_x = x; movement_y = y; }
 
 	void Load(std::string data_path) override;
 	void Unload() override;

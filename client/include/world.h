@@ -15,14 +15,17 @@ typedef Game* pGame;
 
 class World : public Scene, public b2ContactListener {
 protected:
+	sf::Font font;
+	sf::Text text;
+
 	sf::View camera;
 
 	b2Vec2 gravity;
 	b2World* physics_world = nullptr;
 
-	std::unique_ptr<GameObject> tank;
-	std::unique_ptr<GameObject> bullet;
-	std::unique_ptr<GameObject> wall;
+	uint32_t game_object_id = 1000;
+	std::map<uint32_t, uint32_t> networksObjects;
+	std::map<uint32_t, std::shared_ptr<GameObject>> gameObjects;
 
 public:
 	World(pGame game) : Scene(game) {};

@@ -15,8 +15,16 @@ protected:
 	pGame game;
 	pWorld world;
 
+	uint32_t game_object_id;
+	uint32_t networks_id;
+	bool sync;
+
 public:
 	GameObject(pGame game, pWorld world) : game(game), world(world) {};
+
+	void SetId(uint32_t id) { game_object_id = id; }
+	void SetNetworksId(uint32_t id) { networks_id = id; }
+	void SetSync(bool sync) { this->sync = sync; }
 
 	virtual void Load(std::string data_path) = 0;
 	virtual void Unload() = 0;
