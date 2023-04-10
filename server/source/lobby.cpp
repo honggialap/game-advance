@@ -18,7 +18,7 @@ void Lobby::Unload() {
 }
 
 void Lobby::Update(float elapsed) {
-	if (ready_players == 3) {
+	if (ready_players == 1) {
 		auto start_game_packet = std::make_shared<Packet>(PacketType::StartGame);
 		uint32_t scene_id = 1;
 		*start_game_packet << scene_id;

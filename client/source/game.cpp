@@ -10,7 +10,8 @@ void Game::Initialize(std::string data_path) {
 	std::string window_title = window_settings.at("title");
 	unsigned int window_width = window_settings.at("width");
 	unsigned int window_height = window_settings.at("height");
-	float framerate = window_settings.at("framerate");
+	float update_rate = window_settings.at("update_rate");
+	float render_rate = window_settings.at("render_rate");
 
 	window.create(
 		sf::VideoMode(window_width, window_height),
@@ -18,7 +19,8 @@ void Game::Initialize(std::string data_path) {
 		sf::Style::Titlebar | sf::Style::Close
 	);
 	window.setFramerateLimit(0);
-	elapsed_ms_per_tick = 1000.0f / framerate;
+	elapsed_ms_per_update = 1000.0f / update_rate;
+	elapsed_ms_per_render = 1000.0f / render_rate;
 
 	auto& scenes = data.at("scenes");
 	for (auto& scene : scenes.at("scene_list")) {
@@ -32,7 +34,7 @@ void Game::Initialize(std::string data_path) {
 	auto& networks_settings = data.at("networks");
 	std::string address = networks_settings.at("address");
 	uint32_t port = networks_settings.at("port");
-	tick_per_ping = networks_settings.at("tick_per_ping");
+	//tick_per_ping = networks_settings.at("tick_per_ping");
 
 	IPEndPoint host_address = IPEndPoint(address.c_str(), port);
 	Client::Initialize(host_address);
@@ -65,36 +67,23 @@ void Game::Run(std::string data_path) {
 
 		if (load_scene) LoadScene();
 
-		float temp_elapsed_ms = clock.GetMilliseconds();
+		ProcessNetworks();
+
+		float elapsed_ms = clock.GetMilliseconds();
 		clock.Reset();
 
-		elapsed_ms += temp_elapsed_ms;
-		total_elapsed_ms += temp_elapsed_ms;
+		update_elapsed_ms += elapsed_ms;
+		while (update_elapsed_ms >= elapsed_ms_per_update) {
+			scene->Update(elapsed_ms_per_update);
+			update_elapsed_ms -= elapsed_ms_per_update;
+		}
 
-		ProcessNetworks();
-		
-		if (elapsed_ms >= elapsed_ms_per_tick) {
-			if (IsApproved()) {
-				if (tick_per_ping_count > 0) {
-					tick_per_ping_count -= 1;
-				}
-				else {
-					tick_per_ping_count = tick_per_ping;
-
-					auto ping_packet = std::make_shared<Packet>(PacketType::Ping);
-					*ping_packet << id << total_elapsed_ms;
-					Send(ping_packet);
-				}
-			}
-
-			tick_count += 1;
-			scene->Update(elapsed_ms_per_tick);
-
+		render_elapsed_ms += elapsed_ms;
+		while (render_elapsed_ms >= elapsed_ms_per_render) {
 			window.clear(sf::Color::Black);
 			scene->Render(window);
 			window.display();
-
-			elapsed_ms -= elapsed_ms_per_tick;
+			render_elapsed_ms -= elapsed_ms_per_render;
 		}
 	}
 
@@ -126,12 +115,8 @@ void Game::LoadScene() {
 
 	scene->Load(next_scene.second);
 
-	elapsed_ms = 0.0f;
-	total_elapsed_ms = 0.0f;
-	tick_count = 0;
-	
-	tick_per_ping_count = tick_per_ping;
-	ping = 0;
+	update_elapsed_ms = 0.0f;
+	render_elapsed_ms = 0.0f;
 }
 
 pScene Game::CreateScene(unsigned int scene_type) {
@@ -191,7 +176,7 @@ bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 	case PacketType::Ping: {
 		float reply_total_elapsed_ms;
 		*packet >> reply_total_elapsed_ms;
-		ping = total_elapsed_ms - reply_total_elapsed_ms;
+		//ping = total_elapsed_ms - reply_total_elapsed_ms;
 		//system("cls");
 		//printf("PING: %f \n", ping);
 		return true;

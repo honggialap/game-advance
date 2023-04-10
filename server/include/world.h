@@ -15,6 +15,9 @@ typedef Game* pGame;
 
 class World : public Scene, b2ContactListener {
 protected:
+	float total_elapsed_ms = 0.0f;
+	uint32_t tick_count = 0;
+
 	sf::View camera;
 
 	b2Vec2 gravity;

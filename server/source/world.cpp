@@ -48,6 +48,18 @@ void World::Unload() {
 }
 
 void World::Update(float elapsed) {
+	total_elapsed_ms += elapsed;
+	tick_count += 1;
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)) {
+		total_elapsed_ms += 1000.0f;
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num9)) {
+		total_elapsed_ms -= 1000.0f;
+	}
+
+	printf("TICK: %d - ELAPSED: %f \n", tick_count, total_elapsed_ms);
+	
 	// Camera movement
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 		camera.move(sf::Vector2f(0, -1.0f) * elapsed);
@@ -114,6 +126,23 @@ void World::OnDisconnect(uint32_t connection_id) {
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
+
+	case PacketType::Sync: {
+		uint32_t client_id = 0;
+		float client_elapsed = 0;
+		uint32_t client_tick = 0;
+
+		float server_elapsed = total_elapsed_ms;
+		uint32_t server_tick = tick_count;
+
+		*packet >> client_id >> client_tick >> client_elapsed;
+
+		auto sync_packet = std::make_shared<Packet>(PacketType::Sync);
+		*sync_packet << client_tick << client_elapsed << server_tick << server_elapsed;
+		game->Send(client_id, sync_packet);
+
+		return true;
+	}
 
 	case PacketType::LocalPlayerSpawn: {
 		uint32_t client_id = 0;

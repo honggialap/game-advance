@@ -7,7 +7,6 @@
 pGameObject World::CreateGameObject(unsigned int game_object_type) {
 	switch (game_object_type) {
 	case ACTOR_TYPE_TANK:
-		printf("SPAWN!!!");
 		return new Tank(game, this);
 		break;
 
@@ -28,11 +27,6 @@ pGameObject World::CreateGameObject(unsigned int game_object_type) {
 void World::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
-
-	font.loadFromFile("data/resources/fonts/arial.ttf");
-	text.setFont(font);
-
-	text.setString(game->GetId());
 
 	gravity = b2Vec2(0, 0);
 	physics_world = new b2World(gravity);
@@ -55,6 +49,8 @@ void World::Load(std::string data_path) {
 	uint32_t id = game->GetId();
 	*local_player_spawn << id << game_object_id << game_object_type;
 	game->Send(local_player_spawn);
+
+	Sleep(DWORD(2000));
 }
 
 void World::Unload() {
@@ -74,32 +70,19 @@ void World::Unload() {
 
 void World::Update(float elapsed) {
 
-	// Camera movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		camera.move(sf::Vector2f(0, -1.0f) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		camera.move(sf::Vector2f(0, 1.0f) * elapsed);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-		camera.move(sf::Vector2f(-1.0f, 0) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-		camera.move(sf::Vector2f(1.0f, 0) * elapsed);
-	}
+
+
+	tick_count += 1;
 
 	for (auto& game_object : gameObjects) {
 		game_object.second->Update(elapsed);
 	}
-
 
 	physics_world->Step(elapsed, 8, 3);
 }
 
 void World::Render(sf::RenderWindow& window) {
 	window.setView(camera);
-
-	window.draw(text);
 
 	for (auto& game_object : gameObjects) {
 		game_object.second->Render(window);
@@ -150,6 +133,11 @@ void World::OnConnectFail() {
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
+
+	case PacketType::Sync: {
+		return true;
+	}
+
 
 	case PacketType::LocalPlayerSpawn: {
 		uint32 game_object_id;

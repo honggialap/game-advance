@@ -10,7 +10,8 @@ void Game::Initialize(std::string data_path) {
 	std::string window_title = window_settings.at("title");
 	unsigned int window_width = window_settings.at("width");
 	unsigned int window_height = window_settings.at("height");
-	float framerate = window_settings.at("framerate");
+	float update_rate = window_settings.at("update_rate");
+	float render_rate = window_settings.at("render_rate");
 
 	window.create(
 		sf::VideoMode(window_width, window_height),
@@ -18,7 +19,8 @@ void Game::Initialize(std::string data_path) {
 		sf::Style::Titlebar | sf::Style::Close
 	);
 	window.setFramerateLimit(0);
-	elapsed_ms_per_tick = 1000.0f / framerate;
+	elapsed_ms_per_update = 1000.0f / update_rate;
+	elapsed_ms_per_render = 1000.0f / render_rate;
 
 	auto& scenes = data.at("scenes");
 	for (auto& scene : scenes.at("scene_list")) {
@@ -63,20 +65,23 @@ void Game::Run(std::string data_path) {
 
 		if (load_scene) LoadScene();
 
-		elapsed_ms += clock.GetMilliseconds();
-		clock.Reset();
-
 		ProcessNetworks();
 
-		if (elapsed_ms >= elapsed_ms_per_tick) {
-			tick_count += 1;
-			scene->Update(elapsed_ms_per_tick);
+		float elapsed_ms = clock.GetMilliseconds();
+		clock.Reset();
 
+		update_elapsed_ms += elapsed_ms;
+		while (update_elapsed_ms >= elapsed_ms_per_update) {
+			scene->Update(elapsed_ms_per_update);
+			update_elapsed_ms -= elapsed_ms_per_update;
+		}
+
+		render_elapsed_ms += elapsed_ms;
+		while (render_elapsed_ms >= elapsed_ms_per_render) {
 			window.clear(sf::Color::Black);
 			scene->Render(window);
 			window.display();
-
-			elapsed_ms -= elapsed_ms_per_tick;
+			render_elapsed_ms -= elapsed_ms_per_render;
 		}
 	}
 
@@ -108,7 +113,8 @@ void Game::LoadScene() {
 
 	scene->Load(next_scene.second);
 
-	tick_count = 0;
+	update_elapsed_ms = 0.0f;
+	render_elapsed_ms = 0.0f;
 }
 
 pScene Game::CreateScene(unsigned int scene_type) {

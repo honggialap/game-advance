@@ -150,6 +150,7 @@
     <ClInclude Include="include\bullet.h" />
     <ClInclude Include="include\client.h" />
     <ClInclude Include="include\game.h" />
+    <ClInclude Include="include\game_state.h" />
     <ClInclude Include="include\game_object.h" />
     <ClInclude Include="include\lobby.h" />
     <ClInclude Include="include\scene.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="source\bullet.cpp" />
     <ClCompile Include="source\client.cpp" />
     <ClCompile Include="source\game.cpp" />
+    <ClCompile Include="source\game_state.cpp" />
     <ClCompile Include="source\lobby.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\tank.cpp" />

@@ -12,14 +12,12 @@
 class Game : public Client {
 protected:
 	sf::RenderWindow window;
+	
 	b2Timer clock;
-	float elapsed_ms_per_tick;
-	float elapsed_ms;
-	float total_elapsed_ms;
-	uint32_t tick_per_ping;
-	uint32_t tick_per_ping_count;
-	uint32_t tick_count;
-	float ping;
+	float update_elapsed_ms;
+	float elapsed_ms_per_update;
+	float render_elapsed_ms;
+	float elapsed_ms_per_render;
 
 	std::map<unsigned int, std::pair<unsigned int, std::string>> scene_list;
 	unsigned int next_scene_id = -1;
@@ -36,7 +34,7 @@ public:
 	void LoadScene();
 	pScene CreateScene(unsigned int scene_type);
 
-	float GetPing() { return ping; }
+	//float GetPing() { return ping; }
 
 	void OnConnect() override;
 	void OnDisconnect() override;

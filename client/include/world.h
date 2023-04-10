@@ -4,6 +4,7 @@
 
 #include "scene.h"
 #include "game_object.h"
+#include "game_state.h"
 
 #define ACTOR_TYPE_TANK		1
 #define ACTOR_TYPE_BULLET	2
@@ -15,13 +16,12 @@ typedef Game* pGame;
 
 class World : public Scene, public b2ContactListener {
 protected:
-	sf::Font font;
-	sf::Text text;
-
 	sf::View camera;
-
 	b2Vec2 gravity;
 	b2World* physics_world = nullptr;
+
+	uint32_t tick_count = 0;
+
 
 	uint32_t game_object_id = 1000;
 	std::map<uint32_t, uint32_t> networksObjects;

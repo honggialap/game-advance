@@ -9,6 +9,7 @@ enum PacketType : uint16_t {
 	Welcome,
 	NotWelcome,
 	Ping,
+	Sync,
 	PlayerConfirm,
 	StartGame,
 	LocalPlayerSpawn,
