@@ -2,6 +2,31 @@
 #include "game.h"
 #include "world.h"
 
+pGameObjectState Bullet::Serialize() {
+	return new BulletState(
+		id,
+		type,
+		position_x,
+		position_y,
+		velocity_x,
+		velocity_y
+	);
+}
+
+bool Bullet::Deserialize(pGameObjectState game_object_state) {
+	if (!static_cast<pBulletState>(game_object_state)) {
+		return false;
+	}
+
+	pBulletState state = static_cast<pBulletState>(game_object_state);
+	position_x = state->position_x;
+	position_y = state->position_y;
+	velocity_x = state->velocity_x;
+	velocity_y = state->velocity_y;
+
+	return true;
+}
+
 void Bullet::Load(std::string data_path) {
 	//std::ifstream data_file(data_path);
 	//nlohmann::json data = nlohmann::json::parse(data_file);

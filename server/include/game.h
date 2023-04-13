@@ -23,6 +23,9 @@ protected:
 	unsigned int next_scene_id = -1;
 	bool load_scene = false;
 	std::unique_ptr<Scene> scene;
+	
+public:
+	std::map<uint32_t, std::pair<uint32_t, bool>> players;
 
 public:
 	void Initialize(std::string data_path);

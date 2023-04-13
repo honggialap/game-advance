@@ -25,6 +25,8 @@ protected:
 	std::unique_ptr<Scene> scene;
 
 public:
+	uint32_t player_id = 0;
+
 	void Initialize(std::string data_path);
 	void Shutdown();
 	
@@ -33,8 +35,6 @@ public:
 	void PlayScene(unsigned int scene_id);
 	void LoadScene();
 	pScene CreateScene(unsigned int scene_type);
-
-	//float GetPing() { return ping; }
 
 	void OnConnect() override;
 	void OnDisconnect() override;

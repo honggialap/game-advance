@@ -21,10 +21,19 @@
     <ClCompile Include="source\game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\lobby.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\bullet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\lobby.cpp">
+    <ClCompile Include="source\command.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\game_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\tank.cpp">
@@ -36,18 +45,30 @@
     <ClCompile Include="source\world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\lobby.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\bullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\lobby.h">
+    <ClInclude Include="include\command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\tank.h">
@@ -59,14 +80,8 @@
     <ClInclude Include="include\world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\game_object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\server.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\game_data.json" />
   </ItemGroup>
 </Project>

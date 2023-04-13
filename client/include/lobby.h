@@ -11,9 +11,8 @@ typedef Game* pGame;
 
 class Lobby : public Scene {
 	enum State {
-		NotConnected,
-		WaitingForConfirm,
-		Ready,
+		Picking,
+		Locked
 	};
 	State state;
 
@@ -21,15 +20,15 @@ protected:
 	sf::Font font;
 	sf::Text text;
 
+	bool picked;
+	bool locked;
+
 public:
 	Lobby(pGame game);
 	~Lobby();
 
 	void Load(std::string data_path) override;
 	void Unload() override;
-
-	void SetState(State next_state);
-	State GetState() { return state; }
 
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;

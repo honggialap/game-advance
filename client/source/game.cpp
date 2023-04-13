@@ -34,7 +34,6 @@ void Game::Initialize(std::string data_path) {
 	auto& networks_settings = data.at("networks");
 	std::string address = networks_settings.at("address");
 	uint32_t port = networks_settings.at("port");
-	//tick_per_ping = networks_settings.at("tick_per_ping");
 
 	IPEndPoint host_address = IPEndPoint(address.c_str(), port);
 	Client::Initialize(host_address);
@@ -170,15 +169,6 @@ bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 	case PacketType::NotWelcome: {
 		Disconnect();
-		return true;
-	}
-
-	case PacketType::Ping: {
-		float reply_total_elapsed_ms;
-		*packet >> reply_total_elapsed_ms;
-		//ping = total_elapsed_ms - reply_total_elapsed_ms;
-		//system("cls");
-		//printf("PING: %f \n", ping);
 		return true;
 	}
 

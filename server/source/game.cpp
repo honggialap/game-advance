@@ -162,19 +162,6 @@ void Game::OnDisconnect(uint32_t connection_id) {
 
 bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
-
-	case PacketType::Ping: {
-		uint32_t id;
-		float reply_total_elapsed_ms;
-		*packet >> id >> reply_total_elapsed_ms;
-
-		auto reply_ping_packet = std::make_shared<Packet>(PacketType::Ping);
-		*reply_ping_packet << reply_total_elapsed_ms;
-		Send(id, reply_ping_packet);
-
-		return true;
-	}
-
 	default: {
 		if (scene) {
 			return scene->ProcessPacket(packet);

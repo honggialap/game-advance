@@ -8,13 +8,11 @@ enum PacketType : uint16_t {
 	Invalid,
 	Welcome,
 	NotWelcome,
-	Ping,
-	Sync,
+	PlayerPick,
+	PlayerLock,
 	PlayerConfirm,
-	StartGame,
-	LocalPlayerSpawn,
-	RemotePlayerSpawn,
-	PlayerMove,
+	PlayNextScene,
+	ServerGameState,
 };
 
 class Packet {

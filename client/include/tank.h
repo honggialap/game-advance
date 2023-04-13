@@ -4,18 +4,25 @@
 
 #include "game_object.h"
 
-// Forward declaration
-class Game;
-typedef Game* pGame;
-class World;
-typedef World* pWorld;
+struct TankState : public GameObjectState {
+	uint32_t player_id;
+
+	TankState(
+		uint32_t id,
+		uint32_t type,
+		float position_x,
+		float position_y,
+		float velocity_x,
+		float velocity_y,
+		uint32_t player_id
+	) : GameObjectState(id, type, position_x, position_y, velocity_x, velocity_y),
+		player_id(player_id)
+	{}
+};
+typedef TankState* pTankState;
 
 class Tank : public GameObject {
 protected:
-	bool player_control = false;
-	int32_t movement_x = 0;
-	int32_t movement_y = 0;
-
 	sf::Texture texture;
 	sf::Sprite sprite;
 
@@ -28,10 +35,22 @@ protected:
 	b2Fixture* fixture = nullptr;
 
 public:
-	Tank(pGame game, pWorld world) : GameObject(game, world) {};
+	uint32_t player_id;
 
-	void SetPlayerControl(bool player_control) { this->player_control = player_control; }
-	void SetMovement(int32_t x, int32_t y) { movement_x = x; movement_y = y; }
+	Tank(
+		pGame game,
+		pWorld world,
+		uint32_t id,
+		uint32_t type,
+		float position_x,
+		float position_y,
+		float velocity_x,
+		float velocity_y
+	) : GameObject(game, world, id, type, position_x, position_y, velocity_x, velocity_y) {
+	};
+
+	pGameObjectState Serialize() override;
+	bool Deserialize(pGameObjectState game_object_state) override;
 
 	void Load(std::string data_path) override;
 	void Unload() override;

@@ -4,7 +4,6 @@
 
 #include "scene.h"
 #include "game_object.h"
-#include "game_state.h"
 
 #define ACTOR_TYPE_TANK		1
 #define ACTOR_TYPE_BULLET	2
@@ -17,15 +16,14 @@ typedef Game* pGame;
 class World : public Scene, public b2ContactListener {
 protected:
 	sf::View camera;
+
 	b2Vec2 gravity;
 	b2World* physics_world = nullptr;
 
-	uint32_t tick_count = 0;
+	uint32_t server_tick;
 
-
-	uint32_t game_object_id = 1000;
-	std::map<uint32_t, uint32_t> networksObjects;
-	std::map<uint32_t, std::shared_ptr<GameObject>> gameObjects;
+	uint32_t game_object_id;
+	std::map<uint32_t, std::shared_ptr<GameObject>> game_objects;
 
 public:
 	World(pGame game) : Scene(game) {};
@@ -36,7 +34,13 @@ public:
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 
-	pGameObject CreateGameObject(unsigned int game_object_type);
+	pGameObject CreateGameObject(
+		uint32_t game_object_type,
+		float position_x,
+		float position_y,
+		float velocity_x,
+		float velocity_y
+	);
 
 	sf::View& GetCamera();
 

@@ -11,7 +11,8 @@ typedef Game* pGame;
 
 class Lobby : public Scene {
 protected:
-	uint32_t ready_players;
+	sf::Font font;
+	sf::Text text;
 
 public:
 	Lobby(pGame game);

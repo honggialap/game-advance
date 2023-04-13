@@ -2,7 +2,35 @@
 #include "game.h"
 #include "world.h"
 
+#include "bullet.h"
 #include "wall.h"
+
+pGameObjectState Tank::Serialize() {
+	return new TankState(
+		id,
+		type,
+		position_x,
+		position_y,
+		velocity_x,
+		velocity_y,
+		player_id
+	);
+}
+
+bool Tank::Deserialize(pGameObjectState game_object_state) {
+	if (!static_cast<pTankState>(game_object_state)) {
+		return false;
+	}
+
+	pTankState state = static_cast<pTankState>(game_object_state);
+	position_x = state->position_x;
+	position_y = state->position_y;
+	velocity_x = state->velocity_x;
+	velocity_y = state->velocity_y;
+	player_id = state->player_id;
+
+	return true;
+}
 
 void Tank::Load(std::string data_path) {
 	//std::ifstream data_file(data_path);
@@ -12,7 +40,7 @@ void Tank::Load(std::string data_path) {
 	sprite.setTexture(texture);
 	sprite.setOrigin(32, 32);
 
-	setPosition(0, 0);
+	SetPosition(0, 0);
 
 	body_def.position.Set(0, 0);
 	body_def.type = b2_dynamicBody;
@@ -41,109 +69,20 @@ void Tank::Unload() {
 }
 
 void Tank::Update(float elapsed) {
-	setPosition(
+	SetPosition(
 		body->GetPosition().x * 30,
 		body->GetPosition().y * 30
 	);
 
 	// Movement control
 	b2Vec2 movement(0, 0);
-	if (player_control) {
-		int32_t current_movement_x = 0;
-		int32_t current_movement_y = 0;
-
-		switch (game->GetId()) {
-		case 1000: {
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-				current_movement_y = 1;
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-				current_movement_y = -1;
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-				current_movement_x = -1;
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-				current_movement_x = 1;
-			}
-			break;
-		}
-
-		case 1001: {
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
-				current_movement_y = 1;
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
-				current_movement_y = -1;
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-				current_movement_x = -1;
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) {
-				current_movement_x = 1;
-			}
-			break;
-		}
-
-		case 1002: {
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {
-				current_movement_y = 1;
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
-				current_movement_y = -1;
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) {
-				current_movement_x = -1;
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
-				current_movement_x = 1;
-			}
-			break;
-		}
-
-		default: {
-			break;
-		}
-
-		}
-
-		if (
-			(movement_x != current_movement_x)
-			|| (movement_y != current_movement_y)
-			) {
-			movement_x = current_movement_x;
-			movement_y = current_movement_y;
-
-			if (sync) {
-				auto player_move_packet = std::make_shared<Packet>(PacketType::PlayerMove);
-				*player_move_packet << game->GetId() << networks_id << movement_x << movement_y;
-				game->Send(player_move_packet);
-			}
-		}
-
-		movement = b2Vec2(
-			movement_x * 0.01f / 30 * elapsed, 
-			movement_y * 0.01f / 30 * elapsed
-		);
-
-		
-	}
-	else {
-		if (sync) {
-			movement = b2Vec2(
-				movement_x * 0.01f / 30 * elapsed,
-				movement_y * 0.01f / 30 * elapsed
-			);
-		}
-	}
-
 	body->SetLinearVelocity(movement);
 }
 
 void Tank::Render(sf::RenderWindow& window) {
 	sprite.setPosition(
-		getPosition().x,
-		-getPosition().y + window.getSize().y
+		position_x,
+		-position_y + window.getSize().y
 	);
 
 	window.draw(sprite);

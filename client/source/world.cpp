@@ -4,23 +4,41 @@
 #include "bullet.h"
 #include "wall.h"
 
-pGameObject World::CreateGameObject(unsigned int game_object_type) {
+pGameObject World::CreateGameObject(
+	uint32_t game_object_type,
+	float position_x,
+	float position_y,
+	float velocity_x,
+	float velocity_y
+) {
+	pGameObject game_object = nullptr;
 	switch (game_object_type) {
-	case ACTOR_TYPE_TANK:
-		return new Tank(game, this);
-		break;
+	case ACTOR_TYPE_TANK: {
+		game_objects[game_object_id].reset(new Tank(game, this, game_object_id, game_object_type, position_x, position_y, velocity_x, velocity_y));
+		static_cast<pTank>(game_objects[game_object_id].get())->Load("");
+		game_object = game_objects[game_object_id].get();
+		game_object_id += 1;
+		return game_object;
+	}
 
-	case ACTOR_TYPE_BULLET:
-		return new Bullet(game, this);
-		break;
+	case ACTOR_TYPE_BULLET: {
+		game_objects[game_object_id].reset(new Bullet(game, this, game_object_id, game_object_type, position_x, position_y, velocity_x, velocity_y));
+		static_cast<pBullet>(game_objects[game_object_id].get())->Load("");
+		game_object = game_objects[game_object_id].get();
+		game_object_id += 1;
+		return game_object;
+	}
 
-	case ACTOR_TYPE_WALL:
-		return new Wall(game, this);
-		break;
+	case ACTOR_TYPE_WALL: {
+		game_objects[game_object_id].reset(new Wall(game, this, game_object_id, game_object_type, position_x, position_y, velocity_x, velocity_y));
+		static_cast<pWall>(game_objects[game_object_id].get())->Load("");
+		game_object = game_objects[game_object_id].get();
+		game_object_id += 1;
+		return game_object;
+	}
 
 	default:
-		return nullptr;
-		break;
+		return game_object;
 	}
 }
 
@@ -35,32 +53,20 @@ void World::Load(std::string data_path) {
 	camera.reset(sf::FloatRect(0, 0, 800, 600));
 	camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
-	uint32_t game_object_id = this->game_object_id;
-	this->game_object_id++;
-	uint32_t game_object_type = ACTOR_TYPE_TANK;
-	gameObjects[game_object_id].reset(CreateGameObject(game_object_type));
-	gameObjects[game_object_id]->Load("");
-	gameObjects[game_object_id]->SetId(game_object_id);
-	gameObjects[game_object_id]->SetSync(false);
-	pTank tank = static_cast<pTank>(gameObjects[game_object_id].get());
-	tank->SetPlayerControl(true);
-
-	auto local_player_spawn = std::make_shared<Packet>(PacketType::LocalPlayerSpawn);
-	uint32_t id = game->GetId();
-	*local_player_spawn << id << game_object_id << game_object_type;
-	game->Send(local_player_spawn);
-
-	Sleep(DWORD(2000));
+	CreateGameObject(ACTOR_TYPE_TANK, 100.0f, 100.0f, 0.0f, 0.0f);
+	CreateGameObject(ACTOR_TYPE_TANK, 100.0f, 100.0f, 0.0f, 0.0f);
+	CreateGameObject(ACTOR_TYPE_TANK, 100.0f, 100.0f, 0.0f, 0.0f);
+	CreateGameObject(ACTOR_TYPE_TANK, 100.0f, 100.0f, 0.0f, 0.0f);
 }
 
 void World::Unload() {
 
-	for (auto& game_object : gameObjects) {
+	for (auto& game_object : game_objects) {
 		game_object.second->Unload();
 		game_object.second.reset();
 	}
 
-	gameObjects.clear();
+	game_objects.clear();
 
 	if (physics_world != nullptr) {
 		delete physics_world;
@@ -69,22 +75,17 @@ void World::Unload() {
 }
 
 void World::Update(float elapsed) {
-
-
-
-	tick_count += 1;
-
-	for (auto& game_object : gameObjects) {
+	for (auto& game_object : game_objects) {
 		game_object.second->Update(elapsed);
 	}
-
 	physics_world->Step(elapsed, 8, 3);
+
 }
 
 void World::Render(sf::RenderWindow& window) {
 	window.setView(camera);
 
-	for (auto& game_object : gameObjects) {
+	for (auto& game_object : game_objects) {
 		game_object.second->Render(window);
 	}
 }
@@ -133,50 +134,45 @@ void World::OnConnectFail() {
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
+	case PacketType::ServerGameState: {
+		uint32_t total_game_objects = 0;
+		*packet >> total_game_objects;
 
-	case PacketType::Sync: {
+		for (uint32_t i = 0; i < total_game_objects; i++) {
+			uint32_t type = 0;
+			*packet >> type;
+			switch (type) {
+
+			case ACTOR_TYPE_TANK: {
+				uint32_t id = 0;
+				float position_x = 0.0f;
+				float position_y = 0.0f;
+				float velocity_x = 0.0f;
+				float velocity_y = 0.0f;
+				uint32_t player_id = 0;
+
+				*packet
+					>> id
+					>> position_x
+					>> position_y
+					>> velocity_x
+					>> velocity_y
+					>> player_id;
+
+				if (game_objects.find(id) != game_objects.end()) {
+					pTankState tank_state = new TankState(id, type, position_x, position_y, velocity_x, velocity_y, player_id);
+					static_cast<pTank>(game_objects[id].get())->Deserialize(tank_state);
+					delete tank_state;
+				}
+			}
+
+			}
+		}
+
 		return true;
 	}
 
 
-	case PacketType::LocalPlayerSpawn: {
-		uint32 game_object_id;
-		uint32 networks_id;
-		*packet >> game_object_id >> networks_id;
-		networksObjects[networks_id] = game_object_id;
-		gameObjects[game_object_id]->SetNetworksId(networks_id);
-		gameObjects[game_object_id]->SetSync(true);
-		return true;
-	}
-
-	case PacketType::RemotePlayerSpawn: {
-		uint32 game_object_id = this->game_object_id;
-		uint32 networks_id;
-		uint32 game_object_type;
-
-		*packet >> networks_id >> game_object_type;
-		gameObjects[game_object_id].reset(CreateGameObject(game_object_type));
-		gameObjects[game_object_id]->Load("");
-		networksObjects[networks_id] = game_object_id;
-		gameObjects[game_object_id]->SetId(game_object_id);
-		gameObjects[game_object_id]->SetNetworksId(networks_id);
-		gameObjects[game_object_id]->SetSync(true);
-		
-		this->game_object_id++;
-		return true;
-	}
-
-	case PacketType::PlayerMove: {
-		uint32_t networks_id = 0;
-		int32_t movement_x = 0;
-		int32_t movement_y = 0;
-
-		*packet >> networks_id >> movement_x >> movement_y;
-		pTank tank = static_cast<pTank>(gameObjects[networksObjects[networks_id]].get());
-		tank->SetMovement(movement_x, movement_y);
-		printf("ID: %d, %d, %d \n", networks_id, movement_x, movement_y);
-		return true;
-	}
 
 	default: {
 		return false;

@@ -3,19 +3,11 @@
 #define __CLIENT_GAME_STATE_H__
 
 #include "common.h"
-
-struct GameObjectState {
-	float position_x;
-	float position_y;
-
-	float velocity_x;
-	float velocity_y;
-};
+#include "game_object.h"
 
 class GameState {
 public:
-	uint32_t tick;
-	std::map<uint32_t, GameObjectState> game_object_states;
+	std::map<uint32_t, GameObjectState> game_object;
 };
 
 

@@ -3,13 +3,13 @@
     "title": "Server",
     "width": 800,
     "height": 600,
-    "update_rate": 64.0,
-    "render_rate": 30.0
+    "update_rate": 16.0,
+    "render_rate": 16.0
   },
   "networks": {
     "address": "::1",
     "port": 27015,
-    "max_connection": 5
+    "max_connection": 4
   },
   "scenes": {
     "start_scene_id": 0,
@@ -22,7 +22,7 @@
       {
         "id": 1,
         "type": 2,
-        "data_path": "data/scenes/world.json"
+        "data_path": "data/scenes/lobby.json"
       }
     ]
   }

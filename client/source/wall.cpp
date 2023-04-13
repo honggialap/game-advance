@@ -4,6 +4,31 @@
 
 #include "tank.h"
 
+pGameObjectState Wall::Serialize() {
+	return new WallState(
+		id,
+		type,
+		position_x,
+		position_y,
+		velocity_x,
+		velocity_y
+	);
+}
+
+bool Wall::Deserialize(pGameObjectState game_object_state) {
+	if (!static_cast<pWallState>(game_object_state)) {
+		return false;
+	}
+
+	pWallState state = static_cast<pWallState>(game_object_state);
+	position_x = state->position_x;
+	position_y = state->position_y;
+	velocity_x = state->velocity_x;
+	velocity_y = state->velocity_y;
+
+	return true;
+}
+
 void Wall::Load(std::string data_path) {
 	//std::ifstream data_file(data_path);
 	//nlohmann::json data = nlohmann::json::parse(data_file);
@@ -12,7 +37,7 @@ void Wall::Load(std::string data_path) {
 	sprite.setTexture(texture);
 	sprite.setOrigin(32, 32);
 
-	setPosition(0, 0);
+	SetPosition(0, 0);
 
 	body_def.position.Set(0, 0);
 	body_def.type = b2_kinematicBody;
@@ -41,7 +66,7 @@ void Wall::Unload() {
 }
 
 void Wall::Update(float elapsed) {
-	setPosition(
+	SetPosition(
 		body->GetPosition().x * 30,
 		body->GetPosition().y * 30
 	);
@@ -49,8 +74,8 @@ void Wall::Update(float elapsed) {
 
 void Wall::Render(sf::RenderWindow& window) {
 	sprite.setPosition(
-		getPosition().x,
-		-getPosition().y + window.getSize().y
+		position_x,
+		-position_y + window.getSize().y
 	);
 
 	window.draw(sprite);

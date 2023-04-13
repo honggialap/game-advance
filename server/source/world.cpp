@@ -4,23 +4,41 @@
 #include "bullet.h"
 #include "wall.h"
 
-pGameObject World::CreateGameObject(unsigned int game_object_type) {
+pGameObject World::CreateGameObject(
+	uint32_t game_object_type,
+	float position_x,
+	float position_y,
+	float velocity_x,
+	float velocity_y
+) {
+	pGameObject game_object = nullptr;
 	switch (game_object_type) {
-	case ACTOR_TYPE_TANK:
-		return new Tank(game, this);
-		break;
+	case ACTOR_TYPE_TANK: {
+		game_objects[game_object_id].reset(new Tank(game, this, game_object_id, game_object_type, position_x, position_y, velocity_x, velocity_y));
+		static_cast<pTank>(game_objects[game_object_id].get())->Load("");
+		game_object = game_objects[game_object_id].get();
+		game_object_id += 1;
+		return game_object;
+	}
+		
+	case ACTOR_TYPE_BULLET: {
+		game_objects[game_object_id].reset(new Bullet(game, this, game_object_id, game_object_type, position_x, position_y, velocity_x, velocity_y));
+		static_cast<pBullet>(game_objects[game_object_id].get())->Load("");
+		game_object = game_objects[game_object_id].get();
+		game_object_id += 1;
+		return game_object;
+	}
 
-	case ACTOR_TYPE_BULLET:
-		return new Bullet(game, this);
-		break;
-
-	case ACTOR_TYPE_WALL:
-		return new Wall(game, this);
-		break;
+	case ACTOR_TYPE_WALL: {
+		game_objects[game_object_id].reset(new Wall(game, this, game_object_id, game_object_type, position_x, position_y, velocity_x, velocity_y));
+		static_cast<pWall>(game_objects[game_object_id].get())->Load("");
+		game_object = game_objects[game_object_id].get();
+		game_object_id += 1;
+		return game_object;
+	}
 
 	default:
-		return nullptr;
-		break;
+		return game_object;
 	}
 }
 
@@ -28,18 +46,36 @@ void World::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
 
+	gravity = b2Vec2(0, 0);
+	physics_world = new b2World(gravity);
+	physics_world->SetContactListener(this);
+
 	camera.reset(sf::FloatRect(0, 0, 800, 600));
 	camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
+
+	auto player1_tank = CreateGameObject(ACTOR_TYPE_TANK, 100.0f, 100.0f, 0.0f, 0.0f);
+	static_cast<pTank>(player1_tank)->player_id = 1;
+
+	auto player2_tank = CreateGameObject(ACTOR_TYPE_TANK, 200.0f, 200.0f, 0.0f, 0.0f);
+	static_cast<pTank>(player2_tank)->player_id = 2;
+
+	auto player3_tank = CreateGameObject(ACTOR_TYPE_TANK, 300.0f, 300.0f, 0.0f, 0.0f);
+	static_cast<pTank>(player3_tank)->player_id = 3;
+
+	auto player4_tank = CreateGameObject(ACTOR_TYPE_TANK, 300.0f, 300.0f, 0.0f, 0.0f);
+	static_cast<pTank>(player4_tank)->player_id = 4;
+
+	Sleep(DWORD(1000));
 }
 
 void World::Unload() {
 
-	for (auto& game_object : gameObjects) {
+	for (auto& game_object : game_objects) {
 		game_object.second->Unload();
 		game_object.second.reset();
 	}
 
-	gameObjects.clear();
+	game_objects.clear();
 
 	if (physics_world != nullptr) {
 		delete physics_world;
@@ -48,40 +84,42 @@ void World::Unload() {
 }
 
 void World::Update(float elapsed) {
-	total_elapsed_ms += elapsed;
-	tick_count += 1;
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)) {
-		total_elapsed_ms += 1000.0f;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num9)) {
-		total_elapsed_ms -= 1000.0f;
-	}
-
-	printf("TICK: %d - ELAPSED: %f \n", tick_count, total_elapsed_ms);
-	
-	// Camera movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		camera.move(sf::Vector2f(0, -1.0f) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		camera.move(sf::Vector2f(0, 1.0f) * elapsed);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-		camera.move(sf::Vector2f(-1.0f, 0) * elapsed);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-		camera.move(sf::Vector2f(1.0f, 0) * elapsed);
-	}
-
-	for (auto& game_object : gameObjects) {
+	for (auto& game_object : game_objects) {
 		game_object.second->Update(elapsed);
 	}
+	physics_world->Step(elapsed, 8, 3);
+
+	auto game_state_packet = std::make_shared<Packet>(PacketType::ServerGameState);
+	uint32_t total_game_objects = game_objects.size();
+	*game_state_packet << total_game_objects;
+
+	for (auto& game_object : game_objects) {
+		auto base = game_object.second->Serialize();
+		switch (base->type) {
+
+		case ACTOR_TYPE_TANK: {
+			auto derived = static_cast<pTankState>(base);
+			*game_state_packet
+				<< derived->type
+				<< derived->id
+				<< derived->position_x
+				<< derived->position_y
+				<< derived->velocity_x
+				<< derived->velocity_y
+				<< derived->player_id;
+			break;
+		}
+
+		}
+	}
+
+	game->SendAll(game_state_packet);
 }
 
 void World::Render(sf::RenderWindow& window) {
 	window.setView(camera);
-	for (auto& game_object : gameObjects) {
+	for (auto& game_object : game_objects) {
 		game_object.second->Render(window);
 	}
 }
@@ -127,60 +165,6 @@ void World::OnDisconnect(uint32_t connection_id) {
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
 
-	case PacketType::Sync: {
-		uint32_t client_id = 0;
-		float client_elapsed = 0;
-		uint32_t client_tick = 0;
-
-		float server_elapsed = total_elapsed_ms;
-		uint32_t server_tick = tick_count;
-
-		*packet >> client_id >> client_tick >> client_elapsed;
-
-		auto sync_packet = std::make_shared<Packet>(PacketType::Sync);
-		*sync_packet << client_tick << client_elapsed << server_tick << server_elapsed;
-		game->Send(client_id, sync_packet);
-
-		return true;
-	}
-
-	case PacketType::LocalPlayerSpawn: {
-		uint32_t client_id = 0;
-		uint32_t game_object_id = 0;
-		uint32_t game_object_type = 0;
-		uint32_t networks_object_id = this->game_object_id;
-		this->game_object_id++;
-
-		*packet >> client_id >> game_object_id >> game_object_type;
-		gameObjects[networks_object_id].reset(CreateGameObject(game_object_type));
-		gameObjects[networks_object_id]->Load("");
-		
-		auto local_spawn_reply_packet = std::make_shared<Packet>(PacketType::LocalPlayerSpawn);
-		*local_spawn_reply_packet << game_object_id << networks_object_id;
-		game->Send(client_id, local_spawn_reply_packet);
-
-		auto remote_spawn_reply_packet = std::make_shared<Packet>(PacketType::RemotePlayerSpawn);
-		*remote_spawn_reply_packet << networks_object_id << game_object_type;
-		game->SendAllExcept(client_id, remote_spawn_reply_packet);
-
-		return true;
-	}
-
-	case PacketType::PlayerMove: {
-		uint32_t client_id = 0;
-		uint32_t networks_id = 0;
-		int32_t movement_x = 0;
-		int32_t movement_y = 0;
-		
-		*packet >> client_id >> networks_id >> movement_x >> movement_y;
-		gameObjects[networks_id];
-
-		auto player_move_packet = std::make_shared<Packet>(PacketType::PlayerMove);
-		*player_move_packet << networks_id << movement_x << movement_y;
-		game->SendAllExcept(client_id, player_move_packet);
-		
-		return true;
-	}
 
 	default: {
 		return false;
