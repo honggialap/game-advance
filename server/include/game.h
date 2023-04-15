@@ -25,6 +25,7 @@ protected:
 	std::unique_ptr<Scene> scene;
 	
 public:
+	uint32_t open_slots;
 	std::map<uint32_t, std::pair<uint32_t, bool>> players;
 
 public:

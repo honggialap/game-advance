@@ -37,6 +37,8 @@ void Game::Initialize(std::string data_path) {
 	uint32_t max_connection = networks_settings.at("max_connection");
 	IPEndPoint host_address = IPEndPoint(address.c_str(), port);
 
+	open_slots = networks_settings.at("max_connection");
+
 	Server::Initialize(host_address, max_connection);
 }
 

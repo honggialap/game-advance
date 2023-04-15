@@ -50,6 +50,7 @@ protected:
 
 public:
 	uint32_t player_id = 0;
+	sf::Vector2i current_movement;
 
 	Tank(
 		pGame game,

@@ -28,7 +28,7 @@ pGameObject World::CreateGameObject(
 		game_object_id += 1;
 		return game_object;
 	}
-
+	
 	case ACTOR_TYPE_WALL: {
 		game_objects[game_object_id].reset(new Wall(game, this, game_object_id, game_object_type, position_x, position_y, velocity_x, velocity_y));
 		static_cast<pWall>(game_objects[game_object_id].get())->Load("");
@@ -62,10 +62,10 @@ void World::Load(std::string data_path) {
 	auto player3_tank = CreateGameObject(ACTOR_TYPE_TANK, 300.0f, 300.0f, 0.0f, 0.0f);
 	static_cast<pTank>(player3_tank)->player_id = 3;
 
-	auto player4_tank = CreateGameObject(ACTOR_TYPE_TANK, 300.0f, 300.0f, 0.0f, 0.0f);
+	auto player4_tank = CreateGameObject(ACTOR_TYPE_TANK, 400.0f, 400.0f, 0.0f, 0.0f);
 	static_cast<pTank>(player4_tank)->player_id = 4;
 
-	Sleep(DWORD(1000));
+	SendLoadPacket();
 }
 
 void World::Unload() {
@@ -84,37 +84,18 @@ void World::Unload() {
 }
 
 void World::Update(float elapsed) {
+	switch (state) {
+	case World::Loading:
+		break;
 
-	for (auto& game_object : game_objects) {
-		game_object.second->Update(elapsed);
-	}
-	physics_world->Step(elapsed, 8, 3);
-
-	auto game_state_packet = std::make_shared<Packet>(PacketType::ServerGameState);
-	uint32_t total_game_objects = game_objects.size();
-	*game_state_packet << total_game_objects;
-
-	for (auto& game_object : game_objects) {
-		auto base = game_object.second->Serialize();
-		switch (base->type) {
-
-		case ACTOR_TYPE_TANK: {
-			auto derived = static_cast<pTankState>(base);
-			*game_state_packet
-				<< derived->type
-				<< derived->id
-				<< derived->position_x
-				<< derived->position_y
-				<< derived->velocity_x
-				<< derived->velocity_y
-				<< derived->player_id;
-			break;
+	case World::Run:
+		for (auto& game_object : game_objects) {
+			game_object.second->Update(elapsed);
 		}
 
-		}
+		physics_world->Step(elapsed, 8, 3);
+		break;
 	}
-
-	game->SendAll(game_state_packet);
 }
 
 void World::Render(sf::RenderWindow& window) {
@@ -164,11 +145,57 @@ void World::OnDisconnect(uint32_t connection_id) {
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
-
+	case PacketType::ClientLoad: {
+		load_client_count += 1;
+		if (load_client_count == game->open_slots) {
+			state = State::Run;
+			SendStartGamePacket();
+		}
+		return true;
+	}
 
 	default: {
 		return false;
 	}
 
 	}
+}
+
+void World::SendLoadPacket() {
+	auto server_load_packet = std::make_shared<Packet>(PacketType::ServerLoad);
+	
+	uint32_t game_objects_count = game_objects.size();
+	*server_load_packet << game_objects_count;
+
+	for (auto& element : game_objects) {
+		pGameObject game_object = element.second.get();
+		uint32_t type = game_object->type;
+		uint32_t id = game_object->id;
+		float position_x = game_object->position_x;
+		float position_y = game_object->position_y;
+		float velocity_x = game_object->velocity_x;
+		float velocity_y = game_object->velocity_y;
+		*server_load_packet 
+			<< type << id 
+			<< position_x << position_y 
+			<< velocity_x << velocity_y;
+
+		switch (type) {
+
+		case ACTOR_TYPE_TANK: {
+			pTank tank = static_cast<pTank>(game_object);
+			uint32_t player_id = tank->player_id;
+			*server_load_packet << player_id;
+			break;
+		}
+
+		}
+	}
+
+	game->SendAll(server_load_packet);
+}
+
+void World::SendStartGamePacket() {
+	auto start_game_packet = std::make_shared<Packet>(PacketType::StartGame);
+	game->SendAll(start_game_packet);
 }

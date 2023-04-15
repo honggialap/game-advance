@@ -36,6 +36,7 @@ protected:
 
 public:
 	uint32_t player_id;
+	sf::Vector2i current_movement;
 
 	Tank(
 		pGame game,
@@ -55,6 +56,7 @@ public:
 	void Load(std::string data_path) override;
 	void Unload() override;
 
+	void HandleInput();
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 

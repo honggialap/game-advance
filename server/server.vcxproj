@@ -153,9 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\bullet.cpp" />
-    <ClCompile Include="source\command.cpp" />
     <ClCompile Include="source\game.cpp" />
-    <ClCompile Include="source\game_state.cpp" />
     <ClCompile Include="source\lobby.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\server.cpp" />
@@ -165,10 +163,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\bullet.h" />
-    <ClInclude Include="include\command.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\game_object.h" />
-    <ClInclude Include="include\game_state.h" />
     <ClInclude Include="include\lobby.h" />
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\server.h" />
@@ -177,7 +173,12 @@
     <ClInclude Include="include\world.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data\actors\bullet.json" />
+    <None Include="data\actors\tank.json" />
+    <None Include="data\actors\wall.json" />
     <None Include="data\game_data.json" />
+    <None Include="data\scenes\lobby.json" />
+    <None Include="data\scenes\world.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

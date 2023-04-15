@@ -17,6 +17,12 @@ typedef Game* pGame;
 
 class World : public Scene, public b2ContactListener {
 protected:
+	enum State {
+		Loading,
+		Run
+	};
+	State state = Loading;
+
 	sf::View camera;
 
 	b2Vec2 gravity;
@@ -24,6 +30,8 @@ protected:
 
 	uint32_t game_object_id = 1000;
 	std::map<uint32_t, std::shared_ptr<GameObject>> game_objects;
+
+	uint32_t load_client_count = 0;
 
 public:
 	World(pGame game) : Scene(game) {};
@@ -51,6 +59,9 @@ public:
 	void OnConnect(uint32_t connection_id) override;
 	void OnDisconnect(uint32_t connection_id) override;
 	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
+
+	void SendLoadPacket();
+	void SendStartGamePacket();
 };
 typedef World* pWorld;
 

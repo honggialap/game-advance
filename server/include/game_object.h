@@ -39,7 +39,7 @@ struct GameObjectState {
 typedef GameObjectState* pGameObjectState;
 
 class GameObject {
-protected:
+public:
 	pGame game;
 	pWorld world;
 
@@ -55,7 +55,6 @@ protected:
 	float velocity_x;
 	float velocity_y;
 
-public:
 	GameObject(
 		pGame game,
 		pWorld world,

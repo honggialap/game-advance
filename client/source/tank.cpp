@@ -40,9 +40,7 @@ void Tank::Load(std::string data_path) {
 	sprite.setTexture(texture);
 	sprite.setOrigin(32, 32);
 
-	SetPosition(0, 0);
-
-	body_def.position.Set(0, 0);
+	body_def.position.Set(position_x / 30.0f, position_y / 30.0f);
 	body_def.type = b2_dynamicBody;
 	body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
@@ -68,14 +66,113 @@ void Tank::Unload() {
 	}
 }
 
+void Tank::HandleInput() {
+
+	sf::Vector2i movement(0, 0);
+
+	if (player_id == game->player_id) {
+		// same with lobby, this should be fix
+		switch (game->GetId()) {
+		case 1000: {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+				movement.y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+				movement.y = -1;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+				movement.x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+				movement.x = 1;
+			}
+
+			break;
+		}
+
+		case 1001: {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
+				movement.y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
+				movement.y = -1;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+				movement.x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) {
+				movement.x = 1;
+			}
+
+			break;
+		}
+
+		case 1002: {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {
+				movement.y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
+				movement.y = -1;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) {
+				movement.x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
+				movement.x = 1;
+			}
+
+			break;
+		}
+
+		case 1003: {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+				movement.y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+				movement.y = -1;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+				movement.x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+				movement.x = 1;
+			}
+
+			break;
+		}
+
+		}
+	}
+
+	if (
+		current_movement.x != movement.x
+		|| current_movement.y != movement.y
+		) {
+		current_movement.x = movement.x;
+		current_movement.y = movement.y;
+
+		auto player_move_packet = std::make_shared<Packet>(PacketType::PlayerMove);
+		*player_move_packet << game->GetId() << GetId() << current_movement.x << current_movement.y;
+		game->Send(player_move_packet);
+	}
+}
+
 void Tank::Update(float elapsed) {
+	HandleInput();
+
 	SetPosition(
 		body->GetPosition().x * 30,
 		body->GetPosition().y * 30
 	);
 
-	// Movement control
-	b2Vec2 movement(0, 0);
+	b2Vec2 movement(
+		current_movement.x / 30.0f,
+		current_movement.y / 30.0f
+	);
 	body->SetLinearVelocity(movement);
 }
 

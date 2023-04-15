@@ -6,13 +6,21 @@
 
 enum PacketType : uint16_t {
 	Invalid,
+
 	Welcome,
 	NotWelcome,
+
 	PlayerPick,
 	PlayerLock,
 	PlayerConfirm,
 	PlayNextScene,
+
+	ServerLoad,
+	ClientLoad,
+	StartGame,
+
 	ServerGameState,
+	PlayerMove,
 };
 
 class Packet {

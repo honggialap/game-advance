@@ -22,7 +22,7 @@
       {
         "id": 1,
         "type": 2,
-        "data_path": "data/scenes/lobby.json"
+        "data_path": "data/scenes/world.json"
       }
     ]
   }

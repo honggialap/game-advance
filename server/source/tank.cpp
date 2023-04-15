@@ -40,9 +40,7 @@ void Tank::Load(std::string data_path) {
 	sprite.setTexture(texture);
 	sprite.setOrigin(32, 32);
 
-	SetPosition(0, 0);
-
-	body_def.position.Set(0, 0);
+	body_def.position.Set(position_x / 30.0f , position_y / 30.0f);
 	body_def.type = b2_dynamicBody;
 	body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
@@ -67,7 +65,10 @@ void Tank::Update(float elapsed) {
 	);
 
 	// Movement control
-	b2Vec2 movement(0, 0);
+	b2Vec2 movement(
+		current_movement.x / 30.0f,
+		current_movement.y / 30.0f
+	);
 	body->SetLinearVelocity(movement);
 }
 
