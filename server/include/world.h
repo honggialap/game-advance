@@ -42,13 +42,7 @@ public:
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 
-	pGameObject CreateGameObject(
-		uint32_t game_object_type,
-		float position_x,
-		float position_y,
-		float velocity_x,
-		float velocity_y
-		);
+	pGameObject CreateGameObject(uint32_t game_object_type,	float position_x, float position_y);
 
 	sf::View& GetCamera();
 
@@ -62,6 +56,8 @@ public:
 
 	void SendLoadPacket();
 	void SendStartGamePacket();
+
+	void SendGameStatePacket();
 };
 typedef World* pWorld;
 

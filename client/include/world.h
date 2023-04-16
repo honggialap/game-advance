@@ -26,8 +26,6 @@ protected:
 	b2Vec2 gravity;
 	b2World* physics_world = nullptr;
 
-	uint32_t server_tick;
-
 	uint32_t game_object_id = 1000;
 	std::map<uint32_t, std::shared_ptr<GameObject>> game_objects;
 
@@ -42,13 +40,7 @@ public:
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 
-	pGameObject CreateGameObject(
-		uint32_t game_object_type,
-		float position_x,
-		float position_y,
-		float velocity_x,
-		float velocity_y
-	);
+	pGameObject CreateGameObject(uint32_t game_object_type, float position_x, float position_y);
 
 	sf::View& GetCamera();
 
