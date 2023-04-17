@@ -338,11 +338,7 @@ bool Server::SendAllExcept(uint32_t id, std::shared_ptr<Packet> packet) {
 	}
 
 	for (auto& client : connections) {
-		if (client.first == id) {
-			continue;
-		}
-
-		if (std::get<2>(client.second)) {
+		if (std::get<2>(client.second) && client.first != id) {
 			std::get<0>(client.second).outgoing_packets.Append(packet);
 		}
 	}

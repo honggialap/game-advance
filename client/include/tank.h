@@ -3,6 +3,7 @@
 #define __CLIENT_TANK_H__
 
 #include "game_object.h"
+#include "command.h"
 
 class Tank : public GameObject {
 protected:
@@ -25,6 +26,8 @@ public:
 	void SetPlayerControl(bool value) { player_control = value; }
 	bool IsPlayerControl() { return player_control; }
 
+	void SetMovement(int32_t x, int32_t y) { current_movement.x = x; current_movement.y = y; }
+
 	void Load(std::string data_path) override;
 	void Unload() override;
 
@@ -34,6 +37,8 @@ public:
 
 	void OnCollisionEnter(pGameObject other) override;
 	void OnCollisionExit(pGameObject other) override;
+
+	void SendMoveCommand(pMoveCommand move_command);
 };
 typedef Tank* pTank;
 

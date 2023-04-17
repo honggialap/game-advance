@@ -4,7 +4,7 @@
     "width": 800,
     "height": 600,
     "update_rate": 64.0,
-    "render_rate": 30.0
+    "render_rate": 64.0
   },
   "networks": {
     "address": "::1",

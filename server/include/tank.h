@@ -19,6 +19,8 @@ public:
 	void SetPlayerId(uint32_t value) { player_id = value; }
 	uint32_t GetPlayerId() { return player_id; }
 
+	void SetMovement(int32_t x, int32_t y) { current_movement.x = x; current_movement.y = y; }
+
 	void Load(std::string data_path) override;
 	void Unload() override;
 

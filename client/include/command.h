@@ -6,33 +6,33 @@
 
 class Command {
 public:
-	enum CommandType : uint32_t {
+	enum Type : uint32_t {
 		Invalid,
-		MoveCommand,
+		Move,
 	};
-	CommandType command_type;
+	Type type;
 	uint32_t tick;
 
 	Command(uint32_t tick) : 
 		tick(tick), 
-		command_type(CommandType::Invalid) 
+		type(Type::Invalid) 
 	{}
 };
 typedef Command* pCommand;
 
 class MoveCommand : public Command {
 public:
-	uint32_t networks_id;
-	int32_t vertical;
-	int32_t horizontal;
+	uint32_t id;
+	int32_t x;
+	int32_t y;
 
-	MoveCommand(uint32_t tick, uint32_t networks_id, int32_t vertical, int32_t horizontal) :
+	MoveCommand(uint32_t tick, uint32_t id, int32_t x, int32_t y) :
 		Command(tick),
-		networks_id(networks_id),
-		vertical(vertical),
-		horizontal(horizontal)
+		id(id),
+		x(x),
+		y(y)
 	{
-		command_type = CommandType::MoveCommand;
+		type = Type::Move;
 	}
 };
 typedef MoveCommand* pMoveCommand;

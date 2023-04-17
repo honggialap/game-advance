@@ -62,28 +62,65 @@ void Tank::HandleInput() {
 		}
 
 		case 2: {
-
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
+				movement.y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
+				movement.y = -1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+				movement.x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) {
+				movement.x = 1;
+			}
 			break;
 		}
 
 		case 3: {
-
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {
+				movement.y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
+				movement.y = -1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) {
+				movement.x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
+				movement.x = 1;
+			}
 			break;
 		}
 
 		case 4: {
-
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+				movement.y = 1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+				movement.y = -1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+				movement.x = -1;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+				movement.x = 1;
+			}
 			break;
 		}
+
 		}
 
 		if (movement.x != current_movement.x
 			|| movement.y != current_movement.y) {
 			current_movement.x = movement.x;
 			current_movement.y = movement.y;
+
+			auto move_command = new MoveCommand(0, GetId(), current_movement.x, current_movement.y);
+			world->commands.push_back(move_command);
+			SendMoveCommand(move_command);
 		}
 	}
-	
 }
 
 void Tank::Update(float elapsed) {
@@ -118,4 +155,18 @@ void Tank::OnCollisionExit(pGameObject other) {
 	if (dynamic_cast<pWall>(other)) {
 		printf("TANK stop hit WALL.\n");
 	}
+}
+
+void Tank::SendMoveCommand(pMoveCommand move_command) {
+	auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
+	*move_command_packet
+		<< game->GetId()
+		<< player_id
+		<< move_command->tick
+		<< move_command->type
+		<< move_command->id
+		<< move_command->x
+		<< move_command->y
+		;
+	game->Send(move_command_packet);
 }

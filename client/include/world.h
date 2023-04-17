@@ -4,6 +4,7 @@
 
 #include "scene.h"
 #include "game_object.h"
+#include "command.h"
 
 #define ACTOR_TYPE_TANK		1
 #define ACTOR_TYPE_BULLET	2
@@ -29,9 +30,13 @@ protected:
 	uint32_t game_object_id = 1000;
 	std::map<uint32_t, std::shared_ptr<GameObject>> game_objects;
 
+	uint32_t server_tick = 0;
+
 	bool start = false;
 
 public:
+	std::deque<pCommand> commands;
+
 	World(pGame game) : Scene(game) {};
 
 	void Load(std::string data_path) override;

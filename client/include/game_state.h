@@ -7,7 +7,6 @@
 
 class GameState {
 public:
-	std::map<uint32_t, GameObjectState> game_object;
 };
 
 

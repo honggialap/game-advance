@@ -33,6 +33,9 @@ protected:
 
 	uint32_t load_client_count = 0;
 
+	uint32_t server_tick = 0;
+	std::deque<pCommand> commands;
+
 public:
 	World(pGame game) : Scene(game) {};
 

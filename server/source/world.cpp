@@ -87,6 +87,23 @@ void World::Update(float elapsed) {
 		break;
 
 	case World::Run:
+		// have not take in tick, this is incomplete, but i want to make it run first.
+		while (!commands.empty()) {
+			auto command = commands.front();
+			switch (command->type) {
+
+			case Command::Type::Move: {
+				auto move_command = static_cast<pMoveCommand>(command);
+				auto tank = static_cast<pTank>(game_objects[move_command->id].get());
+				tank->SetMovement(move_command->x, move_command->y);
+				break;
+			}
+
+			}
+
+			commands.pop_front();
+		}
+
 		for (auto& game_object : game_objects) {
 			game_object.second->Update(elapsed);
 		}
@@ -151,6 +168,33 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 			state = State::Run;
 			SendStartGamePacket();
 		}
+		return true;
+	}
+
+	case PacketType::PlayerMove: {
+		uint32_t client_id;
+		uint32_t player_id;
+		uint32_t tick;
+		uint32_t command_type;
+		uint32_t game_object_id;
+		int32_t x;
+		int32_t y;
+		
+		*packet
+			>> client_id >> player_id
+			>> tick >> command_type >> game_object_id
+			>> x >> y;
+
+		auto move_command = new MoveCommand(tick, game_object_id, x, y);
+		commands.push_back(move_command);
+
+		auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
+		*move_command_packet 
+			<< tick << command_type << game_object_id 
+			<< x << y;
+
+		game->SendAllExcept(client_id, move_command_packet);
+
 		return true;
 	}
 

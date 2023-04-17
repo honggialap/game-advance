@@ -78,6 +78,7 @@ void World::Update(float elapsed) {
 		}
 
 		physics_world->Step(elapsed, 8, 3);
+
 		break;
 	}
 }
@@ -209,6 +210,21 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 			}
 		}
 
+		return true;
+	}
+
+	case PacketType::PlayerMove: {
+		uint32_t tick;
+		uint32_t command_type;
+		uint32_t game_object_id;
+		int32_t x;
+		int32_t y;
+
+		*packet
+			>> tick >> command_type >> game_object_id
+			>> x >> y;
+
+		static_cast<pTank>(game_objects[game_object_id].get())->SetMovement(x, y);
 		return true;
 	}
 
