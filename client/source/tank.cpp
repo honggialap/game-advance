@@ -41,7 +41,6 @@ void Tank::Unload() {
 }
 
 void Tank::HandleInput() {
-
 	if (player_control) {
 		sf::Vector2i movement(0, 0);
 		switch (game->player_id) {
@@ -113,18 +112,35 @@ void Tank::HandleInput() {
 
 		if (movement.x != current_movement.x
 			|| movement.y != current_movement.y) {
-			current_movement.x = movement.x;
-			current_movement.y = movement.y;
+			//auto move_command = new MoveCommand(world->server_tick, world->client_tick, id, movement.x, movement.y);
+			//commands.push_back(move_command);
+			//SendMoveCommand(move_command);
+		}
+	}
+}
 
-			auto move_command = new MoveCommand(0, GetId(), current_movement.x, current_movement.y);
-			world->commands.push_back(move_command);
-			SendMoveCommand(move_command);
+void Tank::ExecuteCommand(uint32_t tick) {
+	if (commands.empty()) {
+		return;
+	}
+
+	auto command = commands.front();
+	if (command->tick == tick) {
+		switch (command->type) {
+		case Command::Move: {
+			auto move_command = static_cast<pMoveCommand>(command);
+			current_movement.x = move_command->x;
+			current_movement.y = move_command->y;
+
+			delete move_command;
+			commands.pop_front();
+			break;
+		}
 		}
 	}
 }
 
 void Tank::Update(float elapsed) {
-	HandleInput();
 	b2Vec2 movement(
 		speed * current_movement.x / 30.0f,
 		speed * current_movement.y / 30.0f
@@ -162,9 +178,10 @@ void Tank::SendMoveCommand(pMoveCommand move_command) {
 	*move_command_packet
 		<< game->GetId()
 		<< player_id
-		<< move_command->tick
-		<< move_command->type
 		<< move_command->id
+		<< move_command->type
+		<< move_command->server_tick
+		<< move_command->tick
 		<< move_command->x
 		<< move_command->y
 		;

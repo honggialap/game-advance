@@ -12,6 +12,9 @@ public:
 	void Load(std::string data_path) override;
 	void Unload() override;
 
+	void HandleInput() override;
+	void ExecuteCommand(uint32_t tick) override;
+
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 

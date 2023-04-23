@@ -51,17 +51,24 @@ void World::Load(std::string data_path) {
 	camera.reset(sf::FloatRect(0, 0, 800, 600));
 	camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
+	font.loadFromFile("data/resources/fonts/arial.ttf");
+	text.setFont(font);
+
 	auto player1_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 100.0f, 100.0f));
 	player1_tank->SetPlayerId(uint32_t(1));
+	player_ping[1] = 0;
 
 	auto player2_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 200.0f, 200.0f));
 	player2_tank->SetPlayerId(uint32_t(2));
+	player_ping[2] = 0;
 
 	auto player3_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 300.0f, 300.0f));
 	player3_tank->SetPlayerId(uint32_t(3));
+	player_ping[3] = 0;
 
 	auto player4_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 400.0f, 400.0f));
 	player4_tank->SetPlayerId(uint32_t(4));
+	player_ping[4] = 0;
 
 	SendLoadPacket();
 }
@@ -87,36 +94,35 @@ void World::Update(float elapsed) {
 		break;
 
 	case World::Run:
-		// have not take in tick, this is incomplete, but i want to make it run first.
-		while (!commands.empty()) {
-			auto command = commands.front();
-			switch (command->type) {
 
-			case Command::Type::Move: {
-				auto move_command = static_cast<pMoveCommand>(command);
-				auto tank = static_cast<pTank>(game_objects[move_command->id].get());
-				tank->SetMovement(move_command->x, move_command->y);
-				break;
-			}
-
-			}
-
-			commands.pop_front();
+		std::stringstream displaying;
+		for (auto& player : player_ping) {
+			displaying 
+				<< "Player " << player.first 
+				<< " - Ping: " << player.second << '\n';
 		}
+		text.setString(displaying.str());
 
-		for (auto& game_object : game_objects) {
-			game_object.second->Update(elapsed);
-		}
+		//if (tick_per_game_state_count >= tick_per_game_state) {
+		//
+		//	for (uint32_t i = 0; i < 4; i++) {
+		//		for (auto& game_object : game_objects) {
+		//		}
+		//
+		//		physics_world->Step(elapsed, 8, 3);
+		//	}
+		//
+		//	tick_per_game_state_count = 0;
+		//}
 
-		physics_world->Step(elapsed, 8, 3);
-
-		SendGameStatePacket();
 		break;
 	}
 }
 
 void World::Render(sf::RenderWindow& window) {
 	window.setView(camera);
+	window.draw(text);
+
 	for (auto& game_object : game_objects) {
 		game_object.second->Render(window);
 	}
@@ -171,30 +177,29 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 		return true;
 	}
 
-	case PacketType::PlayerMove: {
-		uint32_t client_id;
-		uint32_t player_id;
-		uint32_t tick;
-		uint32_t command_type;
-		uint32_t game_object_id;
-		int32_t x;
-		int32_t y;
-		
+	case PacketType::Ping: {
+		uint32_t client_id = 0;
+		uint32_t player_id = 0;
+		uint32_t reply_tick = 0;
+		uint32_t ping = 0;
+
 		*packet
-			>> client_id >> player_id
-			>> tick >> command_type >> game_object_id
-			>> x >> y;
+			>> client_id
+			>> player_id
+			>> reply_tick
+			>> ping
+			;
 
-		auto move_command = new MoveCommand(tick, game_object_id, x, y);
-		commands.push_back(move_command);
+		player_ping[player_id] = ping;
 
-		auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
-		*move_command_packet 
-			<< tick << command_type << game_object_id 
-			<< x << y;
+		auto ping_reply_packet = std::make_shared<Packet>(PacketType::Ping);
+		*ping_reply_packet << reply_tick;
+		game->Send(client_id, ping_reply_packet);
 
-		game->SendAllExcept(client_id, move_command_packet);
+		return true;
+	}
 
+	case PacketType::PlayerMove: {
 		return true;
 	}
 
@@ -207,7 +212,7 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 void World::SendLoadPacket() {
 	auto server_load_packet = std::make_shared<Packet>(PacketType::ServerLoad);
-	
+
 	uint32_t game_objects_count = game_objects.size();
 	*server_load_packet << game_objects_count;
 
@@ -222,9 +227,9 @@ void World::SendLoadPacket() {
 		float velocity_x, velocity_y;
 		game_object->GetVelocity(velocity_x, velocity_y);
 
-		*server_load_packet 
-			<< type << id 
-			<< position_x << position_y 
+		*server_load_packet
+			<< type << id
+			<< position_x << position_y
 			<< velocity_x << velocity_y;
 
 		switch (type) {
@@ -248,38 +253,68 @@ void World::SendStartGamePacket() {
 }
 
 void World::SendGameStatePacket() {
-	auto game_state = std::make_shared<Packet>(PacketType::ServerGameState);
+	//auto game_state = std::make_shared<Packet>(PacketType::ServerGameState);
+	//
+	//uint32_t tick = server_tick;
+	//*game_state << tick;
+	//
+	//uint32_t player_count = ack_tick.size();
+	//*game_state << player_count;
+	//for (auto& client : ack_tick) {
+	//	*game_state << client.first << client.second;
+	//}
+	//
+	//uint32_t game_objects_count = game_objects.size();
+	//*game_state << game_objects_count;
+	//
+	//for (auto& element : game_objects) {
+	//	pGameObject game_object = element.second.get();
+	//	uint32_t type = game_object->GetType();
+	//	uint32_t id = game_object->GetId();
+	//
+	//	float position_x, position_y;
+	//	game_object->GetPosition(position_x, position_y);
+	//
+	//	float velocity_x, velocity_y;
+	//	game_object->GetVelocity(velocity_x, velocity_y);
+	//
+	//	*game_state
+	//		<< type << id
+	//		<< position_x << position_y
+	//		<< velocity_x << velocity_y;
+	//
+	//	switch (type) {
+	//
+	//	case ACTOR_TYPE_TANK: {
+	//		pTank tank = static_cast<pTank>(game_object);
+	//		uint32_t player_id = tank->GetPlayerId();
+	//		*game_state << player_id;
+	//		break;
+	//	}
+	//
+	//	}
+	//}
+	//
+	//game->SendAll(game_state);
+}
 
-	uint32_t game_objects_count = game_objects.size();
-	*game_state << game_objects_count;
+void World::RelayMoveCommand(uint32_t sent_client_id, pMoveCommand move_command) {
+	//auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
+	//
+	//game->SendAllExcept(sent_client_id, move_command_packet);
+}
 
-	for (auto& element : game_objects) {
-		pGameObject game_object = element.second.get();
-		uint32_t type = game_object->GetType();
-		uint32_t id = game_object->GetId();
+void World::SerializeGameState() {
+	//auto game_state = new GameState();
+	//game_state->tick = server_tick;
+	//
+	//for (auto& game_object : game_objects) {
+	//	game_state->game_objects_state[game_object.first] = game_object.second->Serialize();
+	//}
+	//
+	//game_states.push_back(game_state);
+}
 
-		float position_x, position_y;
-		game_object->GetPosition(position_x, position_y);
+void World::DeserializeGameState() {
 
-		float velocity_x, velocity_y;
-		game_object->GetVelocity(velocity_x, velocity_y);
-
-		*game_state
-			<< type << id
-			<< position_x << position_y
-			<< velocity_x << velocity_y;
-
-		switch (type) {
-
-		case ACTOR_TYPE_TANK: {
-			pTank tank = static_cast<pTank>(game_object);
-			uint32_t player_id = tank->GetPlayerId();
-			*game_state << player_id;
-			break;
-		}
-
-		}
-	}
-
-	game->SendAll(game_state);
 }

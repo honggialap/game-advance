@@ -32,6 +32,8 @@ public:
 	void Unload() override;
 
 	void HandleInput();
+	void ExecuteCommand(uint32_t tick);
+
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 

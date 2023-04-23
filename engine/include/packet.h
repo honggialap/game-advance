@@ -19,6 +19,7 @@ enum PacketType : uint16_t {
 	ClientLoad,
 	StartGame,
 
+	Ping,
 	ServerGameState,
 	PlayerMove,
 };

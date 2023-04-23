@@ -12,6 +12,12 @@ void Wall::Load(std::string data_path) {
 void Wall::Unload() {
 }
 
+void Wall::HandleInput() {
+}
+
+void Wall::ExecuteCommand(uint32_t tick) {
+}
+
 void Wall::Update(float elapsed) {
 }
 

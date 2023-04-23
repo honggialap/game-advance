@@ -3,8 +3,8 @@
     "title": "Client",
     "width": 800,
     "height": 600,
-    "update_rate": 64.0,
-    "render_rate": 64.0
+    "update_rate": 32.0,
+    "render_rate": 32.0
   },
   "networks": {
     "address": "::1",

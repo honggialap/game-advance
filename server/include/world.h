@@ -15,6 +15,12 @@
 class Game;
 typedef Game* pGame;
 
+struct GameState {
+	uint32_t tick;
+	std::map<uint32_t, pGameObjectState> game_objects_state;
+};
+typedef GameState* pGameState;
+
 class World : public Scene, public b2ContactListener {
 protected:
 	enum State {
@@ -24,6 +30,8 @@ protected:
 	State state = Loading;
 
 	sf::View camera;
+	sf::Font font;
+	sf::Text text;
 
 	b2Vec2 gravity;
 	b2World* physics_world = nullptr;
@@ -33,10 +41,12 @@ protected:
 
 	uint32_t load_client_count = 0;
 
-	uint32_t server_tick = 0;
-	std::deque<pCommand> commands;
-
 public:
+	uint32_t tick_per_game_state = 4;
+	uint32_t tick_per_game_state_count = 0;
+
+	std::map<uint32_t, uint32_t> player_ping;
+
 	World(pGame game) : Scene(game) {};
 
 	void Load(std::string data_path) override;
@@ -61,6 +71,10 @@ public:
 	void SendStartGamePacket();
 
 	void SendGameStatePacket();
+	void RelayMoveCommand(uint32_t sent_client_id, pMoveCommand move_command);
+
+	void SerializeGameState();
+	void DeserializeGameState();
 };
 typedef World* pWorld;
 

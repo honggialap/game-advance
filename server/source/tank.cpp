@@ -30,6 +30,58 @@ void Tank::Load(std::string data_path) {
 void Tank::Unload() {
 }
 
+pGameObjectState Tank::Serialize() {
+	float position_x;
+	float position_y;
+	GetPosition(position_x, position_y);
+
+	float velocity_x;
+	float velocity_y;
+	GetVelocity(velocity_x, velocity_y);
+	
+	return new TankState(
+		id,
+		type,
+		position_x,
+		position_y,
+		velocity_x,
+		velocity_y,
+		player_id,
+		current_movement.x,
+		current_movement.y
+	);
+}
+
+void Tank::Deserialize(pGameObjectState game_object_state) {
+	auto tank_state = static_cast<pTankState>(game_object_state);
+	SetPosition(tank_state->position_x, tank_state->position_y);
+	SetVelocity(tank_state->velocity_x, tank_state->velocity_y);
+	player_id = tank_state->player_id;
+	current_movement.x = tank_state->current_movement_x;
+	current_movement.y = tank_state->current_movement_y;
+}
+
+void Tank::ExecuteCommand(uint32_t tick) {
+	if (commands.empty()) {
+		return;
+	}
+
+	auto command = commands.front();
+	if (command->tick == tick) {
+		switch (command->type) {
+		case Command::Move: {
+			auto move_command = static_cast<pMoveCommand>(command);
+			current_movement.x = move_command->x;
+			current_movement.y = move_command->y;
+
+			delete move_command;
+			commands.pop_front();
+			break;
+		}
+		}
+	}
+}
+
 void Tank::Update(float elapsed) {
 	// Movement control
 	b2Vec2 movement(

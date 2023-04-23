@@ -50,6 +50,9 @@ void World::Load(std::string data_path) {
 
 	camera.reset(sf::FloatRect(0, 0, 800, 600));
 	camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
+
+	font.loadFromFile("data/resources/fonts/arial.ttf");
+	text.setFont(font);
 }
 
 void World::Unload() {
@@ -72,19 +75,40 @@ void World::Update(float elapsed) {
 	case World::Loading:
 		break;
 
-	case World::Run:
+	case World::Run: {
+		std::stringstream displaying;
+		displaying 
+			<< "Tick: " << tick << "\n"
+			<< "Ping: " << ping_tick << "\n";
+		text.setString(displaying.str());
+
+		for (auto& game_object : game_objects) {
+			game_object.second->HandleInput();
+		}
+		
 		for (auto& game_object : game_objects) {
 			game_object.second->Update(elapsed);
 		}
-
+		
 		physics_world->Step(elapsed, 8, 3);
 
+		if (tick_per_ping_count >= tick_per_ping && !pinged) {
+			tick_per_ping_count = 0;
+			pinged = true;
+			SendPingPacket();
+		}
+
+		tick += 1;
+		tick_per_ping_count += 1;
+
 		break;
+	}
 	}
 }
 
 void World::Render(sf::RenderWindow& window) {
 	window.setView(camera);
+	window.draw(text);
 
 	for (auto& game_object : game_objects) {
 		game_object.second->Render(window);
@@ -135,6 +159,7 @@ void World::OnConnectFail() {
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
+
 	case PacketType::ServerLoad: {
 		uint32_t game_object_count = 0;
 		*packet >> game_object_count;
@@ -178,53 +203,12 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 		return true;
 	}
 
-	case PacketType::ServerGameState: {
-		uint32_t game_object_count = 0;
-		*packet >> game_object_count;
-
-		for (uint32_t i = 0; i < game_object_count; i++) {
-			uint32_t type = 0;
-			uint32_t id = 0;
-			float position_x = 0.0f;
-			float position_y = 0.0f;
-			float velocity_x = 0.0f;
-			float velocity_y = 0.0f;
-
-			*packet
-				>> type >> id
-				>> position_x >> position_y
-				>> velocity_x >> velocity_y;
-
-			switch (type) {
-			case ACTOR_TYPE_TANK: {
-				uint32_t player_id = 0;
-				*packet >> player_id;
-
-				pTank tank = static_cast<pTank>(game_objects[id].get());
-				tank->SetPosition(position_x, position_y);
-				tank->SetVelocity(velocity_x, velocity_y);
-				tank->SetPlayerId(player_id);
-
-				break;
-			}
-			}
-		}
-
-		return true;
-	}
-
-	case PacketType::PlayerMove: {
-		uint32_t tick;
-		uint32_t command_type;
-		uint32_t game_object_id;
-		int32_t x;
-		int32_t y;
-
-		*packet
-			>> tick >> command_type >> game_object_id
-			>> x >> y;
-
-		static_cast<pTank>(game_objects[game_object_id].get())->SetMovement(x, y);
+	case PacketType::Ping: {
+		uint32_t reply_ping_tick;
+		*packet >> reply_ping_tick;
+		ping_tick = tick - reply_ping_tick;
+		pinged = false;
+		printf("%d - %d - %d \n", tick, reply_ping_tick, ping_tick);
 		return true;
 	}
 
@@ -240,3 +224,13 @@ void World::SendLoadPacket() {
 	game->Send(client_load_packet);
 }
 
+void World::SendPingPacket() {
+	auto ping_packet = std::make_shared<Packet>(PacketType::Ping);
+	*ping_packet
+		<< game->GetId()
+		<< game->player_id
+		<< tick
+		<< ping_tick
+		;
+	game->Send(ping_packet);
+}

@@ -10,6 +10,12 @@ void Bullet::Load(std::string data_path) {
 void Bullet::Unload() {
 }
 
+void Bullet::HandleInput() {
+}
+
+void Bullet::ExecuteCommand(uint32_t tick) {
+}
+
 void Bullet::Update(float elapsed) {
 }
 

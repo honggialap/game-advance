@@ -23,6 +23,8 @@ protected:
 	State state = Loading;
 
 	sf::View camera;
+	sf::Font font;
+	sf::Text text;
 
 	b2Vec2 gravity;
 	b2World* physics_world = nullptr;
@@ -30,12 +32,13 @@ protected:
 	uint32_t game_object_id = 1000;
 	std::map<uint32_t, std::shared_ptr<GameObject>> game_objects;
 
-	uint32_t server_tick = 0;
-
-	bool start = false;
-
 public:
-	std::deque<pCommand> commands;
+	uint32_t tick_per_ping = 4;
+	uint32_t tick_per_ping_count = 0;
+
+	uint32_t tick = 0;
+	uint32_t ping_tick = 0;
+	bool pinged = false;
 
 	World(pGame game) : Scene(game) {};
 
@@ -59,6 +62,7 @@ public:
 	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
 
 	void SendLoadPacket();
+	void SendPingPacket();
 };
 typedef World* pWorld;
 

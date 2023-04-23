@@ -3,12 +3,41 @@
 #define __SERVER_GAMEOBJECT_H__
 
 #include "common.h"
+#include "command.h"
 
 // Forward declaration
 class Game;
 typedef Game* pGame;
 class World;
 typedef World* pWorld;
+
+struct GameObjectState {
+	uint32_t id;
+	uint32_t type;
+	
+	float position_x;
+	float position_y;
+
+	float velocity_x;
+	float velocity_y;
+
+	GameObjectState(
+		uint32_t id,
+		uint32_t type,
+		float position_x,
+		float position_y,
+		float velocity_x,
+		float velocity_y
+	) :
+		id(id),
+		type(type),
+		position_x(position_x),
+		position_y(position_y),
+		velocity_x(velocity_x),
+		velocity_y(velocity_y)
+	{}
+};
+typedef GameObjectState* pGameObjectState;
 
 class GameObject {
 protected:
@@ -28,6 +57,8 @@ protected:
 	b2Fixture* fixture = nullptr;
 
 public:
+	std::deque<pCommand> commands;
+
 	GameObject(
 		pGame game,
 		pWorld world,
@@ -56,6 +87,11 @@ public:
 
 	void SetVelocity(float vx, float vy) { body->SetLinearVelocity(b2Vec2(vx / PIXEL_PER_METER, vy / PIXEL_PER_METER)); }
 	void GetVelocity(float& vx, float& vy) { vx = body->GetPosition().x * PIXEL_PER_METER; vy = body->GetPosition().y * PIXEL_PER_METER; }
+
+	virtual pGameObjectState Serialize() = 0;
+	virtual void Deserialize(pGameObjectState game_object_state) = 0;
+
+	virtual void ExecuteCommand(uint32_t tick) = 0;
 
 	virtual void Load(std::string data_path) = 0;
 	virtual void Unload() = 0;

@@ -11,10 +11,13 @@ public:
 		Move,
 	};
 	Type type;
+
+	uint32_t server_tick;
 	uint32_t tick;
 
-	Command(uint32_t tick) : 
-		tick(tick), 
+	Command(uint32_t server_tick, uint32_t tick) : 
+		server_tick(server_tick),
+		tick(tick),
 		type(Type::Invalid) 
 	{}
 };
@@ -26,8 +29,8 @@ public:
 	int32_t x;
 	int32_t y;
 
-	MoveCommand(uint32_t tick, uint32_t id, int32_t x, int32_t y) :
-		Command(tick),
+	MoveCommand(uint32_t server_tick, uint32_t tick, uint32_t id, int32_t x, int32_t y) :
+		Command(server_tick, tick),
 		id(id),
 		x(x),
 		y(y)

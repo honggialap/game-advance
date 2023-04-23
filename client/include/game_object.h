@@ -3,6 +3,7 @@
 #define __CLIENT_GAMEOBJECT_H__
 
 #include "common.h"
+#include "command.h"
 
 // Forward declaration
 class Game;
@@ -27,7 +28,10 @@ protected:
 	b2FixtureDef fixture_def;
 	b2Fixture* fixture = nullptr;
 
+
 public:
+	std::deque<pCommand> commands;
+
 	GameObject(
 		pGame game,
 		pWorld world,
@@ -59,6 +63,9 @@ public:
 
 	virtual void Load(std::string data_path) = 0;
 	virtual void Unload() = 0;
+
+	virtual void HandleInput() = 0;
+	virtual void ExecuteCommand(uint32_t tick) = 0;
 
 	virtual void Update(float elapsed) = 0;
 	virtual void Render(sf::RenderWindow& window) = 0;
