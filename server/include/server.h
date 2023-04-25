@@ -22,6 +22,8 @@ public:
 	bool Disconnect(uint32_t id);
 
 	bool ProcessNetworks();	
+	bool ProcessPackets();
+
 	bool Send(uint32_t id, std::shared_ptr<Packet> packet);
 	bool SendAll(std::shared_ptr<Packet> packet);
 	bool SendAllExcept(uint32_t id, std::shared_ptr<Packet> packet);

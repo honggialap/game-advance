@@ -39,13 +39,14 @@ protected:
 	uint32_t game_object_id = 1000;
 	std::map<uint32_t, std::shared_ptr<GameObject>> game_objects;
 
+	uint32_t ready_client_count = 0;
 	uint32_t load_client_count = 0;
 
 public:
 	uint32_t tick_per_game_state = 4;
 	uint32_t tick_per_game_state_count = 0;
 
-	std::map<uint32_t, uint32_t> player_ping;
+	std::map<uint32_t, float> player_ping;
 
 	World(pGame game) : Scene(game) {};
 

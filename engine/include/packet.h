@@ -15,6 +15,7 @@ enum PacketType : uint16_t {
 	PlayerConfirm,
 	PlayNextScene,
 
+	ClientReady,
 	ServerLoad,
 	ClientLoad,
 	StartGame,

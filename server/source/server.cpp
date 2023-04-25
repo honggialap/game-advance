@@ -284,7 +284,10 @@ bool Server::ProcessNetworks() {
 		}
 	}
 
-	// Process incomming packets
+	return true;
+}
+
+bool Server::ProcessPackets() {
 	for (auto& client : connections) {
 		auto& client_connection = std::get<0>(client.second);
 		PacketManager& incomming = client_connection.imcomming_packets;
@@ -297,7 +300,6 @@ bool Server::ProcessNetworks() {
 			incomming.Pop();
 		}
 	}
-
 	return true;
 }
 

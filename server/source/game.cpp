@@ -51,6 +51,11 @@ void Game::Shutdown() {
 void Game::Run(std::string data_path) {
 	Initialize(data_path);
 
+	auto networks_process = [this]() {
+		while (ProcessNetworks());
+	};
+	std::thread networks_thread(networks_process);
+
 	while (window.isOpen()) {
 		sf::Event window_event;
 		while (window.pollEvent(window_event)) {
@@ -67,13 +72,12 @@ void Game::Run(std::string data_path) {
 
 		if (load_scene) LoadScene();
 
-		ProcessNetworks();
-
 		float elapsed_ms = clock.GetMilliseconds();
 		clock.Reset();
 
 		update_elapsed_ms += elapsed_ms;
 		if (update_elapsed_ms >= elapsed_ms_per_update) {
+			ProcessPackets();
 			scene->Update(elapsed_ms_per_update);
 			update_elapsed_ms -= elapsed_ms_per_update;
 		}
@@ -85,9 +89,11 @@ void Game::Run(std::string data_path) {
 			window.display();
 			render_elapsed_ms -= elapsed_ms_per_render;
 		}
+
 	}
 
 	Shutdown();
+	networks_thread.join();
 }
 
 void Game::PlayScene(unsigned int scene_id) {

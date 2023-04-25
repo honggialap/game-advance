@@ -179,6 +179,8 @@ bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
 		}
 
 		text.setString(displaying.str());
+
+		printf("Recv Player Confirm\n");
 		return true;
 	}
 
@@ -186,6 +188,8 @@ bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
 		uint32_t scene_id = 0;
 		*packet >> scene_id;
 		game->PlayScene(scene_id);
+
+		printf("Recv Play Next Scene\n");
 		return true;
 	}
 
@@ -202,10 +206,13 @@ void Lobby::SendPickPacket(uint32_t player_id) {
 	game->Send(pick_packet);
 
 	pick_sent = true;
+	printf("Send Pick Packet\n");
 }
 
 void Lobby::SendLockPacket() {
 	auto lock_packet = std::make_shared<Packet>(PacketType::PlayerLock);
 	*lock_packet << game->GetId();
 	game->Send(lock_packet);
+
+	printf("Send Lock Packet\n");
 }

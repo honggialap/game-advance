@@ -7,9 +7,11 @@
 
   "game_objects": [
     {
-      "type": 1,
+      "type": 0,
+      "name": "sample_gameobject",
       "position_x": 10.0,
       "position_y": 20.0,
+      "layer": 0,
       "data_path": "actors/sample_gameobject.json"
     }
   ]

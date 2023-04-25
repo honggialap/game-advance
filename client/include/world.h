@@ -33,12 +33,11 @@ protected:
 	std::map<uint32_t, std::shared_ptr<GameObject>> game_objects;
 
 public:
-	uint32_t tick_per_ping = 4;
-	uint32_t tick_per_ping_count = 0;
+	bool ready_sent = false;
 
-	uint32_t tick = 0;
-	uint32_t ping_tick = 0;
-	bool pinged = false;
+	b2Timer ping_clock;
+	bool ping_sent = false;
+	float ping = 0.0f;
 
 	World(pGame game) : Scene(game) {};
 
@@ -61,6 +60,7 @@ public:
 	void OnConnectFail() override;
 	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
 
+	void SendReadyPacket();
 	void SendLoadPacket();
 	void SendPingPacket();
 };

@@ -181,8 +181,6 @@
     <None Include="data\actors\tank.json" />
     <None Include="data\actors\wall.json" />
     <None Include="data\game_data.json" />
-    <None Include="data\scenes\lobby.json" />
-    <None Include="data\scenes\world.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

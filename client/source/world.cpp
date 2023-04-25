@@ -73,13 +73,15 @@ void World::Unload() {
 void World::Update(float elapsed) {
 	switch (state) {
 	case World::Loading:
+		if (!ready_sent) {
+			SendReadyPacket();
+			ready_sent = true;
+		}
 		break;
 
 	case World::Run: {
 		std::stringstream displaying;
-		displaying 
-			<< "Tick: " << tick << "\n"
-			<< "Ping: " << ping_tick << "\n";
+		displaying << "Ping: " << ping;
 		text.setString(displaying.str());
 
 		for (auto& game_object : game_objects) {
@@ -92,14 +94,9 @@ void World::Update(float elapsed) {
 		
 		physics_world->Step(elapsed, 8, 3);
 
-		if (tick_per_ping_count >= tick_per_ping && !pinged) {
-			tick_per_ping_count = 0;
-			pinged = true;
+		if (!ping_sent) {
 			SendPingPacket();
 		}
-
-		tick += 1;
-		tick_per_ping_count += 1;
 
 		break;
 	}
@@ -200,15 +197,15 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 	case PacketType::StartGame: {
 		state = State::Run;
+		ping_clock.Reset();
 		return true;
 	}
 
 	case PacketType::Ping: {
-		uint32_t reply_ping_tick;
-		*packet >> reply_ping_tick;
-		ping_tick = tick - reply_ping_tick;
-		pinged = false;
-		printf("%d - %d - %d \n", tick, reply_ping_tick, ping_tick);
+		float reply_time_stamp;
+		*packet >> reply_time_stamp;
+		ping = ping_clock.GetMilliseconds() - reply_time_stamp;
+		ping_sent = false;
 		return true;
 	}
 
@@ -217,6 +214,11 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	}
 
 	}
+}
+
+void World::SendReadyPacket() {
+	auto ready_packet = std::make_shared<Packet>(PacketType::ClientReady);
+	game->Send(ready_packet);
 }
 
 void World::SendLoadPacket() {
@@ -229,8 +231,9 @@ void World::SendPingPacket() {
 	*ping_packet
 		<< game->GetId()
 		<< game->player_id
-		<< tick
-		<< ping_tick
+		<< ping_clock.GetMilliseconds()
+		<< ping
 		;
 	game->Send(ping_packet);
+	ping_sent = true;
 }

@@ -270,6 +270,11 @@ bool Client::ProcessNetworks() {
 
 	}
 
+	return true;
+}
+
+bool Client::ProcessPackets() {
+	Connection& connection = host_connection.first;
 	while (connection.imcomming_packets.HasPending()) {
 		std::shared_ptr<Packet> packet = connection.imcomming_packets.Retrive();
 		if (!ProcessPacket(packet)) {

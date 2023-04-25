@@ -70,7 +70,6 @@ void World::Load(std::string data_path) {
 	player4_tank->SetPlayerId(uint32_t(4));
 	player_ping[4] = 0;
 
-	SendLoadPacket();
 }
 
 void World::Unload() {
@@ -97,8 +96,8 @@ void World::Update(float elapsed) {
 
 		std::stringstream displaying;
 		for (auto& player : player_ping) {
-			displaying 
-				<< "Player " << player.first 
+			displaying
+				<< "Player " << player.first
 				<< " - Ping: " << player.second << '\n';
 		}
 		text.setString(displaying.str());
@@ -168,6 +167,14 @@ void World::OnDisconnect(uint32_t connection_id) {
 
 bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
+	case PacketType::ClientReady: {
+		ready_client_count += 1;
+		if (ready_client_count == game->open_slots) {
+			SendLoadPacket();
+		}
+		return true;
+	}
+
 	case PacketType::ClientLoad: {
 		load_client_count += 1;
 		if (load_client_count == game->open_slots) {
@@ -180,20 +187,20 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	case PacketType::Ping: {
 		uint32_t client_id = 0;
 		uint32_t player_id = 0;
-		uint32_t reply_tick = 0;
-		uint32_t ping = 0;
+		float replay_time_stamp = 0;
+		float ping = 0;
 
 		*packet
 			>> client_id
 			>> player_id
-			>> reply_tick
+			>> replay_time_stamp
 			>> ping
 			;
 
 		player_ping[player_id] = ping;
 
 		auto ping_reply_packet = std::make_shared<Packet>(PacketType::Ping);
-		*ping_reply_packet << reply_tick;
+		*ping_reply_packet << replay_time_stamp;
 		game->Send(client_id, ping_reply_packet);
 
 		return true;

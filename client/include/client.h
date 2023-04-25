@@ -25,6 +25,7 @@ public:
 	bool Disconnect();
 
 	bool ProcessNetworks();
+	bool ProcessPackets();
 	bool Send(std::shared_ptr<Packet> packet);
 
 	void AssignId(uint32_t id) { this->id = id; is_approved = true; }
