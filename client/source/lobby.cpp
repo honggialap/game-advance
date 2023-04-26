@@ -32,15 +32,19 @@ void Lobby::Update(float elapsed) {
 			case 1000: {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
 					SendPickPacket(1);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
 					SendPickPacket(2);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
 					SendPickPacket(3);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) {
 					SendPickPacket(4);
+					pick_sent = true;
 				}
 				if (lockable) {
 					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) {
@@ -53,15 +57,19 @@ void Lobby::Update(float elapsed) {
 			case 1001: {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
 					SendPickPacket(1);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 					SendPickPacket(2);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
 					SendPickPacket(3);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
 					SendPickPacket(4);
+					pick_sent = true;
 				}
 				if (lockable) {
 					if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
@@ -74,15 +82,19 @@ void Lobby::Update(float elapsed) {
 			case 1002: {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
 					SendPickPacket(1);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 					SendPickPacket(2);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 					SendPickPacket(3);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
 					SendPickPacket(4);
+					pick_sent = true;
 				}
 				if (lockable) {
 					if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
@@ -95,15 +107,19 @@ void Lobby::Update(float elapsed) {
 			case 1003: {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
 					SendPickPacket(1);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::X)) {
 					SendPickPacket(2);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
 					SendPickPacket(3);
+					pick_sent = true;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::V)) {
 					SendPickPacket(4);
+					pick_sent = true;
 				}
 				if (lockable) {
 					if (sf::Keyboard::isKeyPressed(sf::Keyboard::B)) {
@@ -179,8 +195,6 @@ bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
 		}
 
 		text.setString(displaying.str());
-
-		printf("Recv Player Confirm\n");
 		return true;
 	}
 
@@ -188,8 +202,6 @@ bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
 		uint32_t scene_id = 0;
 		*packet >> scene_id;
 		game->PlayScene(scene_id);
-
-		printf("Recv Play Next Scene\n");
 		return true;
 	}
 
@@ -204,15 +216,10 @@ void Lobby::SendPickPacket(uint32_t player_id) {
 	auto pick_packet = std::make_shared<Packet>(PacketType::PlayerPick);
 	*pick_packet << player_id << game->GetId();
 	game->Send(pick_packet);
-
-	pick_sent = true;
-	printf("Send Pick Packet\n");
 }
 
 void Lobby::SendLockPacket() {
 	auto lock_packet = std::make_shared<Packet>(PacketType::PlayerLock);
 	*lock_packet << game->GetId();
 	game->Send(lock_packet);
-
-	printf("Send Lock Packet\n");
 }

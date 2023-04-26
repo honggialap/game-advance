@@ -23,6 +23,7 @@ enum PacketType : uint16_t {
 	Ping,
 	ServerGameState,
 	PlayerMove,
+	PlayerMoveAck,
 };
 
 class Packet {
