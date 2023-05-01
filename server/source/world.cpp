@@ -56,20 +56,21 @@ void World::Load(std::string data_path) {
 
 	auto player1_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 100.0f, 100.0f));
 	player1_tank->SetPlayerId(uint32_t(1));
-	player_ping[1] = 0;
 
 	auto player2_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 200.0f, 200.0f));
 	player2_tank->SetPlayerId(uint32_t(2));
-	player_ping[2] = 0;
 
 	auto player3_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 300.0f, 300.0f));
 	player3_tank->SetPlayerId(uint32_t(3));
-	player_ping[3] = 0;
 
 	auto player4_tank = static_cast<pTank>(CreateGameObject(ACTOR_TYPE_TANK, 400.0f, 400.0f));
 	player4_tank->SetPlayerId(uint32_t(4));
-	player_ping[4] = 0;
 
+	for (uint32_t i = 1; i <= 4; i++) {
+		player_ping[i] = 0;
+		client_commands[i] = {};
+		client_game_states[i] = {};
+	}
 }
 
 void World::Unload() {
@@ -93,14 +94,29 @@ void World::Update(float elapsed) {
 		break;
 
 	case World::Run:
-
 		std::stringstream displaying;
 		for (auto& player : player_ping) {
 			displaying
 				<< "Player " << player.first
-				<< " - Ping: " << player.second << '\n';
+				<< " - Ping by tick: " << player.second << '\n';
 		}
 		text.setString(displaying.str());
+
+		/*
+		for each clients
+			check for rollback
+				while rollback
+					get game state
+					handle command
+					set game state
+
+			get game state
+			handle command
+
+			if game state is sendable => send
+		*/
+
+
 
 		//if (tick_per_game_state_count >= tick_per_game_state) {
 		//
@@ -187,22 +203,18 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 	case PacketType::Ping: {
 		uint32_t client_id = 0;
 		uint32_t player_id = 0;
-		float replay_time_stamp = 0;
-		float ping = 0;
+		uint32_t reply_ping_tick = 0;
+		uint32_t ping = 0;
 
 		*packet
 			>> client_id
 			>> player_id
-			>> replay_time_stamp
+			>> reply_ping_tick
 			>> ping
 			;
 
 		player_ping[player_id] = ping;
-
-		auto ping_reply_packet = std::make_shared<Packet>(PacketType::Ping);
-		*ping_reply_packet << replay_time_stamp;
-		game->Send(client_id, ping_reply_packet);
-
+		SendReplyPingPacket(client_id, reply_ping_tick);
 		return true;
 	}
 
@@ -305,10 +317,10 @@ void World::SendGameStatePacket() {
 	//game->SendAll(game_state);
 }
 
-void World::RelayMoveCommand(uint32_t sent_client_id, pMoveCommand move_command) {
-	//auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
-	//
-	//game->SendAllExcept(sent_client_id, move_command_packet);
+void World::SendReplyPingPacket(uint32_t client_id, uint32_t reply_ping_tick) {
+	auto ping_reply_packet = std::make_shared<Packet>(PacketType::Ping);
+	*ping_reply_packet << reply_ping_tick;
+	game->Send(client_id, ping_reply_packet);
 }
 
 void World::SerializeGameState() {

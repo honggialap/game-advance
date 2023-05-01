@@ -61,24 +61,14 @@ void Tank::Deserialize(pGameObjectState game_object_state) {
 	current_movement.y = tank_state->current_movement_y;
 }
 
-void Tank::ExecuteCommand(uint32_t tick) {
-	if (commands.empty()) {
-		return;
+void Tank::ExecuteCommand(pCommand command) {
+	switch (command->command_type) {
+	case Command::Move: {
+		auto move_command = static_cast<pMoveCommand>(command);
+		current_movement.x = move_command->x;
+		current_movement.y = move_command->y;
+		break;
 	}
-
-	auto command = commands.front();
-	if (command->tick == tick) {
-		switch (command->type) {
-		case Command::Move: {
-			auto move_command = static_cast<pMoveCommand>(command);
-			current_movement.x = move_command->x;
-			current_movement.y = move_command->y;
-
-			delete move_command;
-			commands.pop_front();
-			break;
-		}
-		}
 	}
 }
 

@@ -53,9 +53,15 @@ void World::Load(std::string data_path) {
 
 	font.loadFromFile("data/resources/fonts/arial.ttf");
 	text.setFont(font);
+
+	commands.reset(new Commands());
 }
 
 void World::Unload() {
+
+	if (commands) {
+		commands->clear();
+	}
 
 	for (auto& game_object : game_objects) {
 		game_object.second->Unload();
@@ -81,23 +87,60 @@ void World::Update(float elapsed) {
 
 	case World::Run: {
 		std::stringstream displaying;
-		displaying << "Ping: " << ping;
+		displaying << "Ping by tick: " << ping_tick;
 		text.setString(displaying.str());
+
+		if (just_got_game_state) {
+			just_got_game_state = false;
+			for (
+				uint32_t reconcilate_tick = ack_tick + 1;
+				reconcilate_tick < latest_tick;
+				reconcilate_tick++
+				) {
+				if (!commands->empty()) {
+					if (commands->found(reconcilate_tick)) {
+						for (auto& command : commands->get(reconcilate_tick)) {
+							game_objects[command->game_object_id]->ExecuteCommand(command.get());
+						}
+					}
+				}
+
+				for (auto& game_object : game_objects) {
+					game_object.second->Update(elapsed);
+				}
+
+				physics_world->Step(elapsed, 8, 3);
+			}
+		}
 
 		for (auto& game_object : game_objects) {
 			game_object.second->HandleInput();
 		}
-		
+
+		if (!commands->empty()) {
+			if (commands->found(latest_tick)) {
+				for (auto& command : commands->get(latest_tick)) {
+					game_objects[command->game_object_id]->ExecuteCommand(command.get());
+				}
+			}
+		}
+
 		for (auto& game_object : game_objects) {
 			game_object.second->Update(elapsed);
 		}
-		
+
 		physics_world->Step(elapsed, 8, 3);
+
+		while (commands->size() > 64) {
+			uint32_t deleting_tick = commands->commands_by_tick.begin()->first;
+			commands->erase(deleting_tick);
+		}
 
 		if (!ping_sent) {
 			SendPingPacket();
 		}
 
+		latest_tick += 1;
 		break;
 	}
 	}
@@ -197,14 +240,13 @@ bool World::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 	case PacketType::StartGame: {
 		state = State::Run;
-		ping_clock.Reset();
 		return true;
 	}
 
 	case PacketType::Ping: {
-		float reply_time_stamp;
-		*packet >> reply_time_stamp;
-		ping = ping_clock.GetMilliseconds() - reply_time_stamp;
+		uint32_t reply_ping_tick;
+		*packet >> reply_ping_tick;
+		ping_tick = (latest_tick - reply_ping_tick) / 2;
 		ping_sent = false;
 		return true;
 	}
@@ -231,8 +273,8 @@ void World::SendPingPacket() {
 	*ping_packet
 		<< game->GetId()
 		<< game->player_id
-		<< ping_clock.GetMilliseconds()
-		<< ping
+		<< latest_tick
+		<< ping_tick
 		;
 	game->Send(ping_packet);
 	ping_sent = true;

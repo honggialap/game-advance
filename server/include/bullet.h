@@ -5,7 +5,6 @@
 #include "game_object.h"
 
 struct BulletState : public GameObjectState {
-
 	BulletState(
 		uint32_t id,
 		uint32_t type,
@@ -34,7 +33,7 @@ public:
 	pGameObjectState Serialize() override;
 	void Deserialize(pGameObjectState game_object_state) override;
 
-	void ExecuteCommand(uint32_t tick) override;
+	void ExecuteCommand(pCommand command) override;
 
 	void Load(std::string data_path) override;
 	void Unload() override;

@@ -40,6 +40,37 @@ void Tank::Unload() {
 	}
 }
 
+GameState* Tank::Serialize() {
+	float position_x;
+	float position_y;
+	GetPosition(position_x, position_y);
+
+	float velocity_x;
+	float velocity_y;
+	GetVelocity(velocity_x, velocity_y);
+
+	return new TankGameState(
+		id,
+		type,
+		position_x,
+		position_y,
+		velocity_x,
+		velocity_y,
+		player_id,
+		current_movement.x,
+		current_movement.y
+	);
+}
+
+void Tank::Deserialize(GameState* game_state) {
+	auto tank_game_state = static_cast<TankGameState*>(game_state);
+	SetPosition(tank_game_state->position_x, tank_game_state->position_y);
+	SetVelocity(tank_game_state->velocity_x, tank_game_state->velocity_y);
+	player_id = tank_game_state->player_id;
+	current_movement.x = tank_game_state->current_movement_x;
+	current_movement.y = tank_game_state->current_movement_y;
+}
+
 void Tank::HandleInput() {
 	if (player_control) {
 		sf::Vector2i movement(0, 0);
@@ -112,31 +143,30 @@ void Tank::HandleInput() {
 
 		if (movement.x != current_movement.x
 			|| movement.y != current_movement.y) {
-			//auto move_command = new MoveCommand(world->server_tick, world->client_tick, id, movement.x, movement.y);
-			//commands.push_back(move_command);
-			//SendMoveCommand(move_command);
+			MoveCommand move_command(id, movement.x, movement.y);
+
+			world->commands->push(
+				world->latest_tick,
+				std::make_unique<MoveCommand>(move_command)
+			);
+			SendMoveCommand(world->latest_tick, move_command);
 		}
 	}
 }
 
-void Tank::ExecuteCommand(uint32_t tick) {
-	if (commands.empty()) {
-		return;
+void Tank::ExecuteCommand(Command* command) {
+	switch (command->command_type) {
+	case TANK_COMMAND_TYPE_MOVE: {
+		auto move_command = static_cast<MoveCommand*>(command);
+		current_movement.x = move_command->x;
+		current_movement.y = move_command->y;
+		break;
 	}
 
-	auto command = commands.front();
-	if (command->tick == tick) {
-		switch (command->type) {
-		case Command::Move: {
-			auto move_command = static_cast<pMoveCommand>(command);
-			current_movement.x = move_command->x;
-			current_movement.y = move_command->y;
-
-			delete move_command;
-			commands.pop_front();
-			break;
-		}
-		}
+	case TANK_COMMAND_TYPE_SHOOT: {
+		auto shoot_command = static_cast<ShootCommand*>(command);
+		break;
+	}
 	}
 }
 
@@ -173,17 +203,16 @@ void Tank::OnCollisionExit(pGameObject other) {
 	}
 }
 
-void Tank::SendMoveCommand(pMoveCommand move_command) {
+void Tank::SendMoveCommand(uint32_t tick, MoveCommand move_command) {
 	auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
 	*move_command_packet
 		<< game->GetId()
 		<< player_id
-		<< move_command->id
-		<< move_command->type
-		<< move_command->server_tick
-		<< move_command->tick
-		<< move_command->x
-		<< move_command->y
+		<< tick
+		<< move_command.game_object_id
+		<< move_command.command_type
+		<< move_command.x
+		<< move_command.y
 		;
 	game->Send(move_command_packet);
 }

@@ -37,7 +37,7 @@ void Wall::Deserialize(pGameObjectState game_object_state) {
 	SetVelocity(wall_state->velocity_x, wall_state->velocity_y);
 }
 
-void Wall::ExecuteCommand(uint32_t tick) {
+void Wall::ExecuteCommand(pCommand command) {
 }
 
 void Wall::Update(float elapsed) {

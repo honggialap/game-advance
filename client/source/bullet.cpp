@@ -10,10 +10,35 @@ void Bullet::Load(std::string data_path) {
 void Bullet::Unload() {
 }
 
+GameState* Bullet::Serialize() {
+	float position_x;
+	float position_y;
+	GetPosition(position_x, position_y);
+
+	float velocity_x;
+	float velocity_y;
+	GetVelocity(velocity_x, velocity_y);
+
+	return new BulletGameState(
+		id,
+		type,
+		position_x,
+		position_y,
+		velocity_x,
+		velocity_y
+	);
+}
+
+void Bullet::Deserialize(GameState* game_state) {
+	auto bullet_state = static_cast<BulletGameState*>(game_state);
+	SetPosition(bullet_state->position_x, bullet_state->position_y);
+	SetVelocity(bullet_state->velocity_x, bullet_state->velocity_y);
+}
+
 void Bullet::HandleInput() {
 }
 
-void Bullet::ExecuteCommand(uint32_t tick) {
+void Bullet::ExecuteCommand(Command* command) {
 }
 
 void Bullet::Update(float elapsed) {

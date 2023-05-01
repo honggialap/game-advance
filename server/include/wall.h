@@ -5,7 +5,6 @@
 #include "game_object.h"
 
 struct WallState : public GameObjectState {
-
 	WallState(
 		uint32_t id,
 		uint32_t type,
@@ -37,7 +36,7 @@ public:
 	pGameObjectState Serialize() override;
 	void Deserialize(pGameObjectState game_object_state) override;
 
-	void ExecuteCommand(uint32_t tick) override;
+	void ExecuteCommand(pCommand command) override;
 
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;

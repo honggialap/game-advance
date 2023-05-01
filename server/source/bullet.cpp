@@ -35,7 +35,7 @@ void Bullet::Deserialize(pGameObjectState game_object_state) {
 	SetVelocity(bullet_state->velocity_x, bullet_state->velocity_y);
 }
 
-void Bullet::ExecuteCommand(uint32_t tick) {
+void Bullet::ExecuteCommand(pCommand command) {
 }
 
 void Bullet::Update(float elapsed) {

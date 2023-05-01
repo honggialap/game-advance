@@ -12,10 +12,35 @@ void Wall::Load(std::string data_path) {
 void Wall::Unload() {
 }
 
+GameState* Wall::Serialize() {
+	float position_x;
+	float position_y;
+	GetPosition(position_x, position_y);
+
+	float velocity_x;
+	float velocity_y;
+	GetVelocity(velocity_x, velocity_y);
+
+	return new WallGameState(
+		id,
+		type,
+		position_x,
+		position_y,
+		velocity_x,
+		velocity_y
+	);
+}
+
+void Wall::Deserialize(GameState* game_state) {
+	auto wall_state = static_cast<WallGameState*>(game_state);
+	SetPosition(wall_state->position_x, wall_state->position_y);
+	SetVelocity(wall_state->velocity_x, wall_state->velocity_y);
+}
+
 void Wall::HandleInput() {
 }
 
-void Wall::ExecuteCommand(uint32_t tick) {
+void Wall::ExecuteCommand(Command* command) {
 }
 
 void Wall::Update(float elapsed) {

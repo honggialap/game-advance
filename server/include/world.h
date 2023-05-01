@@ -15,12 +15,6 @@
 class Game;
 typedef Game* pGame;
 
-struct GameState {
-	uint32_t tick;
-	std::map<uint32_t, pGameObjectState> game_objects_state;
-};
-typedef GameState* pGameState;
-
 class World : public Scene, public b2ContactListener {
 protected:
 	enum State {
@@ -46,7 +40,11 @@ public:
 	uint32_t tick_per_game_state = 4;
 	uint32_t tick_per_game_state_count = 0;
 
-	std::map<uint32_t, float> player_ping;
+	std::map<uint32_t, uint32_t> player_ping;
+	std::map<uint32_t, std::pair<bool, uint32_t>> client_rollback;
+
+	std::map<uint32_t, pCommands> client_commands;
+	std::map<uint32_t, pGameStates> client_game_states;
 
 	World(pGame game) : Scene(game) {};
 
@@ -56,7 +54,7 @@ public:
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 
-	pGameObject CreateGameObject(uint32_t game_object_type,	float position_x, float position_y);
+	pGameObject CreateGameObject(uint32_t game_object_type, float position_x, float position_y);
 
 	sf::View& GetCamera();
 
@@ -70,9 +68,9 @@ public:
 
 	void SendLoadPacket();
 	void SendStartGamePacket();
+	void SendReplyPingPacket(uint32_t client_id, uint32_t reply_ping_tick);
 
 	void SendGameStatePacket();
-	void RelayMoveCommand(uint32_t sent_client_id, pMoveCommand move_command);
 
 	void SerializeGameState();
 	void DeserializeGameState();
