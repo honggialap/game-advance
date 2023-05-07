@@ -1,6 +1,6 @@
 #include "game.h"
-#include "lobby.h"
-#include "world.h"
+#include "lobby_scene.h"
+#include "main_scene.h"
 
 void Game::Initialize(std::string data_path) {
 	std::ifstream data_file(data_path);
@@ -129,12 +129,12 @@ pScene Game::CreateScene(unsigned int scene_type) {
 	switch (scene_type) {
 
 	case SCENE_TYPE_LOBBY: {
-		return new Lobby(this);
+		return new LobbyScene(this);
 		break;
 	}
 
-	case SCENE_TYPE_WORLD: {
-		return new World(this);
+	case SCENE_TYPE_MAIN: {
+		return new MainScene(this);
 		break;
 	}
 
@@ -169,7 +169,7 @@ bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
 	case PacketType::Welcome: {
 		uint32_t id;
 		*packet >> id;
-		AssignId(id);
+		AssignClientId(id);
 		printf("Get ID: %d\n", id);
 		return true;
 	}

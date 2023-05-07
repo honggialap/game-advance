@@ -6,8 +6,8 @@
 #include "client.h"
 #include "scene.h"
 
-#define SCENE_TYPE_LOBBY 1
-#define SCENE_TYPE_WORLD 2
+#define SCENE_TYPE_LOBBY	1
+#define SCENE_TYPE_MAIN		2
 
 class Game : public Client {
 protected:
@@ -27,6 +27,7 @@ protected:
 public:
 	uint32_t player_id = 0;
 
+public:
 	void Initialize(std::string data_path);
 	void Shutdown();
 	

@@ -6,8 +6,8 @@
 #include "server.h"
 #include "scene.h"
 
-#define SCENE_TYPE_LOBBY 1
-#define SCENE_TYPE_WORLD 2
+#define SCENE_TYPE_LOBBY	1
+#define SCENE_TYPE_MAIN		2
 
 class Game : public Server {
 protected:

@@ -4,7 +4,6 @@
 
 #include "common.h"
 #include "packet.h"
-#include "game_object.h"
 
 // Forward declaration
 class Game;
@@ -16,6 +15,7 @@ protected:
 
 public:
 	Scene(pGame game) : game(game) {};
+	virtual ~Scene() = 0 {};
 
 	virtual void Load(std::string data_path) = 0;
 	virtual void Unload() = 0;

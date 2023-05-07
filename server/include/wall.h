@@ -4,16 +4,16 @@
 
 #include "game_object.h"
 
-struct WallState : public GameObjectState {
-	WallState(
+struct WallRecord : public Record {
+	WallRecord(
 		uint32_t id,
 		uint32_t type,
 		float position_x,
 		float position_y,
 		float velocity_x,
 		float velocity_y
-	): 
-		GameObjectState(
+	) :
+		Record(
 			id,
 			type,
 			position_x,
@@ -23,26 +23,27 @@ struct WallState : public GameObjectState {
 		)
 	{}
 };
-typedef WallState* pWallState;
+typedef std::unique_ptr<WallRecord> pWallRecord;
 
 class Wall : public GameObject {
 public:
-	Wall(pGame game, pWorld world, uint32_t id, uint32_t type) 
+	Wall(pGame game, pWorld world, uint32_t id, uint32_t type)
 		: GameObject(game, world, id, type) {};
 
 	void Load(std::string data_path) override;
 	void Unload() override;
 
-	pGameObjectState Serialize() override;
-	void Deserialize(pGameObjectState game_object_state) override;
+	Record* Serialize() override;
+	void Deserialize(Record* record) override;
 
-	void ExecuteCommand(pCommand command) override;
+	void HandleInput(uint32_t tick) override;
+	void ExecuteCommand(Command* command) override;
 
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 
-	void OnCollisionEnter(pGameObject other) override;
-	void OnCollisionExit(pGameObject other) override;
+	void OnCollisionEnter(GameObject* other) override;
+	void OnCollisionExit(GameObject* other) override;
 };
 typedef Wall* pWall;
 

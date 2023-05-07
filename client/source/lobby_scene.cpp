@@ -1,13 +1,7 @@
-#include "lobby.h"
+#include "lobby_scene.h"
 #include "game.h"
 
-Lobby::Lobby(pGame game) : Scene(game) {
-}
-
-Lobby::	~Lobby() {
-}
-
-void Lobby::Load(std::string data_path) {
+void LobbyScene::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
 
@@ -19,15 +13,15 @@ void Lobby::Load(std::string data_path) {
 	lockable = false;
 }
 
-void Lobby::Unload() {
+void LobbyScene::Unload() {
 }
 
-void Lobby::Update(float elapsed) {
+void LobbyScene::Update(float elapsed) {
 	switch (state) {
 
-	case Lobby::Picking: {
+	case LobbyScene::Picking: {
 		if (!pick_sent) {
-			switch (game->GetId()) {
+			switch (game->GetClientId()) {
 
 			case 1000: {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
@@ -134,7 +128,7 @@ void Lobby::Update(float elapsed) {
 		break;
 	}
 
-	case Lobby::Locked: {
+	case LobbyScene::Locked: {
 		text.setString("WAITING FOR OTHER PLAYERS\n");
 		break;
 	}
@@ -142,20 +136,20 @@ void Lobby::Update(float elapsed) {
 	}
 }
 
-void Lobby::Render(sf::RenderWindow& window) {
+void LobbyScene::Render(sf::RenderWindow& window) {
 	window.draw(text);
 }
 
-void Lobby::OnConnect() {
+void LobbyScene::OnConnect() {
 }
 
-void Lobby::OnDisconnect() {
+void LobbyScene::OnDisconnect() {
 }
 
-void Lobby::OnConnectFail() {
+void LobbyScene::OnConnectFail() {
 }
 
-bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
+bool LobbyScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
 	case PacketType::PlayerConfirm: {
 		lockable = false;
@@ -172,19 +166,19 @@ bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
 			bool locked = false;
 			*packet >> player_id >> client_id >> locked;
 
-			if (client_id == game->GetId()) {
+			if (client_id == game->GetClientId()) {
 				game->player_id = player_id;
 			}
 
 			if (
-				client_id == game->GetId()
+				client_id == game->GetClientId()
 				&& player_id == game->player_id
 				) {
 				lockable = true;
 			}
 
 			if (
-				client_id == game->GetId()
+				client_id == game->GetClientId()
 				&& locked
 				) {
 				state = State::Locked;
@@ -212,14 +206,14 @@ bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
 	}
 }
 
-void Lobby::SendPickPacket(uint32_t player_id) {
+void LobbyScene::SendPickPacket(uint32_t player_id) {
 	auto pick_packet = std::make_shared<Packet>(PacketType::PlayerPick);
-	*pick_packet << player_id << game->GetId();
+	*pick_packet << player_id << game->GetClientId();
 	game->Send(pick_packet);
 }
 
-void Lobby::SendLockPacket() {
+void LobbyScene::SendLockPacket() {
 	auto lock_packet = std::make_shared<Packet>(PacketType::PlayerLock);
-	*lock_packet << game->GetId();
+	*lock_packet << game->GetClientId();
 	game->Send(lock_packet);
 }

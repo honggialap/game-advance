@@ -10,7 +10,7 @@ void Bullet::Load(std::string data_path) {
 void Bullet::Unload() {
 }
 
-GameState* Bullet::Serialize() {
+Record* Bullet::Serialize() {
 	float position_x;
 	float position_y;
 	GetPosition(position_x, position_y);
@@ -19,7 +19,7 @@ GameState* Bullet::Serialize() {
 	float velocity_y;
 	GetVelocity(velocity_x, velocity_y);
 
-	return new BulletGameState(
+	return new BulletRecord(
 		id,
 		type,
 		position_x,
@@ -29,13 +29,13 @@ GameState* Bullet::Serialize() {
 	);
 }
 
-void Bullet::Deserialize(GameState* game_state) {
-	auto bullet_state = static_cast<BulletGameState*>(game_state);
-	SetPosition(bullet_state->position_x, bullet_state->position_y);
-	SetVelocity(bullet_state->velocity_x, bullet_state->velocity_y);
+void Bullet::Deserialize(Record* record) {
+	auto bullet_record = static_cast<BulletRecord*>(record);
+	SetPosition(bullet_record->position_x, bullet_record->position_y);
+	SetVelocity(bullet_record->velocity_x, bullet_record->velocity_y);
 }
 
-void Bullet::HandleInput() {
+void Bullet::HandleInput(uint32_t tick) {
 }
 
 void Bullet::ExecuteCommand(Command* command) {
@@ -47,8 +47,8 @@ void Bullet::Update(float elapsed) {
 void Bullet::Render(sf::RenderWindow& window) {
 }
 
-void Bullet::OnCollisionEnter(pGameObject other) {
+void Bullet::OnCollisionEnter(GameObject* other) {
 }
 
-void Bullet::OnCollisionExit(pGameObject other) {
+void Bullet::OnCollisionExit(GameObject* other) {
 }

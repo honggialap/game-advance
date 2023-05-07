@@ -1,13 +1,7 @@
-#include "lobby.h"
+#include "lobby_scene.h"
 #include "game.h"
 
-Lobby::Lobby(pGame game) : Scene(game) {
-}
-
-Lobby::~Lobby() {
-}
-
-void Lobby::Load(std::string data_path) {
+void LobbyScene::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
 
@@ -23,13 +17,13 @@ void Lobby::Load(std::string data_path) {
 
 }
 
-void Lobby::Unload() {
+void LobbyScene::Unload() {
 }
 
-void Lobby::Update(float elapsed) {
+void LobbyScene::Update(float elapsed) {
 	switch (state) {
 
-	case Lobby::Picking: {
+	case LobbyScene::Picking: {
 		std::stringstream displaying;
 		displaying << "PLAYER\n";
 		for (auto& player : game->players) {
@@ -55,7 +49,7 @@ void Lobby::Update(float elapsed) {
 		break;
 	}
 
-	case Lobby::Locked: {
+	case LobbyScene::Locked: {
 		std::stringstream displaying;
 		displaying << "READY: " << count_down;
 		text.setString(displaying.str());
@@ -73,17 +67,17 @@ void Lobby::Update(float elapsed) {
 	
 }
 
-void Lobby::Render(sf::RenderWindow& window) {
+void LobbyScene::Render(sf::RenderWindow& window) {
 	window.draw(text);
 }
 
-void Lobby::OnConnect(uint32_t connection_id) {
+void LobbyScene::OnConnect(uint32_t connection_id) {
 }
 
-void Lobby::OnDisconnect(uint32_t connection_id) {
+void LobbyScene::OnDisconnect(uint32_t connection_id) {
 }
 
-bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
+bool LobbyScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 	switch (packet->GetPacketType()) {
 	case PacketType::PlayerPick: {
 		uint32_t player_id = 0;
@@ -107,7 +101,7 @@ bool Lobby::ProcessPacket(std::shared_ptr<Packet> packet) {
 	}
 }
 
-void Lobby::SendConfirmPacket() {
+void LobbyScene::SendConfirmPacket() {
 	auto player_confirm_packet = std::make_shared<Packet>(PacketType::PlayerConfirm);
 	
 	uint32_t total_player = game->players.size();
@@ -124,14 +118,14 @@ void Lobby::SendConfirmPacket() {
 	game->SendAll(player_confirm_packet);
 }
 
-void Lobby::SendNextScenePacket(uint32_t scene_id) {
+void LobbyScene::SendNextScenePacket(uint32_t scene_id) {
 	auto next_scene_packet = std::make_shared<Packet>(PacketType::PlayNextScene);
 	uint32_t next_scene_id = scene_id;
 	*next_scene_packet << next_scene_id;
 	game->SendAll(next_scene_packet);
 }
 
-void Lobby::SetPlayerPick(uint32_t player_id, uint32_t client_id) {
+void LobbyScene::SetPlayerPick(uint32_t player_id, uint32_t client_id) {
 	for (auto& player : game->players) {
 		if (player.second.second) {
 			continue;
@@ -153,7 +147,7 @@ void Lobby::SetPlayerPick(uint32_t player_id, uint32_t client_id) {
 	}
 }
 
-void Lobby::SetPlayerLock(uint32_t client_id) {
+void LobbyScene::SetPlayerLock(uint32_t client_id) {
 	for (auto& player : game->players) {
 		if (player.second.first == client_id) {
 			player.second.second = true;

@@ -13,9 +13,7 @@ protected:
 
 	bool is_connecting = false;
 	std::pair<Connection, WSAPOLLFD> host_connection;
-
-	bool is_approved = false;
-	uint32_t id;
+	uint32_t client_id;
 
 public:
 	bool Initialize(IPEndPoint ip_endpoint);
@@ -26,11 +24,11 @@ public:
 
 	bool ProcessNetworks();
 	bool ProcessPackets();
+
 	bool Send(std::shared_ptr<Packet> packet);
 
-	void AssignId(uint32_t id) { this->id = id; is_approved = true; }
-	bool IsApproved() { return is_approved; }
-	uint32_t GetId() { return id; }
+	void AssignClientId(uint32_t value) { client_id = value; }
+	uint32_t GetClientId() { return client_id; }
 
 	virtual void OnConnect() = 0;
 	virtual void OnDisconnect() = 0;

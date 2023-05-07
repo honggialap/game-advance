@@ -40,7 +40,7 @@ void Tank::Unload() {
 	}
 }
 
-GameState* Tank::Serialize() {
+Record* Tank::Serialize() {
 	float position_x;
 	float position_y;
 	GetPosition(position_x, position_y);
@@ -49,7 +49,7 @@ GameState* Tank::Serialize() {
 	float velocity_y;
 	GetVelocity(velocity_x, velocity_y);
 
-	return new TankGameState(
+	return new TankRecord(
 		id,
 		type,
 		position_x,
@@ -62,16 +62,16 @@ GameState* Tank::Serialize() {
 	);
 }
 
-void Tank::Deserialize(GameState* game_state) {
-	auto tank_game_state = static_cast<TankGameState*>(game_state);
-	SetPosition(tank_game_state->position_x, tank_game_state->position_y);
-	SetVelocity(tank_game_state->velocity_x, tank_game_state->velocity_y);
-	player_id = tank_game_state->player_id;
-	current_movement.x = tank_game_state->current_movement_x;
-	current_movement.y = tank_game_state->current_movement_y;
+void Tank::Deserialize(Record* record) {
+	auto tank_record = static_cast<TankRecord*>(record);
+	SetPosition(tank_record->position_x, tank_record->position_y);
+	SetVelocity(tank_record->velocity_x, tank_record->velocity_y);
+	player_id = tank_record->player_id;
+	current_movement.x = tank_record->current_movement_x;
+	current_movement.y = tank_record->current_movement_y;
 }
 
-void Tank::HandleInput() {
+void Tank::HandleInput(uint32_t tick) {
 	if (player_control) {
 		sf::Vector2i movement(0, 0);
 		switch (game->player_id) {
@@ -145,11 +145,10 @@ void Tank::HandleInput() {
 			|| movement.y != current_movement.y) {
 			MoveCommand move_command(id, movement.x, movement.y);
 
-			world->commands->push(
-				world->latest_tick,
+			world->commands[tick].push_back(
 				std::make_unique<MoveCommand>(move_command)
 			);
-			SendMoveCommand(world->latest_tick, move_command);
+			SendMoveCommand(tick, move_command);
 		}
 	}
 }
@@ -191,14 +190,14 @@ void Tank::Render(sf::RenderWindow& window) {
 	window.draw(sprite);
 }
 
-void Tank::OnCollisionEnter(pGameObject other) {
-	if (dynamic_cast<pWall>(other)) {
+void Tank::OnCollisionEnter(GameObject* other) {
+	if (dynamic_cast<Wall*>(other)) {
 		printf("TANK hit WALL.\n");
 	}
 }
 
-void Tank::OnCollisionExit(pGameObject other) {
-	if (dynamic_cast<pWall>(other)) {
+void Tank::OnCollisionExit(GameObject* other) {
+	if (dynamic_cast<Wall*>(other)) {
 		printf("TANK stop hit WALL.\n");
 	}
 }
@@ -206,7 +205,7 @@ void Tank::OnCollisionExit(pGameObject other) {
 void Tank::SendMoveCommand(uint32_t tick, MoveCommand move_command) {
 	auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
 	*move_command_packet
-		<< game->GetId()
+		<< game->GetClientId()
 		<< player_id
 		<< tick
 		<< move_command.game_object_id

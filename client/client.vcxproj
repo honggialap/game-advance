@@ -149,11 +149,10 @@
   <ItemGroup>
     <ClInclude Include="include\bullet.h" />
     <ClInclude Include="include\client.h" />
-    <ClInclude Include="include\command.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\game_object.h" />
-    <ClInclude Include="include\game_state.h" />
-    <ClInclude Include="include\lobby.h" />
+    <ClInclude Include="include\lobby_scene.h" />
+    <ClInclude Include="include\main_scene.h" />
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\tank.h" />
     <ClInclude Include="include\wall.h" />
@@ -163,8 +162,9 @@
     <ClCompile Include="source\bullet.cpp" />
     <ClCompile Include="source\client.cpp" />
     <ClCompile Include="source\game.cpp" />
-    <ClCompile Include="source\lobby.cpp" />
+    <ClCompile Include="source\lobby_scene.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\main_scene.cpp" />
     <ClCompile Include="source\tank.cpp" />
     <ClCompile Include="source\wall.cpp" />
     <ClCompile Include="source\world.cpp" />

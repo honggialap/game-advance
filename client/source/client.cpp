@@ -82,8 +82,6 @@ bool Client::Connect() {
 	master_fd.revents = 0;
 
 	host_connection = std::make_pair(connection, master_fd);
-
-	is_approved = false;
 	is_connecting = true;
 	OnConnect();
 
@@ -104,8 +102,6 @@ bool Client::Disconnect() {
 
 	host_connection.first.Close();
 	host_connection.second = {};
-
-	is_approved = false;
 	is_connecting = false;
 	OnDisconnect();
 

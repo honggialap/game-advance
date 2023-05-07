@@ -4,8 +4,8 @@
 
 #include "game_object.h"
 
-struct BulletGameState : public GameState {
-	BulletGameState(
+struct BulletRecord : public Record {
+	BulletRecord(
 		uint32_t id,
 		uint32_t type,
 		float position_x,
@@ -13,7 +13,7 @@ struct BulletGameState : public GameState {
 		float velocity_x,
 		float velocity_y
 	) :
-		GameState(
+		Record(
 			id,
 			type,
 			position_x,
@@ -23,27 +23,28 @@ struct BulletGameState : public GameState {
 		)
 	{}
 };
-typedef std::unique_ptr<BulletGameState> pBulletGameState;
+typedef std::unique_ptr<BulletRecord> pBulletRecord;
 
 class Bullet : public GameObject {
 public:
 	Bullet(pGame game, pWorld world, uint32_t id, uint32_t type)
 		: GameObject(game, world, id, type) {};
+	~Bullet() {};
 
 	void Load(std::string data_path) override;
 	void Unload() override;
 
-	GameState* Serialize() override;
-	void Deserialize(GameState* game_state) override;
+	Record* Serialize() override;
+	void Deserialize(Record* record) override;
 
-	void HandleInput() override;
+	void HandleInput(uint32_t tick) override;
 	void ExecuteCommand(Command* command) override;
 
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 
-	void OnCollisionEnter(pGameObject other) override;
-	void OnCollisionExit(pGameObject other) override;
+	void OnCollisionEnter(GameObject* other) override;
+	void OnCollisionExit(GameObject* other) override;
 };
 typedef Bullet* pBullet;
 

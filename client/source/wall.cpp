@@ -12,7 +12,7 @@ void Wall::Load(std::string data_path) {
 void Wall::Unload() {
 }
 
-GameState* Wall::Serialize() {
+Record* Wall::Serialize() {
 	float position_x;
 	float position_y;
 	GetPosition(position_x, position_y);
@@ -21,7 +21,7 @@ GameState* Wall::Serialize() {
 	float velocity_y;
 	GetVelocity(velocity_x, velocity_y);
 
-	return new WallGameState(
+	return new WallRecord(
 		id,
 		type,
 		position_x,
@@ -31,13 +31,13 @@ GameState* Wall::Serialize() {
 	);
 }
 
-void Wall::Deserialize(GameState* game_state) {
-	auto wall_state = static_cast<WallGameState*>(game_state);
-	SetPosition(wall_state->position_x, wall_state->position_y);
-	SetVelocity(wall_state->velocity_x, wall_state->velocity_y);
+void Wall::Deserialize(Record* record) {
+	auto wall_record = static_cast<WallRecord*>(record);
+	SetPosition(wall_record->position_x, wall_record->position_y);
+	SetVelocity(wall_record->velocity_x, wall_record->velocity_y);
 }
 
-void Wall::HandleInput() {
+void Wall::HandleInput(uint32_t tick) {
 }
 
 void Wall::ExecuteCommand(Command* command) {
@@ -49,8 +49,8 @@ void Wall::Update(float elapsed) {
 void Wall::Render(sf::RenderWindow& window) {
 }
 
-void Wall::OnCollisionEnter(pGameObject other) {
+void Wall::OnCollisionEnter(GameObject* other) {
 }
 
-void Wall::OnCollisionExit(pGameObject other) {
+void Wall::OnCollisionExit(GameObject* other) {
 }

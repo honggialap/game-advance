@@ -1,15 +1,10 @@
 #pragma once
-#ifndef __SERVER_LOBBY_H__
-#define __SERVER_LOBBY_H__
+#ifndef __SERVER_LOBBY_SCENE_H__
+#define __SERVER_LOBBY_SCENE_H__
 
 #include "scene.h"
-#include "game_object.h"
 
-// Forward declaration
-class Game;
-typedef Game* pGame;
-
-class Lobby : public Scene {
+class LobbyScene : public Scene {
 protected:
 	enum State {
 		Picking,
@@ -23,8 +18,8 @@ protected:
 	float count_down = 0;
 
 public:
-	Lobby(pGame game);
-	~Lobby();
+	LobbyScene(pGame game) : Scene(game) {};
+	~LobbyScene() {};
 
 	void Load(std::string data_path) override;
 	void Unload() override;
@@ -42,6 +37,6 @@ public:
 	void SetPlayerPick(uint32_t player_id, uint32_t client_id);
 	void SetPlayerLock(uint32_t client_id);
 };
-typedef Lobby* pLobby;
+typedef LobbyScene* pLobbyScene;
 
-#endif // !__SERVER_LOBBY_H__
+#endif // !__SERVER_LOBBY_SCENE_H__

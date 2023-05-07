@@ -4,15 +4,16 @@
 
 #include "game_object.h"
 
-struct TankGameState : public GameState {
+struct TankRecord : public Record {
 	uint32_t player_id;
 
 	int32_t current_movement_x;
 	int32_t current_movement_y;
 
-	TankGameState(
-		uint32_t id,
-		uint32_t type,
+	
+	TankRecord(
+		uint32_t game_object_id,
+		uint32_t game_object_type,
 		float position_x,
 		float position_y,
 		float velocity_x,
@@ -21,9 +22,9 @@ struct TankGameState : public GameState {
 		int32_t current_movement_x,
 		int32_t current_movement_y
 	) :
-		GameState(
-			id,
-			type,
+		Record(
+			game_object_id,
+			game_object_type,
 			position_x,
 			position_y,
 			velocity_x,
@@ -34,7 +35,7 @@ struct TankGameState : public GameState {
 		current_movement_y(current_movement_y)
 	{}
 };
-typedef std::unique_ptr<TankGameState> pTankGameState;
+typedef std::unique_ptr<TankRecord> pTankRecord;
 
 #define TANK_COMMAND_TYPE_MOVE 1
 struct MoveCommand : public Command {
@@ -81,6 +82,7 @@ protected:
 public:
 	Tank(pGame game, pWorld world, uint32_t id, uint32_t type)
 		: GameObject(game, world, id, type) {};
+	~Tank() {};
 
 	void SetPlayerId(uint32_t value) { player_id = value; }
 	uint32_t GetPlayerId() { return player_id; }
@@ -93,17 +95,17 @@ public:
 	void Load(std::string data_path) override;
 	void Unload() override;
 
-	GameState* Serialize() override;
-	void Deserialize(GameState* game_state) override;
+	Record* Serialize() override;
+	void Deserialize(Record* record) override;
 
-	void HandleInput() override;
+	void HandleInput(uint32_t tick) override;
 	void ExecuteCommand(Command* command) override;
 
 	void Update(float elapsed) override;
 	void Render(sf::RenderWindow& window) override;
 
-	void OnCollisionEnter(pGameObject other) override;
-	void OnCollisionExit(pGameObject other) override;
+	void OnCollisionEnter(GameObject* other) override;
+	void OnCollisionExit(GameObject* other) override;
 
 	void SendMoveCommand(uint32_t tick, MoveCommand move_command);
 };

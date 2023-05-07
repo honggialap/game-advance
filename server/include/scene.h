@@ -4,7 +4,6 @@
 
 #include "common.h"
 #include "packet.h"
-#include "game_object.h"
 
 // Forward declaration
 class Game;
