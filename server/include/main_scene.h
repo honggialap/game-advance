@@ -27,6 +27,8 @@ protected:
 public:
 	uint32_t tick_per_game_state = 4;
 	uint32_t tick_per_game_state_count = 0;
+	uint32_t default_delay_tick = 16;
+	uint32_t current_tick = 0;
 
 	std::map<uint32_t, pWorld> worlds;
 	std::map<uint32_t, uint32_t> player_ping;

@@ -23,11 +23,6 @@ protected:
 	uint32_t server_tick = 0;
 	uint32_t ack_tick = 0;
 
-	uint32_t latest_tick = 0;
-	uint32_t processing_tick = 0;
-
-	uint32_t current_tick = 0;
-
 	bool ready_sent = false;
 
 	bool ping_sent = false;

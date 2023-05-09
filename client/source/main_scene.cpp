@@ -36,13 +36,57 @@ void MainScene::Update(float elapsed) {
 		break;
 
 	case MainScene::Run: {
-		for (auto& game_object_container : world->game_objects) {
-			game_object_container.second->HandleInput(current_tick);
+		if (world->rollback) {
+			uint32_t last_tick = world->latest_tick - 1;
+			uint32_t command_received_at_tick = world->rollback_tick;
+			uint32_t tick_to_be_deserialize = command_received_at_tick - 1;
+			
+			for (uint32_t erasing_tick = last_tick;
+				erasing_tick > tick_to_be_deserialize;
+				erasing_tick--) {
+				world->records.erase(erasing_tick);
+			}
+
+			auto& records_container = world->records[tick_to_be_deserialize];
+			for (auto& record : records_container) {
+				world->game_objects[record->game_object_id]->Deserialize(record.get());
+			}
+
+			for (uint32_t i = command_received_at_tick;
+				i <= last_tick;
+				i++) {
+
+				if (world->commands.find(i) != world->commands.end()) {
+					auto& commands_at_tick = world->commands.at(i);
+					for (auto& command : commands_at_tick) {
+						world->game_objects[
+							command->game_object_id
+						]->ExecuteCommand(command.get());
+					}
+				}
+
+				for (auto& game_object_container : world->game_objects) {
+					game_object_container.second->Update(elapsed);
+				}
+				world->physics_world->Step(elapsed, 8, 3);
+
+				world->Serialize(i);
+			}
+
+			world->rollback = false;
+			world->rollback_tick = last_tick;
 		}
 
-		if (world->commands.find(current_tick) != world->commands.end()) {
-			auto& current_tick_commands = world->commands.at(current_tick);
-			for (auto& command : current_tick_commands) {
+
+		for (auto& game_object_container : world->game_objects) {
+			game_object_container.second->HandleInput(
+				world->latest_tick
+			);
+		}
+
+		if (world->commands.find(world->latest_tick) != world->commands.end()) {
+			auto& commands_at_tick = world->commands.at(world->latest_tick);
+			for (auto& command : commands_at_tick) {
 				world->game_objects[
 					command->game_object_id
 				]->ExecuteCommand(command.get());
@@ -54,13 +98,24 @@ void MainScene::Update(float elapsed) {
 		}
 		world->physics_world->Step(elapsed, 8, 3);
 
-		if (!world->commands.empty() && current_tick > 64) {
+		world->Serialize(world->latest_tick);
+
+		if (!world->commands.empty() && world->latest_tick > 128) {
 			while (
 				!world->commands.empty()
-				&& world->commands.begin()->first < current_tick - 64
+				&& world->commands.begin()->first < world->latest_tick - 128
 				) {
 				auto erasing_tick = world->commands.begin()->first;
 				world->commands.erase(erasing_tick);
+			}
+		}
+		if (!world->records.empty() && world->latest_tick > 128) {
+			while (
+				!world->records.empty()
+				&& world->records.begin()->first < world->latest_tick - 128
+				) {
+				auto erasing_tick = world->records.begin()->first;
+				world->records.erase(erasing_tick);
 			}
 		}
 
@@ -69,7 +124,7 @@ void MainScene::Update(float elapsed) {
 			ping_sent = true;
 		}
 
-		current_tick += 1;
+		world->latest_tick += 1;
 		break;
 	}
 	}
@@ -155,7 +210,7 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 	case PacketType::Ping: {
 		uint32_t reply_ping_tick;
 		*packet >> reply_ping_tick;
-		ping_tick = (current_tick - reply_ping_tick) / 2;
+		ping_tick = (world->latest_tick - reply_ping_tick) / 2;
 		ping_sent = false;
 		return true;
 	}
@@ -183,6 +238,13 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 		world->commands[tick].push_back(
 			std::make_unique<MoveCommand>(move_command)
 		);
+
+		if (tick < world->latest_tick) {
+			world->rollback = true;
+			if (world->rollback_tick > tick) {
+				world->rollback_tick = tick;
+			}
+		}
 		return true;
 	}
 
@@ -208,7 +270,7 @@ void MainScene::SendPingPacket() {
 	*ping_packet
 		<< game->GetClientId()
 		<< game->player_id
-		<< current_tick
+		<< world->latest_tick
 		<< ping_tick
 		;
 	game->Send(ping_packet);

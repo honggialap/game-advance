@@ -34,7 +34,7 @@ public:
 	void Load(std::string data_path) override;
 	void Unload() override;
 
-	Record* Serialize() override;
+	void Serialize(uint32_t tick) override;
 	void Deserialize(Record* record) override;
 
 	void HandleInput(uint32_t tick) override;

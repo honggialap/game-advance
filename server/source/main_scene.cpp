@@ -46,6 +46,49 @@ void MainScene::Update(float elapsed) {
 		break;
 
 	case MainScene::Run:
+
+		std::vector<std::thread> client_threads;
+		for (uint32_t i = 1; i < game->open_slots; i++) {
+			auto& world = worlds[i];
+			client_threads.emplace_back(
+				[&]() {
+					if (world->commands.find(current_tick) != world->commands.end()) {
+						auto& current_tick_commands = world->commands.at(current_tick);
+						for (auto& command : current_tick_commands) {
+							world->game_objects[
+								command->game_object_id
+							]->ExecuteCommand(command.get());
+						}
+					}
+
+					for (auto& game_object_container : world->game_objects) {
+						game_object_container.second->Update(elapsed);
+					}
+					world->physics_world->Step(elapsed, 8, 3);
+				}
+			);
+		}
+		for (auto& thread : client_threads) {
+			thread.join();
+		}
+
+		auto& server_world = worlds[0];
+		if (server_world->commands.find(current_tick) != server_world->commands.end()) {
+			auto& current_tick_commands = server_world->commands.at(current_tick);
+			for (auto& command : current_tick_commands) {
+				server_world->game_objects[
+					command->game_object_id
+				]->ExecuteCommand(command.get());
+			}
+		}
+
+		for (auto& game_object_container : server_world->game_objects) {
+			game_object_container.second->Update(elapsed);
+		}
+		server_world->physics_world->Step(elapsed, 8, 3);
+
+
+		current_tick += 1;
 		break;
 	}
 }
@@ -138,25 +181,25 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 		for (uint32_t i = 0; i <= game->open_slots; i++) {
 			auto& world = worlds[i];
-			if (i == 0 || i == player_id) {
-				MoveCommand move_command(game_object_id, x, y);
+			if (i == player_id) {
 				world->commands[tick].push_back(
-					std::make_unique<MoveCommand>(move_command)
+					std::make_unique<MoveCommand>(game_object_id, x, y)
 				);
 			}
 			else {
-				uint32_t relay_client_id = game->players[i].first;
-				uint32_t receiver_ping = player_ping[i];
-				uint32_t sent_tick = tick + (receiver_ping * 4);
-
-				MoveCommand move_command(game_object_id, x, y);
-				world->commands[sent_tick].push_back(
-					std::make_unique<MoveCommand>(move_command)
+				MoveCommand move_command();
+				world->commands[tick + default_delay_tick].push_back(
+					std::make_unique<MoveCommand>(game_object_id, x, y)
 				);
-
-				RelayMovePacket(relay_client_id, sent_tick, move_command);
 			}
 		}
+
+		RelayMovePacket(
+			client_id, 
+			tick + default_delay_tick, 
+			MoveCommand(game_object_id, x, y)
+		);
+
 		return true;
 	}
 
@@ -226,5 +269,5 @@ void MainScene::RelayMovePacket(uint32_t client_id, uint32_t tick, MoveCommand m
 		<< move_command.x
 		<< move_command.y
 		;
-	game->Send(client_id, relay_move_command_packet);
+	game->SendAllExcept(client_id, relay_move_command_packet);
 }

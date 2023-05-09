@@ -20,10 +20,17 @@ public:
 	std::map<uint32_t, std::vector<pCommand>> commands;
 	std::map<uint32_t, std::vector<pRecord>> records;
 
+	uint32_t latest_tick = 0;
+	uint32_t rollback_tick = 0;
+	bool rollback = false;
+
 	World();
 	~World();
 
 	GameObject* CreateGameObject(Game* game, uint32_t game_object_type, float position_x, float position_y);
+
+	void Serialize(uint32_t tick);
+	void Deserialize(uint32_t tick);
 
 	b2World* GetPhysics();
 	void BeginContact(b2Contact* contact) override;
