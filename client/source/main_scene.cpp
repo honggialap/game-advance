@@ -36,28 +36,15 @@ void MainScene::Update(float elapsed) {
 		break;
 
 	case MainScene::Run: {
-		if (world->rollback) {
-			uint32_t last_tick = world->latest_tick - 1;
-			uint32_t command_received_at_tick = world->rollback_tick;
-			uint32_t tick_to_be_deserialize = command_received_at_tick - 1;
-			
-			for (uint32_t erasing_tick = last_tick;
-				erasing_tick > tick_to_be_deserialize;
-				erasing_tick--) {
-				world->records.erase(erasing_tick);
-			}
 
-			auto& records_container = world->records[tick_to_be_deserialize];
-			for (auto& record : records_container) {
-				world->game_objects[record->game_object_id]->Deserialize(record.get());
-			}
+		if (world->just_got_game_state) {
+			world->just_got_game_state = false;
+			for (uint32_t reconcilate_tick = world->ack_tick + 1;
+				reconcilate_tick < world->latest_tick;
+				reconcilate_tick++) {
 
-			for (uint32_t i = command_received_at_tick;
-				i <= last_tick;
-				i++) {
-
-				if (world->commands.find(i) != world->commands.end()) {
-					auto& commands_at_tick = world->commands.at(i);
+				if (world->commands.find(reconcilate_tick) != world->commands.end()) {
+					auto& commands_at_tick = world->commands.at(reconcilate_tick);
 					for (auto& command : commands_at_tick) {
 						world->game_objects[
 							command->game_object_id
@@ -70,13 +57,8 @@ void MainScene::Update(float elapsed) {
 				}
 				world->physics_world->Step(elapsed, 8, 3);
 
-				world->Serialize(i);
 			}
-
-			world->rollback = false;
-			world->rollback_tick = last_tick;
 		}
-
 
 		for (auto& game_object_container : world->game_objects) {
 			game_object_container.second->HandleInput(
@@ -98,7 +80,9 @@ void MainScene::Update(float elapsed) {
 		}
 		world->physics_world->Step(elapsed, 8, 3);
 
-		world->Serialize(world->latest_tick);
+		//for (auto& game_object_container : world->game_objects) {
+		//	game_object_container.second->Serialize(world->latest_tick);
+		//}
 
 		if (!world->commands.empty() && world->latest_tick > 128) {
 			while (
@@ -109,15 +93,15 @@ void MainScene::Update(float elapsed) {
 				world->commands.erase(erasing_tick);
 			}
 		}
-		if (!world->records.empty() && world->latest_tick > 128) {
-			while (
-				!world->records.empty()
-				&& world->records.begin()->first < world->latest_tick - 128
-				) {
-				auto erasing_tick = world->records.begin()->first;
-				world->records.erase(erasing_tick);
-			}
-		}
+		//if (!world->records.empty() && world->latest_tick > 128) {
+		//	while (
+		//		!world->records.empty()
+		//		&& world->records.begin()->first < world->latest_tick - 128
+		//		) {
+		//		auto erasing_tick = world->records.begin()->first;
+		//		world->records.erase(erasing_tick);
+		//	}
+		//}
 
 		if (!ping_sent) {
 			SendPingPacket();
@@ -216,6 +200,47 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 	}
 
 	case PacketType::ServerGameState: {
+		world->just_got_game_state = true;
+
+		uint32_t ack_tick = 0;
+		*packet >> ack_tick;
+		world->ack_tick = ack_tick;
+
+		uint32_t game_object_count = 0;
+		*packet >> game_object_count;
+		for (uint32_t i = 0; i < game_object_count; i++) {
+			uint32_t type = 0;
+			uint32_t id = 0;
+			float position_x = 0.0f;
+			float position_y = 0.0f;
+			float velocity_x = 0.0f;
+			float velocity_y = 0.0f;
+
+			*packet
+				>> type >> id
+				>> position_x >> position_y
+				>> velocity_x >> velocity_y
+				;
+
+			switch (type) {
+			case ACTOR_TYPE_TANK: {
+				uint32_t player_id;
+				int32_t movement_x;
+				int32_t movement_y;
+
+				*packet
+					>> player_id
+					>> movement_x >> movement_y
+					;
+
+				Tank* tank = static_cast<Tank*>(world->game_objects[id].get());
+				tank->SetPosition(position_x, position_y);
+				tank->SetVelocity(velocity_x, velocity_y);
+				tank->SetMovement(movement_x, movement_y);
+				break;
+			}
+			}
+		}
 		return true;
 	}
 
@@ -225,7 +250,7 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 		uint32_t command_type;
 		int32_t x;
 		int32_t y;
-		
+
 		*packet
 			>> tick
 			>> game_object_id
@@ -239,12 +264,6 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 			std::make_unique<MoveCommand>(move_command)
 		);
 
-		if (tick < world->latest_tick) {
-			world->rollback = true;
-			if (world->rollback_tick > tick) {
-				world->rollback_tick = tick;
-			}
-		}
 		return true;
 	}
 

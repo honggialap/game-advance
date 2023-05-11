@@ -64,10 +64,6 @@ void World::Serialize(uint32_t tick) {
 }
 
 void World::Deserialize(uint32_t tick) {
-	if (records.find(tick) == records.end()) {
-		return;
-	}
-
 	auto& records_container = records[tick];
 	for (auto& record : records_container) {
 		game_objects[record->game_object_id]->Deserialize(record.get());

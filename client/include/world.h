@@ -21,8 +21,8 @@ public:
 	std::map<uint32_t, std::vector<pRecord>> records;
 
 	uint32_t latest_tick = 0;
-	uint32_t rollback_tick = 0;
-	bool rollback = false;
+	uint32_t ack_tick = 0;
+	bool just_got_game_state = false;
 
 	World();
 	~World();

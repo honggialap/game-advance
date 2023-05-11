@@ -57,6 +57,19 @@ GameObject* World::CreateGameObject(
 	}
 }
 
+void World::Serialize(uint32_t tick) {
+	for (auto& game_object_container : game_objects) {
+		game_object_container.second->Serialize(tick);
+	}
+}
+
+void World::Deserialize(uint32_t tick) {
+	auto& records_container = records[tick];
+	for (auto& record : records_container) {
+		game_objects[record->game_object_id]->Deserialize(record.get());
+	}
+}
+
 b2World* World::GetPhysics() {
 	return physics_world;
 }

@@ -41,7 +41,7 @@ void Tank::Unload() {
 	}
 }
 
-Record* Tank::Serialize() {
+void Tank::Serialize(uint32_t tick) {
 	float position_x;
 	float position_y;
 	GetPosition(position_x, position_y);
@@ -50,16 +50,19 @@ Record* Tank::Serialize() {
 	float velocity_y;
 	GetVelocity(velocity_x, velocity_y);
 
-	return new TankRecord(
-		id,
-		type,
-		position_x,
-		position_y,
-		velocity_x,
-		velocity_y,
-		player_id,
-		current_movement.x,
-		current_movement.y
+	auto& records_container = world->records[tick];
+	records_container.push_back(
+		std::make_unique<TankRecord>(
+			id,
+			type,
+			position_x,
+			position_y,
+			velocity_x,
+			velocity_y,
+			player_id,
+			current_movement.x,
+			current_movement.y
+		)
 	);
 }
 

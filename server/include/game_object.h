@@ -99,7 +99,7 @@ public:
 	virtual void Load(std::string data_path) = 0;
 	virtual void Unload() = 0;
 
-	virtual Record* Serialize() = 0;
+	virtual void Serialize(uint32_t tick) = 0;
 	virtual void Deserialize(Record* record) = 0;
 
 	virtual void HandleInput(uint32_t tick) = 0;
