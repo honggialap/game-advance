@@ -42,11 +42,12 @@ void MainScene::Unload() {
 
 void MainScene::Update(float elapsed) {
 	switch (state) {
-	case MainScene::Loading:
+	case MainScene::Loading: {
 		break;
+	}
 
-	case MainScene::Run:
-
+	case MainScene::Run: {
+		/*	client-clone
 		std::vector<std::thread> client_threads;
 		for (uint32_t i = 1; i <= game->open_slots; i++) {
 			auto& world = worlds[i];
@@ -146,6 +147,7 @@ void MainScene::Update(float elapsed) {
 		for (auto& thread : client_threads) {
 			thread.join();
 		}
+		*/
 
 		auto& server_world = worlds[0];
 #pragma region Server
@@ -235,22 +237,21 @@ void MainScene::Update(float elapsed) {
 			}
 		}
 #pragma endregion
-		
-		for (uint32_t i = 1; i <= game->open_slots; i++) {
-			auto& world = worlds[i];
-			uint32_t client_id = game->players[i].first;
-			if (world->latest_tick > default_delay_tick) {
-				if (world->latest_tick % tick_per_game_state == 0) {
-					SendGameStatePacket(client_id, world);
-				}
+
+		if (server_world->latest_tick > default_delay_tick) {
+			if (server_world->latest_tick % tick_per_game_state == 0) {
+				SendGameStatePacket();
 			}
 		}
 
-		for (auto& world : worlds) {
-			world.second->latest_tick += 1;
-		}
+		server_world->latest_tick += 1;
+
+		//for (auto& world : worlds) {
+		//	world.second->latest_tick += 1;
+		//}
 
 		break;
+	}
 	}
 }
 
@@ -342,6 +343,7 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 			>> y
 			;
 
+		/*
 		for (uint32_t i = 0; i <= game->open_slots; i++) {
 			auto& world = worlds[i];
 			if (i == player_id || i == 0) {
@@ -374,10 +376,23 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 				}
 			}
 		}
+		*/
+
+		auto& server_world = worlds[0];
+		server_world->commands[tick].push_back(
+			std::make_unique<MoveCommand>(game_object_id, x, y)
+		);
+
+		if (tick < server_world->latest_tick) {
+			server_world->rollback = true;
+			if (server_world->rollback_tick > tick) {
+				server_world->rollback_tick = tick;
+			}
+		}
 
 		RelayMovePacket(
-			client_id, 
-			tick + default_delay_tick, 
+			client_id,
+			tick,
 			MoveCommand(game_object_id, x, y)
 		);
 
@@ -430,12 +445,13 @@ void MainScene::SendStartGamePacket() {
 	game->SendAll(start_game_packet);
 }
 
-void MainScene::SendGameStatePacket(uint32_t client_id, pWorld world) {
-	auto& records = world->records[world->latest_tick - default_delay_tick];
+void MainScene::SendGameStatePacket() {
+	auto& server_world = worlds[0];
+	auto& records = server_world->records[server_world->latest_tick - default_delay_tick];
 
 	auto game_state_packet = std::make_shared<Packet>(PacketType::ServerGameState);
-	
-	uint32_t ack_tick = world->latest_tick - default_delay_tick;
+
+	uint32_t ack_tick = server_world->latest_tick - default_delay_tick;
 	*game_state_packet << ack_tick;
 
 	uint32_t game_object_count = records.size();
@@ -449,7 +465,7 @@ void MainScene::SendGameStatePacket(uint32_t client_id, pWorld world) {
 		float velocity_x = record->velocity_x;
 		float velocity_y = record->velocity_y;
 
-		switch (type){
+		switch (type) {
 		case ACTOR_TYPE_TANK: {
 			TankRecord* tank_record = static_cast<TankRecord*>(record.get());
 			uint32_t player_id = tank_record->player_id;
@@ -469,7 +485,7 @@ void MainScene::SendGameStatePacket(uint32_t client_id, pWorld world) {
 		}
 	}
 
-	game->Send(client_id, game_state_packet);
+	game->SendAll(game_state_packet);
 }
 
 void MainScene::SendReplyPingPacket(uint32_t client_id, uint32_t reply_ping_tick) {

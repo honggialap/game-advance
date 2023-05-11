@@ -25,8 +25,8 @@ protected:
 	uint32_t load_client_count = 0;
 
 public:
-	uint32_t tick_per_game_state = 8;
-	uint32_t default_delay_tick = 8;
+	uint32_t tick_per_game_state = 4;
+	uint32_t default_delay_tick = 16;
 
 	std::map<uint32_t, pWorld> worlds;
 	std::map<uint32_t, uint32_t> player_ping;
@@ -50,7 +50,7 @@ public:
 	void SendStartGamePacket();
 	void SendReplyPingPacket(uint32_t client_id, uint32_t reply_ping_tick);
 
-	void SendGameStatePacket(uint32_t client_id, pWorld world);
+	void SendGameStatePacket();
 
 	void RelayMovePacket(uint32_t client_id, uint32_t tick, MoveCommand move_command);
 };
