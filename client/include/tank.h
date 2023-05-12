@@ -79,7 +79,13 @@ protected:
 	sf::Vector2i current_movement;
 	float speed = 1;
 
+
 public:
+	float last_known_x = 0;
+	float last_known_y = 0;
+	float latest_x = 0;
+	float latest_y = 0;
+
 	Tank(pGame game, pWorld world, uint32_t id, uint32_t type)
 		: GameObject(game, world, id, type) {};
 	~Tank() {};

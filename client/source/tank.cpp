@@ -181,14 +181,31 @@ void Tank::Update(float elapsed) {
 }
 
 void Tank::Render(sf::RenderWindow& window) {
-	float render_x = 0.0f;
-	float render_y = 0.0f;
-	GetPosition(render_x, render_y);
+	if (player_control) {
+		float render_x = 0.0f;
+		float render_y = 0.0f;
+		GetPosition(render_x, render_y);
 
-	sprite.setPosition(
-		render_x,
-		-render_y + window.getSize().y
-	);
+		sprite.setPosition(
+			render_x,
+			-render_y + window.getSize().y
+		);
+	}
+	else {
+		uint32_t latest_tick = world->latest_tick;
+		uint32_t ack_tick = world->ack_tick;
+		uint32_t tick_per_game_state = world->tick_per_game_state;
+
+		float interval = (float(latest_tick) - float(ack_tick) - float(tick_per_game_state)) / float(tick_per_game_state);
+
+		float render_x = last_known_x + ((latest_x - last_known_x) * interval);
+		float render_y = last_known_y + ((latest_y - last_known_y) * interval);
+
+		sprite.setPosition(
+			render_x,
+			-render_y + window.getSize().y
+		);
+	}
 
 	window.draw(sprite);
 }

@@ -7,6 +7,8 @@
 
 class Client {
 protected:
+	std::mutex mutex;
+	
 	bool is_initialized = false;
 	WSADATA wsa_data;
 	IPEndPoint host_address;

@@ -234,6 +234,11 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 					;
 
 				Tank* tank = static_cast<Tank*>(world->game_objects[id].get());
+				tank->last_known_x = tank->latest_x;
+				tank->last_known_y = tank->latest_y;
+				tank->latest_x = position_x;
+				tank->latest_y = position_y;
+
 				tank->SetPosition(position_x, position_y);
 				tank->SetVelocity(velocity_x, velocity_y);
 				tank->SetMovement(movement_x, movement_y);

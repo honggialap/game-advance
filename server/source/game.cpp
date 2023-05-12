@@ -51,10 +51,11 @@ void Game::Shutdown() {
 void Game::Run(std::string data_path) {
 	Initialize(data_path);
 
-	auto networks_process = [this]() {
-		while (ProcessNetworks());
-	};
-	std::thread networks_thread(networks_process);
+	std::thread networks_processing_thread(
+		[this]() {
+			while (ProcessNetworks()) {}
+		}
+	);
 
 	while (window.isOpen()) {
 		sf::Event window_event;
@@ -93,7 +94,7 @@ void Game::Run(std::string data_path) {
 	}
 
 	Shutdown();
-	networks_thread.join();
+	networks_processing_thread.join();
 }
 
 void Game::PlayScene(unsigned int scene_id) {

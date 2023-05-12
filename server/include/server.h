@@ -7,6 +7,7 @@
 
 class Server {
 protected:
+	std::mutex mutex;
 	bool is_initialized = false;
 	WSADATA wsa_data;
 	std::pair<Socket, WSAPOLLFD> listener;

@@ -28,10 +28,12 @@
 #include <iostream>
 #include <utility>
 #include <thread>
+#include <mutex>
 #include <queue>
 #include <tuple>
 #include <map>
 #include <sstream>
+#include <cmath>
 
 #define PIXEL_PER_METER 30.0f
 #define MAX_PACKET_SIZE 65535

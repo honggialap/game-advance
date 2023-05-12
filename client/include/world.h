@@ -23,6 +23,7 @@ public:
 	uint32_t latest_tick = 0;
 	uint32_t ack_tick = 0;
 	bool just_got_game_state = false;
+	uint32_t tick_per_game_state = 8;
 
 	World();
 	~World();

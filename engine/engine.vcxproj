@@ -95,6 +95,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)external\SFML-2.5.1\include;$(ProjectDir)external\nlohmann-json-3.7.3\include;$(ProjectDir)external\box2d-2.4.1\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -117,6 +118,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)external\SFML-2.5.1\include;$(ProjectDir)external\nlohmann-json-3.7.3\include;$(ProjectDir)external\box2d-2.4.1\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -139,6 +141,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)external\SFML-2.5.1\include;$(ProjectDir)external\nlohmann-json-3.7.3\include;$(ProjectDir)external\box2d-2.4.1\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -161,6 +164,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)external\SFML-2.5.1\include;$(ProjectDir)external\nlohmann-json-3.7.3\include;$(ProjectDir)external\box2d-2.4.1\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>

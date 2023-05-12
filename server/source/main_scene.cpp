@@ -238,7 +238,7 @@ void MainScene::Update(float elapsed) {
 		}
 #pragma endregion
 
-		if (server_world->latest_tick > default_delay_tick) {
+		if (server_world->latest_tick > tick_per_game_state) {
 			if (server_world->latest_tick % tick_per_game_state == 0) {
 				SendGameStatePacket();
 			}
@@ -390,11 +390,11 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 			}
 		}
 
-		RelayMovePacket(
-			client_id,
-			tick,
-			MoveCommand(game_object_id, x, y)
-		);
+		//RelayMovePacket(
+		//	client_id,
+		//	tick + default_delay_tick,
+		//	MoveCommand(game_object_id, x, y)
+		//);
 
 		return true;
 	}
@@ -447,11 +447,11 @@ void MainScene::SendStartGamePacket() {
 
 void MainScene::SendGameStatePacket() {
 	auto& server_world = worlds[0];
-	auto& records = server_world->records[server_world->latest_tick - default_delay_tick];
+	auto& records = server_world->records[server_world->latest_tick - tick_per_game_state];
 
 	auto game_state_packet = std::make_shared<Packet>(PacketType::ServerGameState);
 
-	uint32_t ack_tick = server_world->latest_tick - default_delay_tick;
+	uint32_t ack_tick = server_world->latest_tick - tick_per_game_state;
 	*game_state_packet << ack_tick;
 
 	uint32_t game_object_count = records.size();

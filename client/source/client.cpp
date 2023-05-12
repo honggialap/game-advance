@@ -272,7 +272,11 @@ bool Client::ProcessNetworks() {
 bool Client::ProcessPackets() {
 	Connection& connection = host_connection.first;
 	while (connection.imcomming_packets.HasPending()) {
+
+		mutex.lock();
 		std::shared_ptr<Packet> packet = connection.imcomming_packets.Retrive();
+		mutex.unlock();
+
 		if (!ProcessPacket(packet)) {
 			Disconnect();
 			return false;
@@ -294,6 +298,9 @@ bool Client::Send(std::shared_ptr<Packet> packet) {
 		return false;
 	}
 
+	mutex.lock();
 	host_connection.first.outgoing_packets.Append(packet);
+	mutex.unlock();
+	
 	return true;
 }
