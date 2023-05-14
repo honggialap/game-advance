@@ -198,7 +198,9 @@ bool Client::ProcessNetworks() {
 						packet->buffer.resize(incomming.packet_size);
 						memcpy(&packet->buffer[0], connection.buffer, incomming.packet_size);
 
+						mutex.lock();
 						incomming.Append(packet);
+						mutex.unlock();
 
 						incomming.packet_size = 0;
 						incomming.extraction_offset = 0;
@@ -213,7 +215,10 @@ bool Client::ProcessNetworks() {
 			PacketManager& outgoing = connection.outgoing_packets;
 			while (outgoing.HasPending()) {
 				if (outgoing.packet_process_task == PacketProcessTask::Header) {
+					mutex.lock();
 					outgoing.packet_size = outgoing.Retrive()->buffer.size();
+					mutex.unlock();
+
 					uint16_t packet_size = htons(outgoing.packet_size);
 					int sent_bytes = send(
 						temp_fd.fd,
@@ -235,7 +240,10 @@ bool Client::ProcessNetworks() {
 					}
 				}
 				else {
+					mutex.lock();
 					char* buffer = &outgoing.Retrive()->buffer[0];
+					mutex.unlock();
+
 					int sent_bytes = send(
 						temp_fd.fd,
 						(char*)(buffer)+outgoing.extraction_offset,
@@ -250,7 +258,10 @@ bool Client::ProcessNetworks() {
 					if (outgoing.extraction_offset == outgoing.packet_size) {
 						outgoing.extraction_offset = 0;
 						outgoing.packet_process_task = PacketProcessTask::Header;
+						
+						mutex.lock();
 						outgoing.Pop();
+						mutex.unlock();
 					}
 					else {
 						break;
@@ -272,7 +283,6 @@ bool Client::ProcessNetworks() {
 bool Client::ProcessPackets() {
 	Connection& connection = host_connection.first;
 	while (connection.imcomming_packets.HasPending()) {
-
 		mutex.lock();
 		std::shared_ptr<Packet> packet = connection.imcomming_packets.Retrive();
 		mutex.unlock();
@@ -281,7 +291,10 @@ bool Client::ProcessPackets() {
 			Disconnect();
 			return false;
 		}
+
+		mutex.lock();
 		connection.imcomming_packets.Pop();
+		mutex.unlock();
 	}
 
 	return true;
@@ -299,8 +312,8 @@ bool Client::Send(std::shared_ptr<Packet> packet) {
 	}
 
 	mutex.lock();
-	host_connection.first.outgoing_packets.Append(packet);
+	host_connection.first.outgoing_packets.Append(packet);	
 	mutex.unlock();
-	
+
 	return true;
 }

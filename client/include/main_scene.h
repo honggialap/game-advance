@@ -19,13 +19,7 @@ protected:
 
 	pWorld world = nullptr;
 
-	bool just_got_game_state = false;
-	uint32_t server_tick = 0;
-	uint32_t ack_tick = 0;
-
-
 	bool ready_sent = false;
-
 	bool ping_sent = false;
 	uint32_t ping_tick = 0;
 

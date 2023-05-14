@@ -36,72 +36,19 @@ void MainScene::Update(float elapsed) {
 		break;
 
 	case MainScene::Run: {
-
 		if (world->just_got_game_state) {
 			world->just_got_game_state = false;
-			for (uint32_t reconcilate_tick = world->ack_tick + 1;
+			for (uint32_t reconcilate_tick = world->server_tick + 1;
 				reconcilate_tick < world->latest_tick;
 				reconcilate_tick++) {
 
-				if (world->commands.find(reconcilate_tick) != world->commands.end()) {
-					auto& commands_at_tick = world->commands.at(reconcilate_tick);
-					for (auto& command : commands_at_tick) {
-						world->game_objects[
-							command->game_object_id
-						]->ExecuteCommand(command.get());
-					}
-				}
-
-				for (auto& game_object_container : world->game_objects) {
-					game_object_container.second->Update(elapsed);
-				}
-				world->physics_world->Step(elapsed, 8, 3);
-
+				world->Step(reconcilate_tick, elapsed);
 			}
 		}
 
-		for (auto& game_object_container : world->game_objects) {
-			game_object_container.second->HandleInput(
-				world->latest_tick
-			);
-		}
-
-		if (world->commands.find(world->latest_tick) != world->commands.end()) {
-			auto& commands_at_tick = world->commands.at(world->latest_tick);
-			for (auto& command : commands_at_tick) {
-				world->game_objects[
-					command->game_object_id
-				]->ExecuteCommand(command.get());
-			}
-		}
-
-		for (auto& game_object_container : world->game_objects) {
-			game_object_container.second->Update(elapsed);
-		}
-		world->physics_world->Step(elapsed, 8, 3);
-
-		//for (auto& game_object_container : world->game_objects) {
-		//	game_object_container.second->Serialize(world->latest_tick);
-		//}
-
-		if (!world->commands.empty() && world->latest_tick > 128) {
-			while (
-				!world->commands.empty()
-				&& world->commands.begin()->first < world->latest_tick - 128
-				) {
-				auto erasing_tick = world->commands.begin()->first;
-				world->commands.erase(erasing_tick);
-			}
-		}
-		//if (!world->records.empty() && world->latest_tick > 128) {
-		//	while (
-		//		!world->records.empty()
-		//		&& world->records.begin()->first < world->latest_tick - 128
-		//		) {
-		//		auto erasing_tick = world->records.begin()->first;
-		//		world->records.erase(erasing_tick);
-		//	}
-		//}
+		world->HandleInput(world->latest_tick);
+		world->Step(world->latest_tick, elapsed);
+		world->TrimCommands(128);
 
 		if (!ping_sent) {
 			SendPingPacket();
@@ -202,9 +149,9 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 	case PacketType::ServerGameState: {
 		world->just_got_game_state = true;
 
-		uint32_t ack_tick = 0;
-		*packet >> ack_tick;
-		world->ack_tick = ack_tick;
+		uint32_t server_tick = 0;
+		*packet >> server_tick;
+		world->server_tick = server_tick;
 
 		uint32_t game_object_count = 0;
 		*packet >> game_object_count;

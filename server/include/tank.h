@@ -76,7 +76,7 @@ protected:
 	bool player_control = false;
 
 	sf::Vector2i current_movement;
-	float speed = 1;
+	float speed = 0.5f;
 
 public:
 	Tank(pGame game, pWorld world, uint32_t id, uint32_t type)

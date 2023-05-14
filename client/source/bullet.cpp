@@ -10,34 +10,6 @@ void Bullet::Load(std::string data_path) {
 void Bullet::Unload() {
 }
 
-void Bullet::Serialize(uint32_t tick) {
-	float position_x;
-	float position_y;
-	GetPosition(position_x, position_y);
-
-	float velocity_x;
-	float velocity_y;
-	GetVelocity(velocity_x, velocity_y);
-
-	auto& records_container = world->records[tick];
-	records_container.push_back(
-		std::make_unique<BulletRecord>(
-			id,
-			type,
-			position_x,
-			position_y,
-			velocity_x,
-			velocity_y
-		)
-	);
-}
-
-void Bullet::Deserialize(Record* record) {
-	auto bullet_record = static_cast<BulletRecord*>(record);
-	SetPosition(bullet_record->position_x, bullet_record->position_y);
-	SetVelocity(bullet_record->velocity_x, bullet_record->velocity_y);
-}
-
 void Bullet::HandleInput(uint32_t tick) {
 }
 

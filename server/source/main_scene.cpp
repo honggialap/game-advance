@@ -11,32 +11,31 @@ void MainScene::Load(std::string data_path) {
 	font.loadFromFile("data/resources/fonts/arial.ttf");
 	text.setFont(font);
 
-	for (uint32_t i = 0; i <= game->open_slots; i++) {
-		worlds[i] = new World();
+	world = new World();
 
-		auto player1_tank = static_cast<Tank*>(worlds[i]->CreateGameObject(game, ACTOR_TYPE_TANK, 100.0f, 100.0f));
-		player1_tank->SetPlayerId(1);
+	auto player1_tank = static_cast<Tank*>(world->CreateGameObject(game, ACTOR_TYPE_TANK, 100.0f, 100.0f));
+	player1_tank->SetPlayerId(1);
 
-		auto player2_tank = static_cast<Tank*>(worlds[i]->CreateGameObject(game, ACTOR_TYPE_TANK, 200.0f, 200.0f));
-		player2_tank->SetPlayerId(2);
+	auto player2_tank = static_cast<Tank*>(world->CreateGameObject(game, ACTOR_TYPE_TANK, 200.0f, 200.0f));
+	player2_tank->SetPlayerId(2);
 
-		auto player3_tank = static_cast<Tank*>(worlds[i]->CreateGameObject(game, ACTOR_TYPE_TANK, 300.0f, 300.0f));
-		player3_tank->SetPlayerId(3);
+	auto player3_tank = static_cast<Tank*>(world->CreateGameObject(game, ACTOR_TYPE_TANK, 300.0f, 300.0f));
+	player3_tank->SetPlayerId(3);
 
-		auto player4_tank = static_cast<Tank*>(worlds[i]->CreateGameObject(game, ACTOR_TYPE_TANK, 400.0f, 400.0f));
-		player4_tank->SetPlayerId(4);
+	auto player4_tank = static_cast<Tank*>(world->CreateGameObject(game, ACTOR_TYPE_TANK, 400.0f, 400.0f));
+	player4_tank->SetPlayerId(4);
 
-		if (i != 0) {
-			player_ping[i] = 0;;
-		}
+	for (uint32_t i = 1; i <= game->open_slots; i++) {
+		player_ping[i] = 0;
 	}
 }
 
 void MainScene::Unload() {
-	for (uint32_t i = 0; i <= game->open_slots; i++) {
-		delete worlds[i];
+	if (world) {
+		delete world;
+		world = nullptr;
 	}
-	worlds.clear();
+
 	player_ping.clear();
 }
 
@@ -47,209 +46,38 @@ void MainScene::Update(float elapsed) {
 	}
 
 	case MainScene::Run: {
-		/*	client-clone
-		std::vector<std::thread> client_threads;
-		for (uint32_t i = 1; i <= game->open_slots; i++) {
-			auto& world = worlds[i];
-			uint32_t client_id = game->players[i].first;
-			client_threads.emplace_back(
-				[&]() {
-#pragma region Client-clone
-					if (world->rollback) {
-						uint32_t last_tick = world->latest_tick - 1;
-						uint32_t command_received_at_tick = world->rollback_tick;
-						uint32_t tick_to_be_deserialize = command_received_at_tick - 1;
+		if (world->rollback) {
+			uint32_t last_tick = world->latest_tick - 1;
+			uint32_t deserialize_tick = world->rollback_tick - 1;
 
-						for (uint32_t erasing_tick = last_tick;
-							erasing_tick > tick_to_be_deserialize;
-							erasing_tick--) {
-							world->records.erase(erasing_tick);
-						}
+			world->TrimRecords(deserialize_tick + 1, last_tick);
+			world->Deserialize(deserialize_tick);
 
-						auto& records_container = world->records[tick_to_be_deserialize];
-						for (auto& record : records_container) {
-							world->game_objects[record->game_object_id]->Deserialize(record.get());
-						}
+			for (uint32_t rollback_tick = world->rollback_tick;
+				rollback_tick <= last_tick;
+				rollback_tick++) {
 
-						for (uint32_t i = command_received_at_tick;
-							i <= last_tick;
-							i++) {
-
-							if (world->commands.find(i) != world->commands.end()) {
-								auto& commands_at_tick = world->commands.at(i);
-								for (auto& command : commands_at_tick) {
-									world->game_objects[
-										command->game_object_id
-									]->ExecuteCommand(command.get());
-								}
-							}
-
-							for (auto& game_object_container : world->game_objects) {
-								game_object_container.second->Update(elapsed);
-							}
-							world->physics_world->Step(elapsed, 8, 3);
-
-							for (auto& game_object_container : world->game_objects) {
-								game_object_container.second->Serialize(i);
-							}
-						}
-
-						world->rollback = false;
-						world->rollback_tick = last_tick;
-					}
-
-					for (auto& game_object_container : world->game_objects) {
-						game_object_container.second->HandleInput(
-							world->latest_tick
-						);
-					}
-
-					if (world->commands.find(world->latest_tick) != world->commands.end()) {
-						auto& commands_at_tick = world->commands.at(world->latest_tick);
-						for (auto& command : commands_at_tick) {
-							world->game_objects[
-								command->game_object_id
-							]->ExecuteCommand(command.get());
-						}
-					}
-
-					for (auto& game_object_container : world->game_objects) {
-						game_object_container.second->Update(elapsed);
-					}
-					world->physics_world->Step(elapsed, 8, 3);
-
-					for (auto& game_object_container : world->game_objects) {
-						game_object_container.second->Serialize(world->latest_tick);
-					}
-
-					if (!world->commands.empty() && world->latest_tick > 128) {
-						while (
-							!world->commands.empty()
-							&& world->commands.begin()->first < world->latest_tick - 128
-							) {
-							auto erasing_tick = world->commands.begin()->first;
-							world->commands.erase(erasing_tick);
-						}
-					}
-					if (!world->records.empty() && world->latest_tick > 128) {
-						while (
-							!world->records.empty()
-							&& world->records.begin()->first < world->latest_tick - 128
-							) {
-							auto erasing_tick = world->records.begin()->first;
-							world->records.erase(erasing_tick);
-						}
-					}
-				}
-#pragma endregion
-			);
-		}
-		for (auto& thread : client_threads) {
-			thread.join();
-		}
-		*/
-
-		auto& server_world = worlds[0];
-#pragma region Server
-		if (server_world->rollback) {
-			uint32_t last_tick = server_world->latest_tick - 1;
-			uint32_t command_received_at_tick = server_world->rollback_tick;
-			uint32_t tick_to_be_deserialize = command_received_at_tick - 1;
-
-			for (uint32_t erasing_tick = last_tick;
-				erasing_tick > tick_to_be_deserialize;
-				erasing_tick--) {
-				server_world->records.erase(erasing_tick);
+				world->Step(rollback_tick, elapsed);
+				world->Serialize(rollback_tick);
 			}
 
-			auto& records_container = server_world->records[tick_to_be_deserialize];
-			for (auto& record : records_container) {
-				server_world->game_objects[record->game_object_id]->Deserialize(record.get());
-			}
-
-			for (uint32_t i = command_received_at_tick;
-				i <= last_tick;
-				i++) {
-
-				if (server_world->commands.find(i) != server_world->commands.end()) {
-					auto& commands_at_tick = server_world->commands.at(i);
-					for (auto& command : commands_at_tick) {
-						server_world->game_objects[
-							command->game_object_id
-						]->ExecuteCommand(command.get());
-					}
-				}
-
-				for (auto& game_object_container : server_world->game_objects) {
-					game_object_container.second->Update(elapsed);
-				}
-				server_world->physics_world->Step(elapsed, 8, 3);
-
-				for (auto& game_object_container : server_world->game_objects) {
-					game_object_container.second->Serialize(i);
-				}
-			}
-
-			server_world->rollback = false;
-			server_world->rollback_tick = last_tick;
+			world->rollback = false;
+			world->rollback_tick = last_tick;
 		}
 
-		for (auto& game_object_container : server_world->game_objects) {
-			game_object_container.second->HandleInput(
-				server_world->latest_tick
-			);
+		world->HandleInput(world->latest_tick);
+		world->Step(world->latest_tick, elapsed);
+		world->Serialize(world->latest_tick);
+
+		world->TrimCommands(128);
+		world->TrimRecords(128);
+
+		if (world->latest_tick > world->tick_per_game_state
+			&& world->latest_tick % world->tick_per_game_state == 0) {
+			SendGameStatePacket();
 		}
 
-		if (server_world->commands.find(server_world->latest_tick) != server_world->commands.end()) {
-			auto& commands_at_tick = server_world->commands.at(server_world->latest_tick);
-			for (auto& command : commands_at_tick) {
-				server_world->game_objects[
-					command->game_object_id
-				]->ExecuteCommand(command.get());
-			}
-		}
-
-		for (auto& game_object_container : server_world->game_objects) {
-			game_object_container.second->Update(elapsed);
-		}
-		server_world->physics_world->Step(elapsed, 8, 3);
-
-		for (auto& game_object_container : server_world->game_objects) {
-			game_object_container.second->Serialize(server_world->latest_tick);
-		}
-
-		if (!server_world->commands.empty() && server_world->latest_tick > 128) {
-			while (
-				!server_world->commands.empty()
-				&& server_world->commands.begin()->first < server_world->latest_tick - 128
-				) {
-				auto erasing_tick = server_world->commands.begin()->first;
-				server_world->commands.erase(erasing_tick);
-			}
-		}
-		if (!server_world->records.empty() && server_world->latest_tick > 128) {
-			while (
-				!server_world->records.empty()
-				&& server_world->records.begin()->first < server_world->latest_tick - 128
-				) {
-				auto erasing_tick = server_world->records.begin()->first;
-				server_world->records.erase(erasing_tick);
-			}
-		}
-#pragma endregion
-
-		if (server_world->latest_tick > tick_per_game_state) {
-			if (server_world->latest_tick % tick_per_game_state == 0) {
-				SendGameStatePacket();
-			}
-		}
-
-		server_world->latest_tick += 1;
-
-		//for (auto& world : worlds) {
-		//	world.second->latest_tick += 1;
-		//}
-
+		world->latest_tick += 1;
 		break;
 	}
 	}
@@ -265,7 +93,7 @@ void MainScene::Render(sf::RenderWindow& window) {
 	}
 
 	case MainScene::Run: {
-		for (auto& game_object_container : worlds[0]->game_objects) {
+		for (auto& game_object_container : world->game_objects) {
 			game_object_container.second->Render(window);
 		}
 		break;
@@ -318,7 +146,6 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 			;
 
 		player_ping[player_id] = ping;
-		worlds[player_id]->ack_tick = reply_ping_tick;
 
 		SendReplyPingPacket(client_id, reply_ping_tick);
 		return true;
@@ -343,58 +170,20 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 			>> y
 			;
 
-		/*
-		for (uint32_t i = 0; i <= game->open_slots; i++) {
-			auto& world = worlds[i];
-			if (i == player_id || i == 0) {
-				world->commands[tick].push_back(
-					std::make_unique<MoveCommand>(game_object_id, x, y)
-				);
-
-				if (tick < world->latest_tick) {
-					world->rollback = true;
-					if (world->rollback_tick > tick) {
-						world->rollback_tick = tick;
-					}
-				}
-
-				if (i == player_id) {
-					world->ack_tick = tick;
-				}
-			}
-			else {
-				MoveCommand move_command();
-				world->commands[tick + default_delay_tick].push_back(
-					std::make_unique<MoveCommand>(game_object_id, x, y)
-				);
-
-				if (tick + default_delay_tick < world->latest_tick) {
-					world->rollback = true;
-					if (world->rollback_tick > tick + default_delay_tick) {
-						world->rollback_tick = tick + default_delay_tick;
-					}
-				}
-			}
+		if (tick < world->latest_tick - world->tick_per_game_state) {
+			return true;
 		}
-		*/
 
-		auto& server_world = worlds[0];
-		server_world->commands[tick].push_back(
+		world->commands[tick].push_back(
 			std::make_unique<MoveCommand>(game_object_id, x, y)
 		);
 
-		if (tick < server_world->latest_tick) {
-			server_world->rollback = true;
-			if (server_world->rollback_tick > tick) {
-				server_world->rollback_tick = tick;
+		if (tick < world->latest_tick) {
+			world->rollback = true;
+			if (world->rollback_tick > tick) {
+				world->rollback_tick = tick;
 			}
 		}
-
-		//RelayMovePacket(
-		//	client_id,
-		//	tick + default_delay_tick,
-		//	MoveCommand(game_object_id, x, y)
-		//);
 
 		return true;
 	}
@@ -409,10 +198,10 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 void MainScene::SendLoadPacket() {
 	auto server_load_packet = std::make_shared<Packet>(PacketType::ServerLoad);
 
-	uint32_t game_objects_count = worlds[0]->game_objects.size();
+	uint32_t game_objects_count = world->game_objects.size();
 	*server_load_packet << game_objects_count;
 
-	for (auto& game_object_container : worlds[0]->game_objects) {
+	for (auto& game_object_container : world->game_objects) {
 		GameObject* game_object = game_object_container.second.get();
 
 		uint32_t type = game_object->GetType();
@@ -446,13 +235,12 @@ void MainScene::SendStartGamePacket() {
 }
 
 void MainScene::SendGameStatePacket() {
-	auto& server_world = worlds[0];
-	auto& records = server_world->records[server_world->latest_tick - tick_per_game_state];
+	auto& records = world->records[world->latest_tick - world->tick_per_game_state];
 
 	auto game_state_packet = std::make_shared<Packet>(PacketType::ServerGameState);
 
-	uint32_t ack_tick = server_world->latest_tick - tick_per_game_state;
-	*game_state_packet << ack_tick;
+	uint32_t server_tick = world->latest_tick - world->tick_per_game_state;
+	*game_state_packet << server_tick;
 
 	uint32_t game_object_count = records.size();
 	*game_state_packet << game_object_count;

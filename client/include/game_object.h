@@ -10,34 +10,6 @@ typedef Game* pGame;
 class World;
 typedef World* pWorld;
 
-struct Record {
-	uint32_t game_object_id;
-	uint32_t game_object_type;
-
-	float position_x;
-	float position_y;
-
-	float velocity_x;
-	float velocity_y;
-
-	Record(
-		uint32_t id,
-		uint32_t type,
-		float position_x,
-		float position_y,
-		float velocity_x,
-		float velocity_y
-	) :
-		game_object_id(id),
-		game_object_type(type),
-		position_x(position_x),
-		position_y(position_y),
-		velocity_x(velocity_x),
-		velocity_y(velocity_y)
-	{}
-};
-typedef std::unique_ptr<Record> pRecord;
-
 struct Command {
 	uint32_t game_object_id;
 	uint32_t command_type;
@@ -99,9 +71,6 @@ public:
 
 	virtual void Load(std::string data_path) = 0;
 	virtual void Unload() = 0;
-
-	virtual void Serialize(uint32_t tick) = 0;
-	virtual void Deserialize(Record* record) = 0;
 
 	virtual void HandleInput(uint32_t tick) = 0;
 	virtual void ExecuteCommand(Command* command) = 0;

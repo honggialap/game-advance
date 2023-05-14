@@ -4,39 +4,6 @@
 
 #include "game_object.h"
 
-struct TankRecord : public Record {
-	uint32_t player_id;
-
-	int32_t current_movement_x;
-	int32_t current_movement_y;
-
-	
-	TankRecord(
-		uint32_t game_object_id,
-		uint32_t game_object_type,
-		float position_x,
-		float position_y,
-		float velocity_x,
-		float velocity_y,
-		uint32_t player_id,
-		int32_t current_movement_x,
-		int32_t current_movement_y
-	) :
-		Record(
-			game_object_id,
-			game_object_type,
-			position_x,
-			position_y,
-			velocity_x,
-			velocity_y
-		),
-		player_id(player_id),
-		current_movement_x(current_movement_x),
-		current_movement_y(current_movement_y)
-	{}
-};
-typedef std::unique_ptr<TankRecord> pTankRecord;
-
 #define TANK_COMMAND_TYPE_MOVE 1
 struct MoveCommand : public Command {
 	int32_t x;
@@ -77,7 +44,7 @@ protected:
 	bool player_control = false;
 
 	sf::Vector2i current_movement;
-	float speed = 1;
+	float speed = 0.5f;
 
 
 public:
@@ -100,9 +67,6 @@ public:
 
 	void Load(std::string data_path) override;
 	void Unload() override;
-
-	void Serialize(uint32_t tick) override;
-	void Deserialize(Record* record) override;
 
 	void HandleInput(uint32_t tick) override;
 	void ExecuteCommand(Command* command) override;

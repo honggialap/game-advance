@@ -25,10 +25,9 @@ protected:
 	uint32_t load_client_count = 0;
 
 public:
-	uint32_t tick_per_game_state = 8;
-	uint32_t default_delay_tick = 4;
 
-	std::map<uint32_t, pWorld> worlds;
+	pWorld world = nullptr;
+
 	std::map<uint32_t, uint32_t> player_ping;
 
 	MainScene(pGame game) : Scene(game) {};

@@ -57,6 +57,62 @@ GameObject* World::CreateGameObject(
 	}
 }
 
+void World::HandleInput(uint32_t tick) {
+	for (auto& game_object_container : game_objects) {
+		game_object_container.second->HandleInput(
+			tick
+		);
+	}
+}
+
+void World::Step(uint32_t tick, float elapsed) {
+	if (commands.find(tick) != commands.end()) {
+		auto& commands_at_tick = commands.at(tick);
+		for (auto& command : commands_at_tick) {
+			game_objects[
+				command->game_object_id
+			]->ExecuteCommand(command.get());
+		}
+	}
+
+	for (auto& game_object_container : game_objects) {
+		game_object_container.second->Update(elapsed);
+	}
+	physics_world->Step(elapsed, 8, 3);
+}
+
+void World::TrimCommands(uint32_t threshold) {
+	if (!commands.empty() && latest_tick > threshold) {
+		while (
+			!commands.empty()
+			&& commands.begin()->first < latest_tick - threshold
+			) {
+			auto erasing_tick = commands.begin()->first;
+			commands.erase(erasing_tick);
+		}
+	}
+}
+
+void World::TrimRecords(uint32_t threshold) {
+	if (!records.empty() && latest_tick > threshold) {
+		while (
+			!records.empty()
+			&& records.begin()->first < latest_tick - threshold
+			) {
+			auto erasing_tick = records.begin()->first;
+			records.erase(erasing_tick);
+		}
+	}
+}
+
+void World::TrimRecords(uint32_t from, uint32_t to) {
+	for (uint32_t erasing_tick = to;
+		erasing_tick >= from;
+		erasing_tick--) {
+		records.erase(erasing_tick);
+	}
+}
+
 void World::Serialize(uint32_t tick) {
 	for (auto& game_object_container : game_objects) {
 		game_object_container.second->Serialize(tick);

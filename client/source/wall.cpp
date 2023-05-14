@@ -12,33 +12,6 @@ void Wall::Load(std::string data_path) {
 void Wall::Unload() {
 }
 
-void Wall::Serialize(uint32_t tick) {
-	float position_x;
-	float position_y;
-	GetPosition(position_x, position_y);
-
-	float velocity_x;
-	float velocity_y;
-	GetVelocity(velocity_x, velocity_y);
-	auto& records_container = world->records[tick];
-	records_container.push_back(
-		std::make_unique<WallRecord>(
-			id,
-			type,
-			position_x,
-			position_y,
-			velocity_x,
-			velocity_y
-		)
-	);
-}
-
-void Wall::Deserialize(Record* record) {
-	auto wall_record = static_cast<WallRecord*>(record);
-	SetPosition(wall_record->position_x, wall_record->position_y);
-	SetVelocity(wall_record->velocity_x, wall_record->velocity_y);
-}
-
 void Wall::HandleInput(uint32_t tick) {
 }
 

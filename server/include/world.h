@@ -21,15 +21,22 @@ public:
 	std::map<uint32_t, std::vector<pRecord>> records;
 
 	uint32_t latest_tick = 0;
-	uint32_t ack_tick = 0;
-
 	uint32_t rollback_tick = 0;
 	bool rollback = false;
+	uint32_t tick_per_game_state = 8;
 
 	World();
 	~World();
 
 	GameObject* CreateGameObject(Game* game, uint32_t game_object_type, float position_x, float position_y);
+
+	void HandleInput(uint32_t tick);
+	void Step(uint32_t tick, float elapsed);
+
+	void TrimCommands(uint32_t threshold);
+	
+	void TrimRecords(uint32_t threshold);
+	void TrimRecords(uint32_t from, uint32_t to);
 
 	void Serialize(uint32_t tick);
 	void Deserialize(uint32_t tick);

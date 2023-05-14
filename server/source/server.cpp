@@ -207,7 +207,9 @@ bool Server::ProcessNetworks() {
 									packet->buffer.resize(incomming.packet_size);
 									memcpy(&packet->buffer[0], client_connection.buffer, incomming.packet_size);
 
+									mutex.lock();
 									incomming.Append(packet);
+									mutex.unlock();
 
 									incomming.packet_size = 0;
 									incomming.extraction_offset = 0;
@@ -222,7 +224,10 @@ bool Server::ProcessNetworks() {
 						PacketManager& outgoing = client_connection.outgoing_packets;
 						while (outgoing.HasPending()) {
 							if (outgoing.packet_process_task == PacketProcessTask::Header) {
+								mutex.lock();
 								outgoing.packet_size = outgoing.Retrive()->buffer.size();
+								mutex.unlock();
+								
 								uint16_t packet_size = htons(outgoing.packet_size);
 								int sent_bytes = send(
 									client_temp_fd.fd,
@@ -244,7 +249,10 @@ bool Server::ProcessNetworks() {
 								}
 							}
 							else {
+								mutex.lock();
 								char* buffer = &outgoing.Retrive()->buffer[0];
+								mutex.unlock();
+								
 								int sent_bytes = send(
 									client_temp_fd.fd,
 									(char*)(buffer)+outgoing.extraction_offset,
@@ -259,7 +267,10 @@ bool Server::ProcessNetworks() {
 								if (outgoing.extraction_offset == outgoing.packet_size) {
 									outgoing.extraction_offset = 0;
 									outgoing.packet_process_task = PacketProcessTask::Header;
+
+									mutex.lock();
 									outgoing.Pop();
+									mutex.unlock();
 								}
 								else {
 									break;
@@ -308,7 +319,10 @@ bool Server::ProcessPackets() {
 				Disconnect(client.first);
 				break;
 			}
+			
+			mutex.lock();
 			incomming.Pop();
+			mutex.unlock();
 		}
 	}
 	return true;

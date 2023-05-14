@@ -57,16 +57,39 @@ GameObject* World::CreateGameObject(
 	}
 }
 
-void World::Serialize(uint32_t tick) {
+void World::HandleInput(uint32_t tick) {
 	for (auto& game_object_container : game_objects) {
-		game_object_container.second->Serialize(tick);
+		game_object_container.second->HandleInput(
+			tick
+		);
 	}
 }
 
-void World::Deserialize(uint32_t tick) {
-	auto& records_container = records[tick];
-	for (auto& record : records_container) {
-		game_objects[record->game_object_id]->Deserialize(record.get());
+void World::Step(uint32_t tick, float elapsed) {
+	if (commands.find(tick) != commands.end()) {
+		auto& commands_at_tick = commands.at(tick);
+		for (auto& command : commands_at_tick) {
+			game_objects[
+				command->game_object_id
+			]->ExecuteCommand(command.get());
+		}
+	}
+
+	for (auto& game_object_container : game_objects) {
+		game_object_container.second->Update(elapsed);
+	}
+	physics_world->Step(elapsed, 8, 3);
+}
+
+void World::TrimCommands(uint32_t threshold) {
+	if (!commands.empty() && latest_tick > threshold) {
+		while (
+			!commands.empty()
+			&& commands.begin()->first < latest_tick - threshold
+			) {
+			auto erasing_tick = commands.begin()->first;
+			commands.erase(erasing_tick);
+		}
 	}
 }
 

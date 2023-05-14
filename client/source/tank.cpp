@@ -40,40 +40,6 @@ void Tank::Unload() {
 	}
 }
 
-void Tank::Serialize(uint32_t tick) {
-	float position_x;
-	float position_y;
-	GetPosition(position_x, position_y);
-
-	float velocity_x;
-	float velocity_y;
-	GetVelocity(velocity_x, velocity_y);
-
-	auto& records_container = world->records[tick];
-	records_container.push_back(
-		std::make_unique<TankRecord>(
-			id,
-			type,
-			position_x,
-			position_y,
-			velocity_x,
-			velocity_y,
-			player_id,
-			current_movement.x,
-			current_movement.y
-		)
-	);
-}
-
-void Tank::Deserialize(Record* record) {
-	auto tank_record = static_cast<TankRecord*>(record);
-	SetPosition(tank_record->position_x, tank_record->position_y);
-	SetVelocity(tank_record->velocity_x, tank_record->velocity_y);
-	player_id = tank_record->player_id;
-	current_movement.x = tank_record->current_movement_x;
-	current_movement.y = tank_record->current_movement_y;
-}
-
 void Tank::HandleInput(uint32_t tick) {
 	if (player_control) {
 		sf::Vector2i movement(0, 0);
@@ -193,10 +159,10 @@ void Tank::Render(sf::RenderWindow& window) {
 	}
 	else {
 		uint32_t latest_tick = world->latest_tick;
-		uint32_t ack_tick = world->ack_tick;
+		uint32_t server_tick = world->server_tick;
 		uint32_t tick_per_game_state = world->tick_per_game_state;
 
-		float interval = (float(latest_tick) - float(ack_tick) - float(tick_per_game_state)) / float(tick_per_game_state);
+		float interval = (float(latest_tick) - float(server_tick) - float(tick_per_game_state)) / float(tick_per_game_state);
 
 		float render_x = last_known_x + ((latest_x - last_known_x) * interval);
 		float render_y = last_known_y + ((latest_y - last_known_y) * interval);
