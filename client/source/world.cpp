@@ -1,8 +1,21 @@
 #include "world.h"
 #include "game.h"
-#include "tank.h"
-#include "bullet.h"
+
+#include "game_master.h"
+#include "player_tank.h"
+#include "player_bullet.h"
+#include "creep_tank.h"
+#include "creep_bullet.h"
+#include "turret.h"
+#include "turret_bullet.h"
+#include "headquarter.h"
+#include "factory.h"
+#include "repair_kit.h"
+#include "power_up.h"
+#include "bound.h"
 #include "wall.h"
+#include "tree.h"
+#include "water.h"
 
 World::World() {
 	gravity = b2Vec2(0, 0);
@@ -14,46 +27,6 @@ World::~World() {
 	if (physics_world) {
 		delete physics_world;
 		physics_world = nullptr;
-	}
-}
-
-GameObject* World::CreateGameObject(
-	Game* game,
-	uint32_t game_object_type,
-	float position_x,
-	float position_y
-) {
-	GameObject* game_object = nullptr;
-	switch (game_object_type) {
-	case ACTOR_TYPE_TANK: {
-		game_objects[game_object_id] = std::make_unique<Tank>(game, this, game_object_id, game_object_type);
-		GameObject* game_object = game_objects[game_object_id].get();
-		game_object->Load("");
-		game_object->SetPosition(position_x, position_y);
-		game_object_id += 1;
-		return game_object;
-	}
-
-	case ACTOR_TYPE_BULLET: {
-		game_objects[game_object_id] = std::make_unique<Bullet>(game, this, game_object_id, game_object_type);
-		GameObject* game_object = game_objects[game_object_id].get();
-		game_object->Load("");
-		game_object->SetPosition(position_x, position_y);
-		game_object_id += 1;
-		return game_object;
-	}
-
-	case ACTOR_TYPE_WALL: {
-		game_objects[game_object_id] = std::make_unique<Wall>(game, this, game_object_id, game_object_type);
-		GameObject* game_object = game_objects[game_object_id].get();
-		game_object->Load("");
-		game_object->SetPosition(position_x, position_y);
-		game_object_id += 1;
-		return game_object;
-	}
-
-	default:
-		return game_object;
 	}
 }
 

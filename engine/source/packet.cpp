@@ -74,7 +74,7 @@ Packet& Packet::operator>>(std::string& data) {
 	uint32_t string_size = 0;
 	*this >> string_size;
 
-	if ((offset + sizeof(uint32_t)) > string_size) {
+	if ((offset + string_size) > buffer.size()) {
 		throw PacketException("[Packet::operator>>(std::string&)] - Extraction offset exceeded buffer size.");
 	}
 

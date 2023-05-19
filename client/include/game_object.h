@@ -26,8 +26,10 @@ protected:
 	pGame game;
 	pWorld world;
 
+	std::string name;
 	uint32_t id;
 	uint32_t type;
+	uint32_t layer;
 
 	bool is_active;
 	bool is_destroyed;
@@ -39,23 +41,23 @@ protected:
 	b2Fixture* fixture = nullptr;
 
 public:
-	GameObject(
-		pGame game,
-		pWorld world,
-		uint32_t id,
-		uint32_t type
-	) :
-		game(game),
-		world(world),
-		id(id),
-		type(type),
-		is_active(false),
-		is_destroyed(false)
-	{};
-	virtual ~GameObject() {};
+	void SetGame(pGame value) { game = value; }
+	pGame GetGame() { return game; }
 
+	void SetWorld(pWorld value) { world = value; }
+	pWorld GetWorld() { return world; }
+
+	void SetName(std::string value) { name = value; }
+	std::string GetName() { return name; }
+
+	void SetId(uint32_t value) { id = value; }
 	uint32_t GetId() { return id; }
+	
+	void SetType(uint32_t value) { type = value; }
 	uint32_t GetType() { return type; }
+
+	void SetLayer(uint32_t value) { layer = value; }
+	uint32_t GetLayer() { return layer; }
 
 	void SetActive(bool active) { is_active = active; }
 	bool IsActive() { return is_active; }

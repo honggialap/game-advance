@@ -1,60 +1,119 @@
 #include "world.h"
 #include "game.h"
-#include "tank.h"
-#include "bullet.h"
-#include "wall.h"
 
-World::World() {
+#include "game_master.h"
+#include "player_tank.h"
+#include "player_bullet.h"
+#include "creep_tank.h"
+#include "creep_bullet.h"
+#include "turret.h"
+#include "turret_bullet.h"
+#include "headquarter.h"
+#include "factory.h"
+#include "repair_kit.h"
+#include "power_up.h"
+#include "bound.h"
+#include "wall.h"
+#include "tree.h"
+#include "water.h"
+
+
+World::World(pGame game) {
+	this->game = game;
+
 	gravity = b2Vec2(0, 0);
 	physics_world = new b2World(gravity);
 	physics_world->SetContactListener(this);
 }
 
 World::~World() {
+	if (game) {
+		game = nullptr;
+	}
+
 	if (physics_world) {
 		delete physics_world;
 		physics_world = nullptr;
 	}
 }
 
-GameObject* World::CreateGameObject(
-	Game* game,
-	uint32_t game_object_type,
-	float position_x,
-	float position_y
-) {
-	GameObject* game_object = nullptr;
-	switch (game_object_type) {
-	case ACTOR_TYPE_TANK: {
-		game_objects[game_object_id] = std::make_unique<Tank>(game, this, game_object_id, game_object_type);
-		GameObject* game_object = game_objects[game_object_id].get();
-		game_object->Load("");
-		game_object->SetPosition(position_x, position_y);
-		game_object_id += 1;
-		return game_object;
+void World::Load(nlohmann::json& data) {
+
+	auto& game_master = data.at("game_master");
+	GameMaster::Create(game, this, game_master);
+
+	auto& player_tanks = data.at("player_tanks");
+	for (auto& player_tank : player_tanks) {
+		PlayerTank::Create(game, this, player_tank);
+
+		auto& bullets = player_tank.at("bullets");
+		for (auto& bullet : bullets) {
+			PlayerBullet::Create(game, this, bullet);
+		}
 	}
 
-	case ACTOR_TYPE_BULLET: {
-		game_objects[game_object_id] = std::make_unique<Bullet>(game, this, game_object_id, game_object_type);
-		GameObject* game_object = game_objects[game_object_id].get();
-		game_object->Load("");
-		game_object->SetPosition(position_x, position_y);
-		game_object_id += 1;
-		return game_object;
+	auto& headquarters = data.at("headquarters");
+	for (auto& headquarter : headquarters) {
+		Headquarter::Create(game, this, headquarter);
 	}
 
-	case ACTOR_TYPE_WALL: {
-		game_objects[game_object_id] = std::make_unique<Wall>(game, this, game_object_id, game_object_type);
-		GameObject* game_object = game_objects[game_object_id].get();
-		game_object->Load("");
-		game_object->SetPosition(position_x, position_y);
-		game_object_id += 1;
-		return game_object;
+	auto& factories = data.at("factories");
+	for (auto& factory : factories) {
+		Factory::Create(game, this, factory);
+
+		auto& creep_tanks = factory.at("creep_tanks");
+		for (auto& creep_tank : creep_tanks) {
+			CreepTank::Create(game, this, creep_tank);
+
+			auto& bullets = creep_tank.at("bullets");
+			for (auto& bullet : bullets) {
+				CreepBullet::Create(game, this, bullet);
+			}
+		}
 	}
 
-	default:
-		return game_object;
+	auto& turrets = data.at("turrets");
+	for (auto& turret : turrets) {
+		Turret::Create(game, this, turret);
+
+		auto& bullets = turret.at("bullets");
+		for (auto& bullet : bullets) {
+			TurretBullet::Create(game, this, bullet);
+		}
 	}
+
+	auto& bounds = data.at("bounds");
+	for (auto& bound : bounds) {
+		Bound::Create(game, this, bound);
+	}
+
+	auto& walls = data.at("walls");
+	for (auto& wall : walls) {
+		Wall::Create(game, this, wall);
+	}
+
+	auto& waters = data.at("waters");
+	for (auto& water : waters) {
+		Water::Create(game, this, water);
+	}
+
+	auto& trees = data.at("trees");
+	for (auto& tree : trees) {
+		Tree::Create(game, this, tree);
+	}
+
+	auto& repair_kits = data.at("repair_kits");
+	for (auto& repair_kit : repair_kits) {
+		RepairKit::Create(game, this, repair_kit);
+	}
+
+	auto& power_ups = data.at("power_ups");
+	for (auto& power_up : power_ups) {
+		PowerUp::Create(game, this, power_up);
+	}
+}
+
+void World::Unload() {
 }
 
 void World::HandleInput(uint32_t tick) {
@@ -107,7 +166,7 @@ void World::TrimRecords(uint32_t threshold) {
 
 void World::TrimRecords(uint32_t from, uint32_t to) {
 	for (uint32_t erasing_tick = to;
-		erasing_tick >= from;
+		erasing_tick > from;
 		erasing_tick--) {
 		records.erase(erasing_tick);
 	}

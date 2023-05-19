@@ -6,8 +6,8 @@
 #include "server.h"
 #include "scene.h"
 
-#define SCENE_TYPE_LOBBY	1
-#define SCENE_TYPE_MAIN		2
+#define SCENE_LOBBY		1001
+#define SCENE_MAIN		1002
 
 class Game : public Server {
 protected:
@@ -29,6 +29,8 @@ public:
 	std::map<uint32_t, std::pair<uint32_t, bool>> players;
 
 public:
+	sf::RenderWindow& GetWindow() { return window; }
+
 	void Initialize(std::string data_path);
 	void Shutdown();
 

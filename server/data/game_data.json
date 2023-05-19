@@ -1,8 +1,8 @@
 {
   "window": {
     "title": "Server",
-    "width": 800,
-    "height": 600,
+    "width": 1280,
+    "height": 720,
     "update_rate": 64.0,
     "render_rate": 64.0
   },
@@ -16,13 +16,13 @@
     "scene_list": [
       {
         "id": 0,
-        "type": 1,
+        "type": 1001,
         "data_path": "data/scenes/lobby.json"
       },
       {
         "id": 1,
-        "type": 2,
-        "data_path": "data/scenes/world.json"
+        "type": 1002,
+        "data_path": "data/scenes/demo.json"
       }
     ]
   }

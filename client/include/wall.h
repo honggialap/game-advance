@@ -5,10 +5,18 @@
 #include "game_object.h"
 
 class Wall : public GameObject {
+protected:
+	sf::Texture texture;
+	sf::Sprite sprite;
+
 public:
-	Wall(pGame game, pWorld world, uint32_t id, uint32_t type)
-		: GameObject(game, world, id, type) {};
-	~Wall() {};
+	static Wall* Create(
+		pGame game, pWorld world,
+		std::string name,
+		float position_x, float position_y,
+		uint32_t layer,
+		std::string data_path
+	);
 
 	void Load(std::string data_path) override;
 	void Unload() override;

@@ -128,12 +128,12 @@ void Game::LoadScene() {
 pScene Game::CreateScene(unsigned int scene_type) {
 	switch (scene_type) {
 
-	case SCENE_TYPE_LOBBY: {
+	case SCENE_LOBBY: {
 		return new LobbyScene(this);
 		break;
 	}
 
-	case SCENE_TYPE_MAIN: {
+	case SCENE_MAIN: {
 		return new MainScene(this);
 		break;
 	}

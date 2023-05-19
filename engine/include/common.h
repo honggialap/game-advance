@@ -38,11 +38,4 @@
 #define PIXEL_PER_METER 30.0f
 #define MAX_PACKET_SIZE 65535
 
-#define SCENE_TYPE_LOBBY	1
-#define SCENE_TYPE_WORLD	2
-
-#define ACTOR_TYPE_TANK		1
-#define ACTOR_TYPE_BULLET	2
-#define ACTOR_TYPE_WALL		3
-
 #endif // !__ENGINE_COMMON_H__

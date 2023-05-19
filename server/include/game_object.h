@@ -14,26 +14,9 @@ struct Record {
 	uint32_t game_object_id;
 	uint32_t game_object_type;
 
-	float position_x;
-	float position_y;
-
-	float velocity_x;
-	float velocity_y;
-
-	Record(
-		uint32_t id,
-		uint32_t type,
-		float position_x,
-		float position_y,
-		float velocity_x,
-		float velocity_y
-	) :
+	Record(uint32_t id, uint32_t type) :
 		game_object_id(id),
-		game_object_type(type),
-		position_x(position_x),
-		position_y(position_y),
-		velocity_x(velocity_x),
-		velocity_y(velocity_y)
+		game_object_type(type)
 	{}
 };
 typedef std::unique_ptr<Record> pRecord;
@@ -54,8 +37,12 @@ protected:
 	pGame game;
 	pWorld world;
 
+	std::string name;
 	uint32_t id;
 	uint32_t type;
+	uint32_t layer;
+
+	std::string resource_path;
 
 	bool is_active;
 	bool is_destroyed;
@@ -67,22 +54,26 @@ protected:
 	b2Fixture* fixture = nullptr;
 
 public:
-	GameObject(
-		pGame game,
-		pWorld world,
-		uint32_t id,
-		uint32_t type
-	) :
-		game(game),
-		world(world),
-		id(id),
-		type(type),
-		is_active(false),
-		is_destroyed(false)
-	{};
+	void SetGame(pGame value) { game = value; }
+	pGame GetGame() { return game; }
 
+	void SetWorld(pWorld value) { world = value; }
+	pWorld GetWorld() { return world; }
+
+	void SetName(std::string value) { name = value; }
+	std::string GetName() { return name; }
+
+	void SetId(uint32_t value) { id = value; }
 	uint32_t GetId() { return id; }
+
+	void SetType(uint32_t value) { type = value; }
 	uint32_t GetType() { return type; }
+
+	void SetLayer(uint32_t value) { layer = value; }
+	uint32_t GetLayer() { return layer; }
+
+	void SetResourcePath(std::string value) { resource_path = value; }
+	std::string GetResourcePath() { return resource_path; }
 
 	void SetActive(bool active) { is_active = active; }
 	bool IsActive() { return is_active; }

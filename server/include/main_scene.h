@@ -5,10 +5,6 @@
 #include "scene.h"
 #include "world.h"
 
-#include "tank.h"
-#include "bullet.h"
-#include "wall.h"
-
 class MainScene : public Scene {
 protected:
 	enum State {
@@ -50,8 +46,6 @@ public:
 	void SendReplyPingPacket(uint32_t client_id, uint32_t reply_ping_tick);
 
 	void SendGameStatePacket();
-
-	void RelayMovePacket(uint32_t client_id, uint32_t tick, MoveCommand move_command);
 };
 typedef MainScene* pMainScene;
 
