@@ -22,7 +22,7 @@
       {
         "id": 1,
         "type": 1002,
-        "data_path": "data/scenes/demo.json"
+        "data_path": "data/scenes/sandbox.json"
       }
     ]
   }

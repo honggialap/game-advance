@@ -203,7 +203,8 @@
     <None Include="data\actors\wall.json" />
     <None Include="data\game_data.json" />
     <None Include="data\scenes\lobby.json" />
-    <None Include="data\scenes\demo.json" />
+    <None Include="data\scenes\sandbox.json" />
+    <None Include="data\scenes\map1.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\engine\engine.vcxproj">

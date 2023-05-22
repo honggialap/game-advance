@@ -27,7 +27,9 @@ void MainScene::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
 
-	camera.reset(sf::FloatRect(0, 0, game->GetWindow().getSize().x, game->GetWindow().getSize().y));
+	float window_width = (float)game->GetWindow().getSize().x;
+	float window_height = (float)game->GetWindow().getSize().y;
+	camera.reset(sf::FloatRect(0, 0, window_width, window_height));
 	camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
 	font.loadFromFile("data/resources/fonts/arial.ttf");
@@ -164,7 +166,7 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 				auto tank = PlayerTank::Create(game, world, name, position_x, position_y, layer, data_path);
 				tank->SetPlayerId(player_id);
-				if (tank->GetPlayerId() == game_client->GetClientId()) {
+				if (tank->GetPlayerId() == game_client->GetPlayerId()) {
 					tank->SetPlayerControl(true);
 				}
 				break;
