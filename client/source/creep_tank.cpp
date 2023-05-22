@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+CreepTank::CreepTank(pGame game, pWorld world)
+	: ClientGameObject(game, world) {
+}
+
+CreepTank::~CreepTank() {
+}
+
 CreepTank* CreepTank::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ CreepTank* CreepTank::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<CreepTank>();
+	world->game_objects[id] = std::make_unique<CreepTank>(game, world);
 	world->dictionary[name] = id;
 
 	CreepTank* creep_tank = static_cast<CreepTank*>(world->game_objects[id].get());
-	creep_tank->SetGame(game);
-	creep_tank->SetWorld(world);
 	creep_tank->SetName(name);
 	creep_tank->SetId(id);
 	creep_tank->SetType(ACTOR_CREEP_TANK);

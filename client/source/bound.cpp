@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+Bound::Bound(pGame game, pWorld world)
+	: ClientGameObject(game, world) {
+}
+
+Bound::~Bound() {
+}
+
 Bound* Bound::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ Bound* Bound::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<Bound>();
+	world->game_objects[id] = std::make_unique<Bound>(game, world);
 	world->dictionary[name] = id;
 
 	Bound* bound = static_cast<Bound*>(world->game_objects[id].get());
-	bound->SetGame(game);
-	bound->SetWorld(world);
 	bound->SetName(name);
 	bound->SetId(id);
 	bound->SetType(ACTOR_BOUND);
@@ -45,8 +50,8 @@ void Bound::Load(std::string data_path) {
 
 	fixture_def.filter.categoryBits = FILTER_WALL;
 	fixture_def.filter.maskBits =
-		FILTER_PLAYER_TANK 
-		| FILTER_CREEP_TANK 
+		FILTER_PLAYER_TANK
+		| FILTER_CREEP_TANK
 		| FILTER_BULLET
 		//| FILTER_STRUCTURE
 		//| FILTER_WALL

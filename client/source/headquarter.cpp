@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+Headquarter::Headquarter(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+Headquarter::~Headquarter() {
+}
+
 Headquarter* Headquarter::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ Headquarter* Headquarter::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<Headquarter>();
+	world->game_objects[id] = std::make_unique<Headquarter>(game, world);
 	world->dictionary[name] = id;
 
 	Headquarter* headquarter = static_cast<Headquarter*>(world->game_objects[id].get());
-	headquarter->SetGame(game);
-	headquarter->SetWorld(world);
 	headquarter->SetName(name);
 	headquarter->SetId(id);
 	headquarter->SetType(ACTOR_HEADQUARTER);

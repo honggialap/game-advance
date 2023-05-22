@@ -1,15 +1,11 @@
 #pragma once
-#ifndef __CLIENT_GAME_H__
-#define __CLIENT_GAME_H__
+#ifndef __ENGINE__GAME_H__
+#define __ENGINE__GAME_H__
 
 #include "common.h"
-#include "client.h"
 #include "scene.h"
 
-#define SCENE_LOBBY		(uint32_t)	1001
-#define SCENE_MAIN		(uint32_t)	1002
-
-class Game : public Client {
+class Game {
 protected:
 	sf::RenderWindow window;
 	
@@ -19,31 +15,24 @@ protected:
 	float render_elapsed_ms;
 	float elapsed_ms_per_render;
 
-	std::map<unsigned int, std::pair<unsigned int, std::string>> scene_list;
-	unsigned int next_scene_id = -1;
+	std::map<uint32_t, std::pair<uint32_t, std::string>> scene_list;
+	uint32_t next_scene_id = -1;
 	bool load_scene = false;
 	std::unique_ptr<Scene> scene;
 
 public:
-	uint32_t player_id = 0;
-
-public:
 	sf::RenderWindow& GetWindow() { return window; }
 
-	void Initialize(std::string data_path);
-	void Shutdown();
+	virtual void Initialize(std::string data_path);
+	virtual void Shutdown();
 	
-	void Run(std::string data_path);
+	virtual void Run(std::string data_path) = 0;
+	void Exit() { window.close(); }
 
-	void PlayScene(unsigned int scene_id);
+	void PlayScene(uint32_t scene_id);
 	void LoadScene();
-	pScene CreateScene(unsigned int scene_type);
-
-	void OnConnect() override;
-	void OnDisconnect() override;
-	void OnConnectFail() override;
-	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
+	virtual pScene CreateScene(uint32_t scene_type) = 0;
 };
 typedef Game* pGame;
 
-#endif // !__CLIENT_GAME_H__
+#endif // !__ENGINE__GAME_H__

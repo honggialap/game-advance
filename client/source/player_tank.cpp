@@ -5,6 +5,13 @@
 #include "player_bullet.h"
 #include "wall.h"
 
+PlayerTank::PlayerTank(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+PlayerTank::~PlayerTank() {
+}
+
 PlayerTank* PlayerTank::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -14,12 +21,10 @@ PlayerTank* PlayerTank::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<PlayerTank>();
+	world->game_objects[id] = std::make_unique<PlayerTank>(game, world);
 	world->dictionary[name] = id;
 
 	PlayerTank* player_tank = static_cast<PlayerTank*>(world->game_objects[id].get());
-	player_tank->SetGame(game);
-	player_tank->SetWorld(world);
 	player_tank->SetName(name);
 	player_tank->SetId(id);
 	player_tank->SetType(ACTOR_PLAYER_TANK);
@@ -81,7 +86,7 @@ void PlayerTank::Unload() {
 void PlayerTank::HandleInput(uint32_t tick) {
 	if (player_control) {
 		sf::Vector2i movement(0, 0);
-		switch (game->player_id) {
+		switch (game_client->GetPlayerId()) {
 		case 1: {
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 				movement.y = 1;
@@ -229,7 +234,7 @@ void PlayerTank::OnCollisionExit(GameObject* other) {
 void PlayerTank::SendMoveCommand(uint32_t tick, MoveCommand move_command) {
 	auto move_command_packet = std::make_shared<Packet>(PacketType::PlayerMove);
 	*move_command_packet
-		<< game->GetClientId()
+		<< game_client->GetClientId()
 		<< player_id
 		<< tick
 		<< move_command.game_object_id
@@ -237,5 +242,5 @@ void PlayerTank::SendMoveCommand(uint32_t tick, MoveCommand move_command) {
 		<< move_command.x
 		<< move_command.y
 		;
-	game->Send(move_command_packet);
+	game_client->Send(move_command_packet);
 }

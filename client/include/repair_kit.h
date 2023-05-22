@@ -2,14 +2,17 @@
 #ifndef __CLIENT_REPAIR_KIT_H__
 #define __CLIENT_REPAIR_KIT_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class RepairKit : public GameObject {
+class RepairKit : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	RepairKit(Game* game, World* world);
+	~RepairKit();
+
 	static RepairKit* Create(
 		pGame game, pWorld world,
 		std::string name,

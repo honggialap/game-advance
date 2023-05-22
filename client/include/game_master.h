@@ -2,10 +2,13 @@
 #ifndef __CLIENT_GAME_MASTER_H__
 #define __CLIENT_GAME_MASTER_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class GameMaster : public GameObject {
+class GameMaster : public ClientGameObject {
 public:
+	GameMaster(Game* game, World* world);
+	~GameMaster();
+
 	static GameMaster* Create(
 		pGame game, pWorld world,
 		std::string name,

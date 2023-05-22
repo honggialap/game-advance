@@ -1,11 +1,14 @@
 #pragma once
-#ifndef __CLIENT_BOUND_H__
-#define __CLIENT_BOUND_H__
+#ifndef __CLIENT__BOUND_H__
+#define __CLIENT__BOUND_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class Bound : public GameObject {
+class Bound : public ClientGameObject {
 public:
+	Bound(pGame game, pWorld world);
+	~Bound();
+
 	static Bound* Create(
 		pGame game, pWorld world,
 		std::string name,
@@ -28,4 +31,4 @@ public:
 };
 typedef Bound* pBound;
 
-#endif // !__CLIENT_BOUND_H__
+#endif // !__CLIENT__BOUND_H__

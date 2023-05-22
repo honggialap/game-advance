@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+Tree::Tree(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+Tree::~Tree() {
+}
+
 Tree* Tree::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ Tree* Tree::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<Tree>();
+	world->game_objects[id] = std::make_unique<Tree>(game, world);
 	world->dictionary[name] = id;
 
 	Tree* tree = static_cast<Tree*>(world->game_objects[id].get());
-	tree->SetGame(game);
-	tree->SetWorld(world);
 	tree->SetName(name);
 	tree->SetId(id);
 	tree->SetType(ACTOR_TREE);

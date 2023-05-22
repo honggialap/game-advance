@@ -1,5 +1,12 @@
 #include "lobby_scene.h"
-#include "game.h"
+#include "game_client.h"
+
+LobbyScene::LobbyScene(pGame game)
+	: ClientScene(game)
+{}
+
+LobbyScene::~LobbyScene() 
+{}
 
 void LobbyScene::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
@@ -8,7 +15,7 @@ void LobbyScene::Load(std::string data_path) {
 	font.loadFromFile("data/resources/fonts/arial.ttf");
 	text.setFont(font);
 
-	state = State::Picking;
+	state = State::Connecting;
 	pick_sent = false;
 	lockable = false;
 }
@@ -19,11 +26,16 @@ void LobbyScene::Unload() {
 void LobbyScene::Update(float elapsed) {
 	switch (state) {
 
+	case LobbyScene::Connecting: {
+		text.setString("PRESS SPACE TO CONNECT TO SERVER !");
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+			game_client->Connect();
+		}
+	}
+
 	case LobbyScene::Picking: {
 		if (!pick_sent) {
-			switch (game->GetClientId()) {
-
-			case 1000: {
+			if (game->GetWindow().hasFocus()) {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
 					SendPickPacket(1);
 					pick_sent = true;
@@ -41,90 +53,13 @@ void LobbyScene::Update(float elapsed) {
 					pick_sent = true;
 				}
 				if (lockable) {
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) {
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
 						SendLockPacket();
 					}
 				}
-				break;
-			}
-
-			case 1001: {
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-					SendPickPacket(1);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-					SendPickPacket(2);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-					SendPickPacket(3);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
-					SendPickPacket(4);
-					pick_sent = true;
-				}
-				if (lockable) {
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
-						SendLockPacket();
-					}
-				}
-				break;
-			}
-
-			case 1002: {
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-					SendPickPacket(1);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-					SendPickPacket(2);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-					SendPickPacket(3);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-					SendPickPacket(4);
-					pick_sent = true;
-				}
-				if (lockable) {
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
-						SendLockPacket();
-					}
-				}
-				break;
-			}
-
-			case 1003: {
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
-					SendPickPacket(1);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::X)) {
-					SendPickPacket(2);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
-					SendPickPacket(3);
-					pick_sent = true;
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::V)) {
-					SendPickPacket(4);
-					pick_sent = true;
-				}
-				if (lockable) {
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::B)) {
-						SendLockPacket();
-					}
-				}
-				break;
-			}
-
 			}
 		}
+
 		break;
 	}
 
@@ -141,12 +76,15 @@ void LobbyScene::Render(sf::RenderWindow& window) {
 }
 
 void LobbyScene::OnConnect() {
+	state = Picking;
 }
 
 void LobbyScene::OnDisconnect() {
+	state = Connecting;
 }
 
 void LobbyScene::OnConnectFail() {
+	state = Connecting;
 }
 
 bool LobbyScene::ProcessPacket(std::shared_ptr<Packet> packet) {
@@ -166,19 +104,19 @@ bool LobbyScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 			bool locked = false;
 			*packet >> player_id >> client_id >> locked;
 
-			if (client_id == game->GetClientId()) {
-				game->player_id = player_id;
+			if (client_id == game_client->GetClientId()) {
+				game_client->SetPlayerId(player_id);
 			}
 
 			if (
-				client_id == game->GetClientId()
-				&& player_id == game->player_id
+				client_id == game_client->GetClientId()
+				&& player_id == game_client->GetPlayerId()
 				) {
 				lockable = true;
 			}
 
 			if (
-				client_id == game->GetClientId()
+				client_id == game_client->GetClientId()
 				&& locked
 				) {
 				state = State::Locked;
@@ -208,12 +146,12 @@ bool LobbyScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 void LobbyScene::SendPickPacket(uint32_t player_id) {
 	auto pick_packet = std::make_shared<Packet>(PacketType::PlayerPick);
-	*pick_packet << player_id << game->GetClientId();
-	game->Send(pick_packet);
+	*pick_packet << player_id << game_client->GetClientId();
+	game_client->Send(pick_packet);
 }
 
 void LobbyScene::SendLockPacket() {
 	auto lock_packet = std::make_shared<Packet>(PacketType::PlayerLock);
-	*lock_packet << game->GetClientId();
-	game->Send(lock_packet);
+	*lock_packet << game_client->GetClientId();
+	game_client->Send(lock_packet);
 }

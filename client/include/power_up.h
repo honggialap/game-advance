@@ -2,14 +2,17 @@
 #ifndef __CLIENT_POWER_UP_H__
 #define __CLIENT_POWER_UP_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class PowerUp : public GameObject {
+class PowerUp : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	PowerUp(Game* game, World* world);
+	~PowerUp();
+
 	static PowerUp* Create(
 		pGame game, pWorld world,
 		std::string name,

@@ -2,7 +2,6 @@
 #ifndef __CLIENT_WORLD_H__
 #define __CLIENT_WORLD_H__
 
-#include "scene.h"
 #include "game_object.h"
 #include "game.h"
 
@@ -43,6 +42,9 @@
 #pragma endregion
 
 class World : public b2ContactListener {
+protected:
+	pGame game;
+
 public:
 	b2Vec2 gravity;
 	b2World* physics_world = nullptr;
@@ -58,7 +60,7 @@ public:
 	bool just_got_game_state = false;
 	uint32_t tick_per_game_state = 8;
 
-	World();
+	World(pGame game);
 	~World();
 
 	void HandleInput(uint32_t tick);

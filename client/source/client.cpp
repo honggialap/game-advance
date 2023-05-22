@@ -1,6 +1,6 @@
 #include "client.h"
 
-bool Client::Initialize(IPEndPoint ip_endpoint) {
+bool Client::Initialize() {
 	if (is_initialized) {
 		printf("[bool Client::Initialize(IPEndPoint)] - Already initialized.\n");
 		return false;
@@ -11,7 +11,6 @@ bool Client::Initialize(IPEndPoint ip_endpoint) {
 		return false;
 	}
 
-	host_address = ip_endpoint;
 	is_initialized = true;
 	
 	printf("[bool Client::Initialize(IPEndPoint)] - Success.\n");
@@ -29,7 +28,6 @@ bool Client::Shutdown() {
 		return true;
 	}
 
-	host_address = {};
 	is_initialized = false;
 
 	printf("[bool Client::Shutdown()] - Success.\n");
@@ -74,14 +72,13 @@ bool Client::Connect() {
 		return false;
 	}
 
-	Connection connection = Connection(connection_socket, host_address);
+	connection = Connection(connection_socket, host_address);
 
-	WSAPOLLFD master_fd = {};
+	master_fd = {};
 	master_fd.fd = connection.socket.GetSocketHandle();
 	master_fd.events = POLLRDNORM;
 	master_fd.revents = 0;
 
-	host_connection = std::make_pair(connection, master_fd);
 	is_connecting = true;
 	OnConnect();
 
@@ -100,8 +97,13 @@ bool Client::Disconnect() {
 		return false;
 	}
 
-	host_connection.first.Close();
-	host_connection.second = {};
+	if (is_accepted) {
+		is_accepted = false;
+	}
+
+	connection.Close();
+	master_fd = {};
+
 	is_connecting = false;
 	OnDisconnect();
 
@@ -119,9 +121,6 @@ bool Client::ProcessNetworks() {
 		printf("[bool Client::ProcessNetworks()] - Not connected yet.\n");
 		return false;
 	}
-
-	Connection& connection = host_connection.first;
-	WSAPOLLFD& master_fd = host_connection.second;
 
 	if (connection.outgoing_packets.HasPending()) {
 		master_fd.events = POLLRDNORM | POLLWRNORM;
@@ -281,7 +280,16 @@ bool Client::ProcessNetworks() {
 }
 
 bool Client::ProcessPackets() {
-	Connection& connection = host_connection.first;
+	if (!is_initialized) {
+		printf("[bool Client::ProcessPackets()] - Not initialized yet.\n");
+		return false;
+	}
+
+	if (!is_connecting) {
+		printf("[bool Client::ProcessPackets()] - Not connected yet.\n");
+		return false;
+	}
+
 	while (connection.imcomming_packets.HasPending()) {
 		mutex.lock();
 		std::shared_ptr<Packet> packet = connection.imcomming_packets.Retrive();
@@ -311,9 +319,40 @@ bool Client::Send(std::shared_ptr<Packet> packet) {
 		return false;
 	}
 
+	if (!is_accepted) {
+		printf("[bool Client::Send(std::shared_ptr<Packet>)] - Not accepted yet.\n");
+		return false;
+	}
+
 	mutex.lock();
-	host_connection.first.outgoing_packets.Append(packet);	
+	connection.outgoing_packets.Append(packet);	
 	mutex.unlock();
 
 	return true;
+}
+
+bool Client::ProcessPacket(std::shared_ptr<Packet> packet){
+	switch (packet->GetPacketType()) {
+	case PacketType::Welcome: {
+		uint32_t id;
+		*packet >> id;
+
+		AssignClientId(id);
+		printf("Get ID: %d\n", id);
+
+		is_accepted = true;
+		
+		return true;
+	}
+
+	case PacketType::NotWelcome: {
+		Disconnect();
+		return true;
+	}
+
+	default: {
+		return false;
+	}
+
+	}
 }

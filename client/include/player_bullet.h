@@ -2,14 +2,17 @@
 #ifndef __CLIENT_PLAYER_BULLET_H__
 #define __CLIENT_PLAYER_BULLET_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class PlayerBullet : public GameObject {
+class PlayerBullet : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	PlayerBullet(Game* game, World* world);
+	~PlayerBullet();
+
 	static PlayerBullet* Create(
 		pGame game, pWorld world,
 		std::string name,

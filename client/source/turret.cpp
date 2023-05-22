@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+Turret::Turret(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+Turret::~Turret() {
+}
+
 Turret* Turret::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ Turret* Turret::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<Turret>();
+	world->game_objects[id] = std::make_unique<Turret>(game, world);
 	world->dictionary[name] = id;
 
 	Turret* turret = static_cast<Turret*>(world->game_objects[id].get());
-	turret->SetGame(game);
-	turret->SetWorld(world);
 	turret->SetName(name);
 	turret->SetId(id);
 	turret->SetType(ACTOR_TURRET);
@@ -48,7 +53,7 @@ void Turret::Load(std::string data_path) {
 	fixture_def.friction = 0.0f;
 
 	fixture_def.filter.categoryBits = FILTER_STRUCTURE;
-	fixture_def.filter.maskBits = 
+	fixture_def.filter.maskBits =
 		FILTER_PLAYER_TANK
 		| FILTER_CREEP_TANK
 		| FILTER_BULLET

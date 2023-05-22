@@ -1,5 +1,5 @@
 #include "main_scene.h"
-#include "game.h"
+#include "game_client.h"
 
 #include "game_master.h"
 #include "player_tank.h"
@@ -17,6 +17,12 @@
 #include "tree.h"
 #include "water.h"
 
+MainScene::MainScene(pGame game) 
+	: ClientScene(game) 
+{}
+
+MainScene::~MainScene() {}
+
 void MainScene::Load(std::string data_path) {
 	std::ifstream data_file(data_path);
 	nlohmann::json data = nlohmann::json::parse(data_file);
@@ -27,8 +33,7 @@ void MainScene::Load(std::string data_path) {
 	font.loadFromFile("data/resources/fonts/arial.ttf");
 	text.setFont(font);
 
-	world = new World();
-
+	world = new ClientWorld(game);
 }
 
 void MainScene::Unload() {
@@ -159,7 +164,7 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 				auto tank = PlayerTank::Create(game, world, name, position_x, position_y, layer, data_path);
 				tank->SetPlayerId(player_id);
-				if (tank->GetPlayerId() == game->player_id) {
+				if (tank->GetPlayerId() == game_client->GetClientId()) {
 					tank->SetPlayerControl(true);
 				}
 				break;
@@ -629,22 +634,22 @@ bool MainScene::ProcessPacket(std::shared_ptr<Packet> packet) {
 
 void MainScene::SendReadyPacket() {
 	auto ready_packet = std::make_shared<Packet>(PacketType::ClientReady);
-	game->Send(ready_packet);
+	game_client->Send(ready_packet);
 }
 
 void MainScene::SendLoadPacket() {
 	auto client_load_packet = std::make_shared<Packet>(PacketType::ClientLoad);
-	game->Send(client_load_packet);
+	game_client->Send(client_load_packet);
 }
 
 void MainScene::SendPingPacket() {
 	auto ping_packet = std::make_shared<Packet>(PacketType::Ping);
 	*ping_packet
-		<< game->GetClientId()
-		<< game->player_id
+		<< game_client->GetClientId()
+		<< game_client->GetPlayerId()
 		<< world->latest_tick
 		<< ping_tick
 		;
-	game->Send(ping_packet);
+	game_client->Send(ping_packet);
 	ping_sent = true;
 }

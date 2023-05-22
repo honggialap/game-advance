@@ -1,8 +1,8 @@
-#include "game.h"
+#include "game_client.h"
 
 int main() {
-	Game client;
-	client.Run("data/game_data.json");
+	GameClient game_client;
+	game_client.Run("data/game_data.json");
 
 	system("pause");
 	return 0;

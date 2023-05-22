@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+GameMaster::GameMaster(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+GameMaster::~GameMaster() {
+}
+
 GameMaster* GameMaster::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ GameMaster* GameMaster::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<GameMaster>();
+	world->game_objects[id] = std::make_unique<GameMaster>(game, world);
 	world->dictionary[name] = id;
 
 	GameMaster* game_master = static_cast<GameMaster*>(world->game_objects[id].get());
-	game_master->SetGame(game);
-	game_master->SetWorld(world);
 	game_master->SetName(name);
 	game_master->SetId(id);
 	game_master->SetType(ACTOR_GAME_MASTER);

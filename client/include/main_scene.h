@@ -3,9 +3,12 @@
 #define __CLIENT_MAIN_SCENE_H__
 
 #include "scene.h"
-#include "world.h"
+#include "client_scene.h"
 
-class MainScene : public Scene {
+#include "world.h"
+#include "client_world.h"
+
+class MainScene : public ClientScene {
 protected:
 	enum State {
 		Loading,
@@ -17,27 +20,27 @@ protected:
 	sf::Font font;
 	sf::Text text;
 
-	pWorld world = nullptr;
+	ClientWorld* world = nullptr;
 
 	bool ready_sent = false;
 	bool ping_sent = false;
 	uint32_t ping_tick = 0;
 
 public:
-	MainScene(pGame game) : Scene(game) {};
-	~MainScene() {};
+	MainScene(pGame game);
+	~MainScene();
 
-	void Load(std::string data_path) override;
-	void Unload() override;
+	void Load(std::string data_path) final;
+	void Unload() final;
 
-	void Update(float elapsed) override;
-	void Render(sf::RenderWindow& window) override;
+	void Update(float elapsed) final;
+	void Render(sf::RenderWindow& window) final;
 
 	sf::View& GetCamera();
 
-	void OnConnect() override;
-	void OnDisconnect() override;
-	void OnConnectFail() override;
+	void OnConnect() final;
+	void OnDisconnect() final;
+	void OnConnectFail() final;
 	bool ProcessPacket(std::shared_ptr<Packet> packet) override;
 
 	void SendReadyPacket();

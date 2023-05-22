@@ -77,14 +77,14 @@ void Game::Run(std::string data_path) {
 		clock.Reset();
 
 		update_elapsed_ms += elapsed_ms;
-		if (update_elapsed_ms >= elapsed_ms_per_update) {
+		while (update_elapsed_ms >= elapsed_ms_per_update) {
 			ProcessPackets();
 			scene->Update(elapsed_ms_per_update);
 			update_elapsed_ms -= elapsed_ms_per_update;
 		}
 
 		render_elapsed_ms += elapsed_ms;
-		if (render_elapsed_ms >= elapsed_ms_per_render) {
+		while (render_elapsed_ms >= elapsed_ms_per_render) {
 			window.clear(sf::Color::Black);
 			scene->Render(window);
 			window.display();

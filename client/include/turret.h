@@ -2,14 +2,17 @@
 #ifndef __CLIENT_TURRET_H__
 #define __CLIENT_TURRET_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class Turret : public GameObject {
+class Turret : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	Turret(Game* game, World* world);
+	~Turret();
+
 	static Turret* Create(
 		pGame game, pWorld world,
 		std::string name,

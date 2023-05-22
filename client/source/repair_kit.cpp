@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+RepairKit::RepairKit(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+RepairKit::~RepairKit() {
+}
+
 RepairKit* RepairKit::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ RepairKit* RepairKit::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<RepairKit>();
+	world->game_objects[id] = std::make_unique<RepairKit>(game, world);
 	world->dictionary[name] = id;
 
 	RepairKit* repair_kit = static_cast<RepairKit*>(world->game_objects[id].get());
-	repair_kit->SetGame(game);
-	repair_kit->SetWorld(world);
 	repair_kit->SetName(name);
 	repair_kit->SetId(id);
 	repair_kit->SetType(ACTOR_REPAIR_KIT);
@@ -48,7 +53,7 @@ void RepairKit::Load(std::string data_path) {
 	fixture_def.friction = 0.0f;
 
 	fixture_def.filter.categoryBits = FILTER_PICK_UP;
-	fixture_def.filter.maskBits = 
+	fixture_def.filter.maskBits =
 		FILTER_PLAYER_TANK
 		//| FILTER_CREEP_TANK
 		//| FILTER_BULLET

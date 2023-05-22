@@ -1,6 +1,4 @@
 #include "game.h"
-#include "lobby_scene.h"
-#include "main_scene.h"
 
 void Game::Initialize(std::string data_path) {
 	std::ifstream data_file(data_path);
@@ -30,73 +28,13 @@ void Game::Initialize(std::string data_path) {
 		scene_list[id] = std::make_pair(type, data_path);
 	}
 	PlayScene(scenes.at("start_scene_id"));
-
-	auto& networks_settings = data.at("networks");
-	std::string address = networks_settings.at("address");
-	uint32_t port = networks_settings.at("port");
-
-	IPEndPoint host_address = IPEndPoint(address.c_str(), port);
-	Client::Initialize(host_address);
-	Client::Connect();
 }
 
 void Game::Shutdown() {
 	if (scene) scene->Unload();
-
-	Client::Disconnect();
-	Client::Shutdown();
 }
 
-void Game::Run(std::string data_path) {
-	Initialize(data_path);
-
-	std::thread network_processing_thread(
-		[&]() {
-			while (ProcessNetworks());
-		}
-	);
-
-	while (window.isOpen()) {
-		sf::Event window_event;
-		while (window.pollEvent(window_event)) {
-			switch (window_event.type) {
-			case sf::Event::Closed: {
-				window.close();
-				break;
-			}
-
-			default:
-				break;
-			}
-		}
-
-		if (load_scene) LoadScene();
-
-		float elapsed_ms = clock.GetMilliseconds();
-		clock.Reset();
-
-		update_elapsed_ms += elapsed_ms;
-		if (update_elapsed_ms >= elapsed_ms_per_update) {
-			ProcessPackets();
-			scene->Update(elapsed_ms_per_update);
-			update_elapsed_ms -= elapsed_ms_per_update;
-		}
-
-		render_elapsed_ms += elapsed_ms;
-		if (render_elapsed_ms >= elapsed_ms_per_render) {
-			window.clear(sf::Color::Black);
-			scene->Render(window);
-			window.display();
-			render_elapsed_ms -= elapsed_ms_per_render;
-		}
-
-	}
-
-	Shutdown();
-	network_processing_thread.join();
-}
-
-void Game::PlayScene(unsigned int scene_id) {
+void Game::PlayScene(uint32_t scene_id) {
 	if (scene_list.find(scene_id) == scene_list.end()) {
 		printf("Scene [%d] not found!\n", scene_id);
 		return;
@@ -123,68 +61,4 @@ void Game::LoadScene() {
 
 	update_elapsed_ms = 0.0f;
 	render_elapsed_ms = 0.0f;
-}
-
-pScene Game::CreateScene(unsigned int scene_type) {
-	switch (scene_type) {
-
-	case SCENE_LOBBY: {
-		return new LobbyScene(this);
-		break;
-	}
-
-	case SCENE_MAIN: {
-		return new MainScene(this);
-		break;
-	}
-
-	default: {
-		return nullptr;
-		break;
-	}
-
-	}
-}
-
-void Game::OnConnect() {
-	if (scene) {
-		scene->OnConnect();
-	}
-}
-
-void Game::OnDisconnect() {
-	if (scene) {
-		scene->OnDisconnect();
-	}
-}
-
-void Game::OnConnectFail() {
-	if (scene) {
-		scene->OnConnectFail();
-	}
-}
-
-bool Game::ProcessPacket(std::shared_ptr<Packet> packet) {
-	switch (packet->GetPacketType()) {
-	case PacketType::Welcome: {
-		uint32_t id;
-		*packet >> id;
-		AssignClientId(id);
-		printf("Get ID: %d\n", id);
-		return true;
-	}
-
-	case PacketType::NotWelcome: {
-		Disconnect();
-		return true;
-	}
-
-	default: {
-		if (scene) {
-			return scene->ProcessPacket(packet);
-		}
-		return false;
-	}
-
-	}
 }

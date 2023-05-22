@@ -2,14 +2,17 @@
 #ifndef __CLIENT_TREE_H__
 #define __CLIENT_TREE_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class Tree : public GameObject {
+class Tree : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	Tree(Game* game, World* world);
+	~Tree();
+
 	static Tree* Create(
 		pGame game, pWorld world,
 		std::string name,

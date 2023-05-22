@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+Factory::Factory(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+Factory::~Factory() {
+}
+
 Factory* Factory::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ Factory* Factory::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<Factory>();
+	world->game_objects[id] = std::make_unique<Factory>(game, world);
 	world->dictionary[name] = id;
 
 	Factory* factory = static_cast<Factory*>(world->game_objects[id].get());
-	factory->SetGame(game);
-	factory->SetWorld(world);
 	factory->SetName(name);
 	factory->SetId(id);
 	factory->SetType(ACTOR_FACTORY);

@@ -4,6 +4,13 @@
 
 #include "player_tank.h"
 
+Wall::Wall(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+Wall::~Wall() {
+}
+
 Wall* Wall::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -13,12 +20,10 @@ Wall* Wall::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<Wall>();
+	world->game_objects[id] = std::make_unique<Wall>(game, world);
 	world->dictionary[name] = id;
 
 	Wall* wall = static_cast<Wall*>(world->game_objects[id].get());
-	wall->SetGame(game);
-	wall->SetWorld(world);
 	wall->SetName(name);
 	wall->SetId(id);
 	wall->SetType(ACTOR_WALL);

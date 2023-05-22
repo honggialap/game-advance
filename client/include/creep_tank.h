@@ -2,14 +2,17 @@
 #ifndef __CLIENT_CREEP_TANK_H__
 #define __CLIENT_CREEP_TANK_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class CreepTank : public GameObject {
+class CreepTank : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	CreepTank(pGame game, pWorld world);
+	~CreepTank();
+
 	static CreepTank* Create(
 		pGame game, pWorld world,
 		std::string name,

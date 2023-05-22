@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+Water::Water(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+Water::~Water() {
+}
+
 Water* Water::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ Water* Water::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<Water>();
+	world->game_objects[id] = std::make_unique<Water>(game, world);
 	world->dictionary[name] = id;
 
 	Water* water = static_cast<Water*>(world->game_objects[id].get());
-	water->SetGame(game);
-	water->SetWorld(world);
 	water->SetName(name);
 	water->SetId(id);
 	water->SetType(ACTOR_WATER);

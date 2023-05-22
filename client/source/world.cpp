@@ -1,23 +1,8 @@
 #include "world.h"
 #include "game.h"
 
-#include "game_master.h"
-#include "player_tank.h"
-#include "player_bullet.h"
-#include "creep_tank.h"
-#include "creep_bullet.h"
-#include "turret.h"
-#include "turret_bullet.h"
-#include "headquarter.h"
-#include "factory.h"
-#include "repair_kit.h"
-#include "power_up.h"
-#include "bound.h"
-#include "wall.h"
-#include "tree.h"
-#include "water.h"
-
-World::World() {
+World::World(pGame game)
+	: game(game) {
 	gravity = b2Vec2(0, 0);
 	physics_world = new b2World(gravity);
 	physics_world->SetContactListener(this);

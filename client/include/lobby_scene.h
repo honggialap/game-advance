@@ -2,15 +2,17 @@
 #ifndef __CLIENT_LOBBY_SCENE_H__
 #define __CLIENT_LOBBY_SCENE_H__
 
+#include "client_scene.h"
 #include "scene.h"
 
-class LobbyScene : public Scene {
+class LobbyScene : public ClientScene {
 protected:
 	enum State {
+		Connecting,
 		Picking,
 		Locked
 	};
-	State state = State::Picking;
+	State state = State::Connecting;
 
 	sf::Font font;
 	sf::Text text;
@@ -19,8 +21,8 @@ protected:
 	bool lockable = false;
 
 public:
-	LobbyScene(pGame game) : Scene(game) {};
-	~LobbyScene() {};
+	LobbyScene(pGame game);
+	~LobbyScene();
 
 	void Load(std::string data_path) override;
 	void Unload() override;

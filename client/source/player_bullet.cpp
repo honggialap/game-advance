@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+PlayerBullet::PlayerBullet(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+PlayerBullet::~PlayerBullet() {
+}
+
 PlayerBullet* PlayerBullet::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ PlayerBullet* PlayerBullet::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<PlayerBullet>();
+	world->game_objects[id] = std::make_unique<PlayerBullet>(game, world);
 	world->dictionary[name] = id;
 
 	PlayerBullet* player_bullet = static_cast<PlayerBullet*>(world->game_objects[id].get());
-	player_bullet->SetGame(game);
-	player_bullet->SetWorld(world);
 	player_bullet->SetName(name);
 	player_bullet->SetId(id);
 	player_bullet->SetType(ACTOR_PLAYER_BULLET);

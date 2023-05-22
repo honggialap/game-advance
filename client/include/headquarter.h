@@ -2,14 +2,17 @@
 #ifndef __CLIENT_HEADQUARTER_H__
 #define __CLIENT_HEADQUARTER_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class Headquarter : public GameObject {
+class Headquarter : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	Headquarter(Game* game, World* world);
+	~Headquarter();
+
 	static Headquarter* Create(
 		pGame game, pWorld world,
 		std::string name,

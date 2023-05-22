@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+TurretBullet::TurretBullet(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+TurretBullet::~TurretBullet() {
+}
+
 TurretBullet* TurretBullet::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ TurretBullet* TurretBullet::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<TurretBullet>();
+	world->game_objects[id] = std::make_unique<TurretBullet>(game, world);
 	world->dictionary[name] = id;
 
 	TurretBullet* turret_bullet = static_cast<TurretBullet*>(world->game_objects[id].get());
-	turret_bullet->SetGame(game);
-	turret_bullet->SetWorld(world);
 	turret_bullet->SetName(name);
 	turret_bullet->SetId(id);
 	turret_bullet->SetType(ACTOR_TURRET_BULLET);

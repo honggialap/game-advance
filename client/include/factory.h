@@ -2,14 +2,17 @@
 #ifndef __CLIENT_FACTORY_H__
 #define __CLIENT_FACTORY_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class Factory : public GameObject {
+class Factory : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	Factory(Game* game, World* world);
+	~Factory();
+
 	static Factory* Create(
 		pGame game, pWorld world,
 		std::string name,

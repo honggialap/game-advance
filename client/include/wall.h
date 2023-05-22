@@ -2,14 +2,17 @@
 #ifndef __CLIENT_WALL_H__
 #define __CLIENT_WALL_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class Wall : public GameObject {
+class Wall : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	Wall(Game* game, World* world);
+	~Wall();
+
 	static Wall* Create(
 		pGame game, pWorld world,
 		std::string name,

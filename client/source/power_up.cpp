@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+PowerUp::PowerUp(Game* game, World* world)
+	: ClientGameObject(game, world) {
+}
+
+PowerUp::~PowerUp() {
+}
+
 PowerUp* PowerUp::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ PowerUp* PowerUp::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<PowerUp>();
+	world->game_objects[id] = std::make_unique<PowerUp>(game, world);
 	world->dictionary[name] = id;
 
 	PowerUp* power_up = static_cast<PowerUp*>(world->game_objects[id].get());
-	power_up->SetGame(game);
-	power_up->SetWorld(world);
 	power_up->SetName(name);
 	power_up->SetId(id);
 	power_up->SetType(ACTOR_POWER_UP);
@@ -48,7 +53,7 @@ void PowerUp::Load(std::string data_path) {
 	fixture_def.friction = 0.0f;
 
 	fixture_def.filter.categoryBits = FILTER_PICK_UP;
-	fixture_def.filter.maskBits = 
+	fixture_def.filter.maskBits =
 		FILTER_PLAYER_TANK
 		//| FILTER_CREEP_TANK
 		//| FILTER_BULLET

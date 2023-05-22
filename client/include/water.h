@@ -2,14 +2,17 @@
 #ifndef __CLIENT_WATER_H__
 #define __CLIENT_WATER_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class Water : public GameObject {
+class Water : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
 
 public:
+	Water(Game* game, World* world);
+	~Water();
+
 	static Water* Create(
 		pGame game, pWorld world,
 		std::string name,

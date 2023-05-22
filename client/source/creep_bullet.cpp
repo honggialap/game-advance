@@ -2,6 +2,13 @@
 #include "game.h"
 #include "world.h"
 
+CreepBullet::CreepBullet(pGame game, pWorld world) 
+	: ClientGameObject(game, world) {
+}
+
+CreepBullet::~CreepBullet() {
+}
+
 CreepBullet* CreepBullet::Create(
 	pGame game, pWorld world,
 	std::string name,
@@ -11,12 +18,10 @@ CreepBullet* CreepBullet::Create(
 ) {
 	uint32_t id = world->game_object_id++;
 
-	world->game_objects[id] = std::make_unique<CreepBullet>();
+	world->game_objects[id] = std::make_unique<CreepBullet>(game, world);
 	world->dictionary[name] = id;
 
 	CreepBullet* creep_bullet = static_cast<CreepBullet*>(world->game_objects[id].get());
-	creep_bullet->SetGame(game);
-	creep_bullet->SetWorld(world);
 	creep_bullet->SetName(name);
 	creep_bullet->SetId(id);
 	creep_bullet->SetType(ACTOR_CREEP_BULLET);

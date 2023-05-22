@@ -1,10 +1,10 @@
 #pragma once
-#ifndef __CLIENT_CREEP_BULLET_H__
-#define __CLIENT_CREEP_BULLET_H__
+#ifndef __CLIENT__CREEP_BULLET_H__
+#define __CLIENT__CREEP_BULLET_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
-class CreepBullet : public GameObject {
+class CreepBullet : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
@@ -12,6 +12,9 @@ protected:
 	uint32_t team = 0;
 
 public:
+	CreepBullet(pGame game, pWorld world);
+	~CreepBullet();
+
 	static CreepBullet* Create(
 		pGame game, pWorld world,
 		std::string name,
@@ -37,4 +40,4 @@ public:
 };
 typedef CreepBullet* pCreepBullet;
 
-#endif // !__CLIENT_CREEP_BULLET_H__
+#endif // !__CLIENT__CREEP_BULLET_H__

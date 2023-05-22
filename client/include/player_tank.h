@@ -2,7 +2,7 @@
 #ifndef __CLIENT_PLAYER_TANK_H__
 #define __CLIENT_PLAYER_TANK_H__
 
-#include "game_object.h"
+#include "client_game_object.h"
 
 #define PLAYER_TANK_COMMAND_MOVE 1
 struct MoveCommand : public Command {
@@ -35,7 +35,7 @@ struct ShootCommand : public Command {
 };
 typedef std::unique_ptr<ShootCommand> pShootCommand;
 
-class PlayerTank : public GameObject {
+class PlayerTank : public ClientGameObject {
 protected:
 	sf::Texture texture;
 	sf::Sprite sprite;
@@ -46,12 +46,14 @@ protected:
 	sf::Vector2i current_movement;
 	float speed = 0.5f;
 
-
 public:
 	float last_known_x = 0;
 	float last_known_y = 0;
 	float latest_x = 0;
 	float latest_y = 0;
+
+	PlayerTank(Game* game, World* world);
+	~PlayerTank();
 
 	static PlayerTank* Create(
 		pGame game, pWorld world,
