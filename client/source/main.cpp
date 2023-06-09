@@ -1,7 +1,7 @@
-#include "game_client.h"
+#include "client/core/game.h"
 
 int main() {
-	GameClient game_client;
+	NSClient::NSCore::CGame game_client;
 	game_client.Run("data/game_data.json");
 
 	system("pause");

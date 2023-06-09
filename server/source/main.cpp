@@ -1,8 +1,8 @@
-#include "game.h"
+#include "server/core/game.h"
 
 int main() {
-	Game server;
-	server.Run("data/game_data.json");
+	NSServer::NSCore::CGame game_server;
+	game_server.Run("data/game_data.json");
 
 	system("pause");
 	return 0;
