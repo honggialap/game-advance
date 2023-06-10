@@ -9,6 +9,7 @@
 #include "engine/core/game_object.h"
 
 #include "engine/component/updatable.h"
+#include "engine/component/renderable.h"
 #include "engine/component/commandable.h"
 #include "engine/component/recordable.h"
 #include "engine/component/physics.h"
@@ -29,28 +30,25 @@ namespace NSEngine {
 			std::map<std::string, uint32_t> dictionary;
 			std::map<uint32_t, upGameObject> game_objects;
 			std::map<uint32_t, std::vector<upCommand>> commands;
-
 			std::map<uint32_t, std::vector<upRecord>> records;
 
 			uint32_t latest_tick = 0;
-			uint32_t server_tick = 0;
-
-			bool just_got_game_state = false;
 			uint32_t tick_per_game_state = 8;
-
-			uint32_t rollback_tick = 0;
-			bool rollback = false;
-
+			
 			CWorld(pGame game);
 			~CWorld();
 
-			void Load(nlohmann::json& data);
-			void Unload();
+			virtual void Load(nlohmann::json& data) = 0;
+			virtual void Unload() = 0;
 
 			void HandleInput(uint32_t tick);
+
 			void Step(uint32_t tick, float elapsed);
 
+			void Render(sf::RenderWindow& window);
+
 			void TrimCommands(uint32_t threshold);
+			void TrimCommands(uint32_t from, uint32_t to);
 
 			void TrimRecords(uint32_t threshold);
 			void TrimRecords(uint32_t from, uint32_t to);

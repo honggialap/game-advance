@@ -3,7 +3,7 @@
 namespace NSEngine {
 	namespace NSComponent {
 
-		CLoadable::CLoadable() {
+		CLoadable::CLoadable(){
 		}
 
 		CLoadable::~CLoadable() {

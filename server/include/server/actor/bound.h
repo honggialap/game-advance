@@ -15,18 +15,16 @@ namespace NSServer {
 			static CBound* Create(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
-				, std::string name
-				, std::string data_path
+				, nlohmann::json& data
 			);
 
 			CBound(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
+				, uint32_t id
+				, std::string name
 			);
 			~CBound();
-
-			void Load(std::string data_path) override;
-			void Unload() override;
 
 			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
 			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;

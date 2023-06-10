@@ -60,9 +60,9 @@ namespace NSClient {
 				break;
 
 			case CMainScene::EState::Run: {
-				if (world->just_got_game_state) {
-					world->just_got_game_state = false;
-					for (uint32_t reconcilate_tick = world->server_tick + 1;
+				if (world->IsJustGotGameState()) {
+					world->SetJustGotGameState(false);
+					for (uint32_t reconcilate_tick = world->GetServerTick() + 1;
 						reconcilate_tick < world->latest_tick;
 						reconcilate_tick++) {
 
@@ -95,12 +95,7 @@ namespace NSClient {
 			}
 
 			case CMainScene::EState::Run: {
-				for (auto& game_object_container : world->game_objects) {
-					auto game_object = game_object_container.second.get();
-					if (dynamic_cast<NSEngine::NSComponent::pRenderable>(game_object)) {
-						dynamic_cast<NSEngine::NSComponent::pRenderable>(game_object)->Render(window);
-					}
-				}
+				world->Render(window);
 				break;
 			}
 			}
@@ -131,25 +126,29 @@ namespace NSClient {
 				*packet >> game_object_count;
 
 				for (uint32_t i = 0; i < game_object_count; i++) {
+					
 					uint32_t type;
 					*packet >> type;
+
+					std::string name;
+					*packet >> name;
+
 					switch (NSEngine::EActorType(type)) {
 
 					case NSEngine::EActorType::GAME_MASTER: {
-						std::string name;
-						*packet >> name;
+						
+						std::string resource_path;
+						*packet >> resource_path;
 
-						std::string data_path;
-						*packet >> data_path;
-
-						auto game_master = NSClient::NSActor::CGameMaster::Create(game, world, name, data_path);
+						auto game_master = NSClient::NSActor::CGameMaster::Create(
+							game, world, name,
+							resource_path
+						);
 						break;
 					}
 
 					case NSEngine::EActorType::PLAYER_TANK: {
-						std::string name;
-						*packet >> name;
-
+						
 						float position_x, position_y;
 						*packet >> position_x >> position_y;
 
@@ -348,19 +347,8 @@ namespace NSClient {
 					}
 
 					case NSEngine::EActorType::BOUND: {
-						std::string name;
-						*packet >> name;
-
-						float position_x, position_y;
-						*packet >> position_x >> position_y;
-
-						uint32_t layer;
-						*packet >> layer;
-
-						std::string data_path;
-						*packet >> data_path;
-
-						auto bound = NSClient::NSActor::CBound::Create(game, world, name, data_path);
+						auto bound = NSClient::NSActor::CBound::Create(game, world, name);
+						bound->UnpackLoadPhysics(packet.get());
 						break;
 					}
 
@@ -437,11 +425,11 @@ namespace NSClient {
 			}
 
 			case NSEngine::EPacketType::SERVER_GAME_STATE: {
-				world->just_got_game_state = true;
+				world->SetJustGotGameState(true);
 
 				uint32_t server_tick = 0;
 				*packet >> server_tick;
-				world->server_tick = server_tick;
+				world->SetServerTick(server_tick);
 
 				uint32_t game_object_count = 0;
 				*packet >> game_object_count;

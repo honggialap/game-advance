@@ -14,8 +14,10 @@ namespace NSEngine {
 		CGameMaster::CGameMaster(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSCore::CGameObject(game, world) {
+			: NSEngine::NSCore::CGameObject(game, world, id, name) {
 			type = EActorType::GAME_MASTER;
 		}
 

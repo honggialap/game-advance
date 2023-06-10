@@ -15,13 +15,14 @@ namespace NSServer {
 			static CTree* Create(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
-				, std::string name
-				, std::string data_path
+				, nlohmann::json& data
 			);
 
 			CTree(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
+				, uint32_t id
+				, std::string name
 			);
 			~CTree();
 

@@ -21,6 +21,12 @@ namespace NSEngine {
 			void Clear();
 			void Append(const void* data, uint32_t size);
 
+			CPacket& operator << (uint16_t data);
+			CPacket& operator >> (uint16_t& data);
+
+			CPacket& operator << (int16_t data);
+			CPacket& operator >> (int16_t& data);
+
 			CPacket& operator << (uint32_t data);
 			CPacket& operator >> (uint32_t& data);
 

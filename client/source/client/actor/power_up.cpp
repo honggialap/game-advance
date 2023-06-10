@@ -12,12 +12,11 @@ namespace NSClient {
 			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CPowerUp>(game, world);
+
+			world->game_objects[id] = std::make_unique<CPowerUp>(game, world, id, name);
 			world->dictionary[name] = id;
 			pPowerUp power_up = static_cast<pPowerUp>(world->game_objects[id].get());
 
-			power_up->SetId(id);
-			power_up->SetName(name);
 			power_up->SetResourcePath(data_path);
 			power_up->Load(data_path);
 
@@ -27,8 +26,10 @@ namespace NSClient {
 		CPowerUp::CPowerUp(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CPowerUp(game, world)
+			: NSEngine::NSActor::CPowerUp(game, world, id, name)
 			, NSClient::NSCore::CGameObject(game, world) {
 		}
 

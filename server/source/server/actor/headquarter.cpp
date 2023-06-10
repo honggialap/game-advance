@@ -8,18 +8,19 @@ namespace NSServer {
 		pHeadquarter CHeadquarter::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CHeadquarter>(game, world);
+			std::string name = data.at("data");
+
+			world->game_objects[id] = std::make_unique<CHeadquarter>(game, world, id, name);
 			world->dictionary[name] = id;
 			pHeadquarter headquarter = static_cast<pHeadquarter>(world->game_objects[id].get());
 
-			headquarter->SetId(id);
-			headquarter->SetName(name);
-			headquarter->SetResourcePath(data_path);
-			headquarter->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			headquarter->SetResourcePath(resource_path);
+			
+			headquarter->Load(resource_path);
 
 			return headquarter;
 		}
@@ -27,8 +28,10 @@ namespace NSServer {
 		CHeadquarter::CHeadquarter(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CHeadquarter(game, world)
+			: NSEngine::NSActor::CHeadquarter(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

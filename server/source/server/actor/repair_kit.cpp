@@ -8,18 +8,18 @@ namespace NSServer {
 		pRepairKit CRepairKit::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CRepairKit>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CRepairKit>(game, world, id, name);
 			world->dictionary[name] = id;
 			pRepairKit repair_kit = static_cast<pRepairKit>(world->game_objects[id].get());
 
-			repair_kit->SetId(id);
-			repair_kit->SetName(name);
-			repair_kit->SetResourcePath(data_path);
-			repair_kit->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			repair_kit->SetResourcePath(resource_path);
+			repair_kit->Load(resource_path);
 
 			return repair_kit;
 		}
@@ -27,8 +27,10 @@ namespace NSServer {
 		CRepairKit::CRepairKit(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CRepairKit(game, world)
+			: NSEngine::NSActor::CRepairKit(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

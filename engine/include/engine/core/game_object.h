@@ -27,16 +27,16 @@ namespace NSEngine {
 			bool is_destroyed;
 
 		public:
-			CGameObject(pGame game, pWorld world);
+			CGameObject(
+				pGame game
+				, pWorld world
+				, uint32_t id
+				, std::string name
+			);
 			virtual ~CGameObject() = 0;
 
-			void SetId(uint32_t value);
 			uint32_t GetId();
-
-			void SetType(EActorType value);
 			EActorType GetType();
-
-			void SetName(std::string value);
 			std::string GetName();
 
 			void SetActive(bool value);

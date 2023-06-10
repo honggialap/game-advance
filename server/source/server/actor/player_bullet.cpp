@@ -8,18 +8,19 @@ namespace NSServer {
 		pPlayerBullet CPlayerBullet::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CPlayerBullet>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CPlayerBullet>(game, world, id, name);
 			world->dictionary[name] = id;
 			pPlayerBullet player_bullet = static_cast<pPlayerBullet>(world->game_objects[id].get());
 
-			player_bullet->SetId(id);
-			player_bullet->SetName(name);
-			player_bullet->SetResourcePath(data_path);
-			player_bullet->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			player_bullet->SetResourcePath(resource_path);
+
+			player_bullet->Load(resource_path);
 
 			return player_bullet;
 		}
@@ -27,8 +28,10 @@ namespace NSServer {
 		CPlayerBullet::CPlayerBullet(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CPlayerBullet(game, world)
+			: NSEngine::NSActor::CPlayerBullet(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

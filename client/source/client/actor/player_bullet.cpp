@@ -12,12 +12,11 @@ namespace NSClient {
 			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CPlayerBullet>(game, world);
+
+			world->game_objects[id] = std::make_unique<CPlayerBullet>(game, world, id, name);
 			world->dictionary[name] = id;
 			pPlayerBullet player_bullet = static_cast<pPlayerBullet>(world->game_objects[id].get());
 
-			player_bullet->SetId(id);
-			player_bullet->SetName(name);
 			player_bullet->SetResourcePath(data_path);
 			player_bullet->Load(data_path);
 
@@ -27,8 +26,10 @@ namespace NSClient {
 		CPlayerBullet::CPlayerBullet(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CPlayerBullet(game, world)
+			: NSEngine::NSActor::CPlayerBullet(game, world, id, name)
 			, NSClient::NSCore::CGameObject(game, world) {
 		}
 

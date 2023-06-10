@@ -8,18 +8,19 @@ namespace NSServer {
 		pTree CTree::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CTree>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CTree>(game, world, id, name);
 			world->dictionary[name] = id;
 			pTree tree = static_cast<pTree>(world->game_objects[id].get());
 
-			tree->SetId(id);
-			tree->SetName(name);
-			tree->SetResourcePath(data_path);
-			tree->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			tree->SetResourcePath(resource_path);
+
+			tree->Load(resource_path);
 
 			return tree;
 		}
@@ -27,8 +28,10 @@ namespace NSServer {
 		CTree::CTree(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CTree(game, world)
+			: NSEngine::NSActor::CTree(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

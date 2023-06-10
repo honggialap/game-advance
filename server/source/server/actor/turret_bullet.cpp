@@ -8,18 +8,19 @@ namespace NSServer {
 		pTurretBullet CTurretBullet::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CTurretBullet>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CTurretBullet>(game, world, id, name);
 			world->dictionary[name] = id;
 			pTurretBullet turret_bullet = static_cast<pTurretBullet>(world->game_objects[id].get());
 
-			turret_bullet->SetId(id);
-			turret_bullet->SetName(name);
-			turret_bullet->SetResourcePath(data_path);
-			turret_bullet->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			turret_bullet->SetResourcePath(resource_path);
+			
+			turret_bullet->Load(resource_path);
 
 			return turret_bullet;
 		}
@@ -27,8 +28,10 @@ namespace NSServer {
 		CTurretBullet::CTurretBullet(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CTurretBullet(game, world)
+			: NSEngine::NSActor::CTurretBullet(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

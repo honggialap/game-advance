@@ -37,6 +37,8 @@ namespace NSEngine {
 			CPowerUp(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
+				, uint32_t id
+				, std::string name
 			);
 			~CPowerUp();
 

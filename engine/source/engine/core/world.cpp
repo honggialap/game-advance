@@ -22,116 +22,6 @@ namespace NSEngine {
 			}
 		}
 
-		void CWorld::Load(nlohmann::json& data) {
-			/*
-			if (data.contains("game_master")) {
-				auto& game_master = data.at("game_master");
-				GameMaster::Create(game, this, game_master);
-			}
-
-			if (data.contains("player_tanks")) {
-				auto& player_tanks = data.at("player_tanks");
-				for (auto& player_tank : player_tanks) {
-					PlayerTank::Create(game, this, player_tank);
-
-					if (player_tank.contains("bullets")) {
-						auto& bullets = player_tank.at("bullets");
-						for (auto& bullet : bullets) {
-							PlayerBullet::Create(game, this, bullet);
-						}
-					}
-				}
-			}
-
-			if (data.contains("headquarters")) {
-				auto& headquarters = data.at("headquarters");
-				for (auto& headquarter : headquarters) {
-					Headquarter::Create(game, this, headquarter);
-				}
-			}
-
-			if (data.contains("factories")) {
-				auto& factories = data.at("factories");
-				for (auto& factory : factories) {
-					Factory::Create(game, this, factory);
-
-					if (factories.contains("creep_tanks")) {
-						auto& creep_tanks = factory.at("creep_tanks");
-						for (auto& creep_tank : creep_tanks) {
-							CreepTank::Create(game, this, creep_tank);
-
-							if (creep_tank.contains("bullets")) {
-								auto& bullets = creep_tank.at("bullets");
-								for (auto& bullet : bullets) {
-									CreepBullet::Create(game, this, bullet);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if (data.contains("turrets")) {
-				auto& turrets = data.at("turrets");
-				for (auto& turret : turrets) {
-					Turret::Create(game, this, turret);
-
-					if (turret.contains("bullets")) {
-						auto& bullets = turret.at("bullets");
-						for (auto& bullet : bullets) {
-							TurretBullet::Create(game, this, bullet);
-						}
-					}
-				}
-			}
-
-			if (data.contains("bounds")) {
-				auto& bounds = data.at("bounds");
-				for (auto& bound : bounds) {
-					Bound::Create(game, this, bound);
-				}
-			}
-
-			if (data.contains("walls")) {
-				auto& walls = data.at("walls");
-				for (auto& wall : walls) {
-					Wall::Create(game, this, wall);
-				}
-			}
-
-			if (data.contains("waters")) {
-				auto& waters = data.at("waters");
-				for (auto& water : waters) {
-					Water::Create(game, this, water);
-				}
-			}
-
-			if (data.contains("trees")) {
-				auto& trees = data.at("trees");
-				for (auto& tree : trees) {
-					Tree::Create(game, this, tree);
-				}
-			}
-
-			if (data.contains("repair_kits")) {
-				auto& repair_kits = data.at("repair_kits");
-				for (auto& repair_kit : repair_kits) {
-					RepairKit::Create(game, this, repair_kit);
-				}
-			}
-
-			if (data.contains("power_ups")) {
-				auto& power_ups = data.at("power_ups");
-				for (auto& power_up : power_ups) {
-					PowerUp::Create(game, this, power_up);
-				}
-			}
-			*/
-		}
-
-		void CWorld::Unload() {
-		}
-
 		void CWorld::HandleInput(uint32_t tick) {
 			for (auto& game_object_container : game_objects) {
 				auto game_object = game_object_container.second.get();
@@ -161,6 +51,15 @@ namespace NSEngine {
 			physics_world->Step(elapsed, 8, 3);
 		}
 
+		void CWorld::Render(sf::RenderWindow& window) {
+			for (auto& game_object_container : game_objects) {
+				auto game_object = game_object_container.second.get();
+				if (dynamic_cast<NSComponent::pRenderable>(game_object)) {
+					dynamic_cast<NSComponent::pRenderable>(game_object)->Render(window);
+				}
+			}
+		}
+
 		void CWorld::TrimCommands(uint32_t threshold) {
 			if (!commands.empty() && latest_tick > threshold) {
 				while (
@@ -170,6 +69,14 @@ namespace NSEngine {
 					auto erasing_tick = commands.begin()->first;
 					commands.erase(erasing_tick);
 				}
+			}
+		}
+
+		void CWorld::TrimCommands(uint32_t from, uint32_t to) {
+			for (uint32_t erasing_tick = to;
+				erasing_tick > from;
+				erasing_tick--) {
+				commands.erase(erasing_tick);
 			}
 		}
 

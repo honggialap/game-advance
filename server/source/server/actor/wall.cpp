@@ -8,18 +8,19 @@ namespace NSServer {
 		pWall CWall::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CWall>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CWall>(game, world, id, name);
 			world->dictionary[name] = id;
 			pWall wall = static_cast<pWall>(world->game_objects[id].get());
 
-			wall->SetId(id);
-			wall->SetName(name);
-			wall->SetResourcePath(data_path);
-			wall->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			wall->SetResourcePath(resource_path);
+
+			wall->Load(resource_path);
 
 			return wall;
 		}
@@ -27,8 +28,10 @@ namespace NSServer {
 		CWall::CWall(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CWall(game, world)
+			: NSEngine::NSActor::CWall(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

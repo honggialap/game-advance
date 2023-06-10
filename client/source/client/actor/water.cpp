@@ -12,12 +12,11 @@ namespace NSClient {
 			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CWater>(game, world);
+
+			world->game_objects[id] = std::make_unique<CWater>(game, world, id, name);
 			world->dictionary[name] = id;
 			pWater water = static_cast<pWater>(world->game_objects[id].get());
 
-			water->SetId(id);
-			water->SetName(name);
 			water->SetResourcePath(data_path);
 			water->Load(data_path);
 
@@ -27,8 +26,10 @@ namespace NSClient {
 		CWater::CWater(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CWater(game, world)
+			: NSEngine::NSActor::CWater(game, world, id, name)
 			, NSClient::NSCore::CGameObject(game, world) {
 		}
 

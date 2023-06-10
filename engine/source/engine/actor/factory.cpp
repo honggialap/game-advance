@@ -14,8 +14,11 @@ namespace NSEngine {
 		CFactory::CFactory(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSCore::CGameObject(game, world) {
+			: NSEngine::NSCore::CGameObject(game, world, id, name)
+			, NSEngine::NSComponent::CPhysics(world->GetPhysics()) {
 			type = EActorType::FACTORY;
 		}
 

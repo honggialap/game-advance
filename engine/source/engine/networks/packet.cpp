@@ -32,6 +32,40 @@ namespace NSEngine {
 			buffer.insert(buffer.end(), (char*)data, (char*)data + size);
 		}
 
+		CPacket& CPacket::operator<<(uint16_t data) {
+			data = htons(data);
+			Append(&data, sizeof(uint16_t));
+			return *this;
+		}
+
+		CPacket& CPacket::operator>>(uint16_t& data) {
+			if ((offset + sizeof(uint16_t)) > buffer.size()) {
+				throw CPacketException("[Packet::operator>>(uint16_t&)] - Extraction offset exceeded buffer size.");
+			}
+
+			data = *reinterpret_cast<uint16_t*>(&buffer[offset]);
+			data = ntohs(data);
+			offset += sizeof(uint16_t);
+			return *this;
+		}
+
+		CPacket& CPacket::operator<<(int16_t data) {
+			data = htons(data);
+			Append(&data, sizeof(int16_t));
+			return *this;
+		}
+
+		CPacket& CPacket::operator>>(int16_t& data) {
+			if ((offset + sizeof(int16_t)) > buffer.size()) {
+				throw CPacketException("[Packet::operator>>(int16_t&)] - Extraction offset exceeded buffer size.");
+			}
+
+			data = *reinterpret_cast<int16_t*>(&buffer[offset]);
+			data = ntohs(data);
+			offset += sizeof(int16_t);
+			return *this;
+		}
+
 		CPacket& CPacket::operator<<(uint32_t data) {
 			data = htonl(data);
 			Append(&data, sizeof(uint32_t));

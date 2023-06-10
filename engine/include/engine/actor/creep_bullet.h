@@ -43,6 +43,8 @@ namespace NSEngine {
 			CCreepBullet(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
+				, uint32_t id
+				, std::string name
 			);
 			~CCreepBullet();
 

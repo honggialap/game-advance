@@ -12,11 +12,24 @@ namespace NSClient {
 		class CWorld
 			: public NSEngine::NSCore::CWorld {
 		protected:
-			CGame* game_client;
+			NSClient::NSCore::pGame game_client;
+			
+			bool just_got_game_state = false;
+			uint32_t tick_per_game_state = 8;
+			uint32_t server_tick = 0;
 
 		public:
 			CWorld(NSEngine::NSCore::pGame game);
 			~CWorld();
+
+			void SetJustGotGameState(bool value);
+			bool IsJustGotGameState();
+			
+			void SetServerTick(uint32_t value);
+			uint32_t GetServerTick();
+
+			void Load(nlohmann::json& data) override;
+			void Unload() override;
 		};
 		typedef CWorld* pWorld;
 

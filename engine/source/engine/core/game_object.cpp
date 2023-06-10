@@ -3,32 +3,28 @@
 namespace NSEngine {
 	namespace NSCore {
 
-		CGameObject::CGameObject(pGame game, pWorld world)
+		CGameObject::CGameObject(
+			pGame game
+			, pWorld world
+			, uint32_t id
+			, std::string name
+		)
 			: game(game)
-			, world(world) {
+			, world(world) 
+			, id(id)
+			, name(name) {
+			type = EActorType::INVALID_ACTOR;
 		}
 
 		CGameObject::~CGameObject() {
-		}
-
-		void CGameObject::SetName(std::string value) {
-			name = value;
 		}
 
 		std::string CGameObject::GetName() {
 			return name;
 		}
 
-		void CGameObject::SetId(uint32_t value) {
-			id = value;
-		}
-
 		uint32_t CGameObject::GetId() {
 			return id;
-		}
-
-		void CGameObject::SetType(EActorType value) {
-			type = value;
 		}
 
 		EActorType CGameObject::GetType() {

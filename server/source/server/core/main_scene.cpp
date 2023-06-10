@@ -64,14 +64,14 @@ namespace NSServer {
 			}
 
 			case CMainScene::EState::Run: {
-				if (world->rollback) {
+				if (world->IsRollback()) {
 					uint32_t last_tick = world->latest_tick - 1;
-					uint32_t deserialize_tick = world->rollback_tick - 1;
+					uint32_t deserialize_tick = world->GetRollbackTick() - 1;
 
 					world->TrimRecords(deserialize_tick, last_tick);
 					world->Deserialize(deserialize_tick);
 
-					for (uint32_t rollback_tick = world->rollback_tick;
+					for (uint32_t rollback_tick = world->GetRollbackTick();
 						rollback_tick <= last_tick;
 						rollback_tick++) {
 
@@ -79,8 +79,8 @@ namespace NSServer {
 						world->Serialize(rollback_tick);
 					}
 
-					world->rollback = false;
-					world->rollback_tick = last_tick;
+					world->SetRollback(false);
+					world->SetRollbackTick(last_tick);
 				}
 
 				world->HandleInput(world->latest_tick);
@@ -111,12 +111,7 @@ namespace NSServer {
 			}
 
 			case CMainScene::EState::Run: {
-				for (auto& game_object_container : world->game_objects) {
-					auto game_object = game_object_container.second.get();
-					if (dynamic_cast<NSEngine::NSComponent::pRenderable>(game_object)) {
-						dynamic_cast<NSEngine::NSComponent::pRenderable>(game_object)->Render(window);
-					}
-				}
+				world->Render(window);
 				break;
 			}
 			}
@@ -200,9 +195,9 @@ namespace NSServer {
 				);
 
 				if (tick < world->latest_tick) {
-					world->rollback = true;
-					if (world->rollback_tick > tick) {
-						world->rollback_tick = tick;
+					world->SetRollback(true);
+					if (world->GetRollbackTick() > tick) {
+						world->SetRollbackTick(tick);
 					}
 				}
 
@@ -235,7 +230,10 @@ namespace NSServer {
 
 				case NSEngine::EActorType::GAME_MASTER: {
 					NSServer::NSActor::pGameMaster game_master = static_cast<NSServer::NSActor::pGameMaster>(game_object);
-
+					
+					std::string resource_path = game_master->GetResourcePath();
+					*server_load_packet << resource_path;
+					
 					break;
 				}
 
@@ -328,7 +326,7 @@ namespace NSServer {
 
 				case NSEngine::EActorType::BOUND: {
 					NSServer::NSActor::pBound bound = static_cast<NSServer::NSActor::pBound>(game_object);
-
+					bound->PackLoadPhysics(server_load_packet.get());
 					break;
 				}
 

@@ -15,13 +15,14 @@ namespace NSServer {
 			static CTurret* Create(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
-				, std::string name
-				, std::string data_path
+				, nlohmann::json& data
 			);
 
 			CTurret(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
+				, uint32_t id
+				, std::string name
 			);
 			~CTurret();
 

@@ -12,12 +12,11 @@ namespace NSClient {
 			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CPlayerTank>(game, world);
+
+			world->game_objects[id] = std::make_unique<CPlayerTank>(game, world, id, name);
 			world->dictionary[name] = id;
 			pPlayerTank player_tank = static_cast<pPlayerTank>(world->game_objects[id].get());
 
-			player_tank->SetId(id);
-			player_tank->SetName(name);
 			player_tank->SetResourcePath(data_path);
 			player_tank->Load(data_path);
 
@@ -27,8 +26,10 @@ namespace NSClient {
 		CPlayerTank::CPlayerTank(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CPlayerTank(game, world)
+			: NSEngine::NSActor::CPlayerTank(game, world, id, name)
 			, NSClient::NSCore::CGameObject(game, world) {
 		}
 
@@ -161,7 +162,7 @@ namespace NSClient {
 			}
 			else {
 				uint32_t latest_tick = world->latest_tick;
-				uint32_t server_tick = world->server_tick;
+				uint32_t server_tick = client_world->GetServerTick();
 				uint32_t tick_per_game_state = world->tick_per_game_state;
 
 				float interval = (float(latest_tick) - float(server_tick) - float(tick_per_game_state)) / float(tick_per_game_state);

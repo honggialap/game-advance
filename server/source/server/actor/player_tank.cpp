@@ -10,18 +10,19 @@ namespace NSServer {
 		pPlayerTank CPlayerTank::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CPlayerTank>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CPlayerTank>(game, world, id, name);
 			world->dictionary[name] = id;
 			pPlayerTank player_tank = static_cast<pPlayerTank>(world->game_objects[id].get());
 
-			player_tank->SetId(id);
-			player_tank->SetName(name);
-			player_tank->SetResourcePath(data_path);
-			player_tank->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			player_tank->SetResourcePath(resource_path);
+			
+			player_tank->Load(resource_path);
 
 			return player_tank;
 		}
@@ -29,8 +30,10 @@ namespace NSServer {
 		CPlayerTank::CPlayerTank(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CPlayerTank(game, world)
+			: NSEngine::NSActor::CPlayerTank(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

@@ -9,38 +9,26 @@ namespace NSClient {
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
 			, std::string name
-			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CBound>(game, world);
+			world->game_objects[id] = std::make_unique<CBound>(game, world, id, name);
 			world->dictionary[name] = id;
+
 			pBound bound = static_cast<pBound>(world->game_objects[id].get());
-
-			bound->SetId(id);
-			bound->SetName(name);
-			bound->SetResourcePath(data_path);
-			bound->Load(data_path);
-
 			return bound;
 		}
 
 		CBound::CBound(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CBound(game, world)
-			, NSClient::NSCore::CGameObject(game, world) {
+			:NSClient::NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CBound(game, world, id, name) {
 		}
 
 		CBound::~CBound() {
-		}
-
-		void CBound::Load(std::string data_path) {
-			NSEngine::NSActor::CBound::Load(data_path);
-		}
-
-		void CBound::Unload() {
-			NSEngine::NSActor::CBound::Unload();
 		}
 
 		void CBound::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {

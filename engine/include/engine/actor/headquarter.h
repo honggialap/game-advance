@@ -36,6 +36,8 @@ namespace NSEngine {
 			CHeadquarter(
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
+				, uint32_t id
+				, std::string name
 			);
 			~CHeadquarter();
 

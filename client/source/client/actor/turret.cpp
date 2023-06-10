@@ -12,12 +12,11 @@ namespace NSClient {
 			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CTurret>(game, world);
+
+			world->game_objects[id] = std::make_unique<CTurret>(game, world, id, name);
 			world->dictionary[name] = id;
 			pTurret turret = static_cast<pTurret>(world->game_objects[id].get());
 
-			turret->SetId(id);
-			turret->SetName(name);
 			turret->SetResourcePath(data_path);
 			turret->Load(data_path);
 
@@ -27,8 +26,10 @@ namespace NSClient {
 		CTurret::CTurret(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CTurret(game, world)
+			: NSEngine::NSActor::CTurret(game, world, id, name)
 			, NSClient::NSCore::CGameObject(game, world) {
 		}
 

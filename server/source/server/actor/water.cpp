@@ -8,18 +8,19 @@ namespace NSServer {
 		pWater CWater::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CWater>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CWater>(game, world, id, name);
 			world->dictionary[name] = id;
 			pWater water = static_cast<pWater>(world->game_objects[id].get());
 
-			water->SetId(id);
-			water->SetName(name);
-			water->SetResourcePath(data_path);
-			water->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			water->SetResourcePath(resource_path);
+
+			water->Load(resource_path);
 
 			return water;
 		}
@@ -27,8 +28,10 @@ namespace NSServer {
 		CWater::CWater(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CWater(game, world)
+			: NSEngine::NSActor::CWater(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 

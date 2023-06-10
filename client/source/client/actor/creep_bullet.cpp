@@ -12,12 +12,11 @@ namespace NSClient {
 			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CCreepBullet>(game, world);
+
+			world->game_objects[id] = std::make_unique<CCreepBullet>(game, world, id, name);
 			world->dictionary[name] = id;
 			pCreepBullet creep_bullet = static_cast<pCreepBullet>(world->game_objects[id].get());
 
-			creep_bullet->SetId(id);
-			creep_bullet->SetName(name);
 			creep_bullet->SetResourcePath(data_path);
 			creep_bullet->Load(data_path);
 
@@ -27,8 +26,10 @@ namespace NSClient {
 		CCreepBullet::CCreepBullet(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CCreepBullet(game, world)
+			: NSEngine::NSActor::CCreepBullet(game, world, id, name)
 			, NSClient::NSCore::CGameObject(game, world) {
 		}
 

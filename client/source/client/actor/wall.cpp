@@ -12,12 +12,11 @@ namespace NSClient {
 			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CWall>(game, world);
+
+			world->game_objects[id] = std::make_unique<CWall>(game, world, id, name);
 			world->dictionary[name] = id;
 			pWall wall = static_cast<pWall>(world->game_objects[id].get());
 
-			wall->SetId(id);
-			wall->SetName(name);
 			wall->SetResourcePath(data_path);
 			wall->Load(data_path);
 
@@ -27,8 +26,10 @@ namespace NSClient {
 		CWall::CWall(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CWall(game, world)
+			: NSEngine::NSActor::CWall(game, world, id, name)
 			, NSClient::NSCore::CGameObject(game, world) {
 		}
 

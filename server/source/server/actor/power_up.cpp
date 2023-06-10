@@ -8,18 +8,19 @@ namespace NSServer {
 		pPowerUp CPowerUp::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, std::string name
-			, std::string data_path
+			, nlohmann::json& data
 		) {
 			uint32_t id = world->game_object_id++;
-			world->game_objects[id] = std::make_unique<CPowerUp>(game, world);
+			std::string name = data.at("name");
+
+			world->game_objects[id] = std::make_unique<CPowerUp>(game, world, id, name);
 			world->dictionary[name] = id;
 			pPowerUp power_up = static_cast<pPowerUp>(world->game_objects[id].get());
 
-			power_up->SetId(id);
-			power_up->SetName(name);
-			power_up->SetResourcePath(data_path);
-			power_up->Load(data_path);
+			std::string resource_path = data.at("resource_path");
+			power_up->SetResourcePath(resource_path);
+			
+			power_up->Load(resource_path);
 
 			return power_up;
 		}
@@ -27,8 +28,10 @@ namespace NSServer {
 		CPowerUp::CPowerUp(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
+			, uint32_t id
+			, std::string name
 		)
-			: NSEngine::NSActor::CPowerUp(game, world)
+			: NSEngine::NSActor::CPowerUp(game, world, id, name)
 			, NSServer::NSCore::CGameObject(game, world) {
 		}
 
