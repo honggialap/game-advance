@@ -70,6 +70,12 @@ namespace NSEngine {
 			}
 		}
 
+		void CHeadquarter::PackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
+		void CHeadquarter::UnpackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
 		void CHeadquarter::Serialize(uint32_t tick) {
 			auto& records_container = world->records[tick];
 			records_container.push_back(
@@ -81,6 +87,22 @@ namespace NSEngine {
 
 		void CHeadquarter::Deserialize(NSEngine::NSCore::pRecord record) {
 			auto headquarter_record = static_cast<pHeadquarterRecord>(record);
+		}
+
+		void CHeadquarter::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto headquarter_record = static_cast<pHeadquarterRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CHeadquarter::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto game_master_record = static_cast<pHeadquarterRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CHeadquarter::Update(float elapsed) {

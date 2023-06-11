@@ -70,6 +70,14 @@ namespace NSEngine {
 			}
 		}
 
+		void CTurret::PackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
+		void CTurret::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
 		void CTurret::Serialize(uint32_t tick) {
 			auto& records_container = world->records[tick];
 			records_container.push_back(
@@ -81,6 +89,22 @@ namespace NSEngine {
 
 		void CTurret::Deserialize(NSEngine::NSCore::pRecord record) {
 			auto turret_record = static_cast<pTurretRecord>(record);
+		}
+
+		void CTurret::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto turret_record = static_cast<pTurretRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CTurret::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto turret_record = static_cast<pTurretRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CTurret::Update(float elapsed) {

@@ -10,6 +10,16 @@ namespace NSEngine {
 
 		CPlayerTankRecord::CPlayerTankRecord(
 			uint32_t id
+		)
+			: NSEngine::NSCore::CRecord(id)
+			, position_x(0.0f), position_y(0.0f)
+			, velocity_x(0.0f), velocity_y(0.0f)
+			, movement_x(0), movement_y(0) {
+			actor_type = EActorType::PLAYER_TANK;
+		}
+
+		CPlayerTankRecord::CPlayerTankRecord(
+			uint32_t id
 			, float position_x, float position_y
 			, float velocity_x, float velocity_y
 			, int32_t movement_x, int32_t movement_y
@@ -83,6 +93,12 @@ namespace NSEngine {
 			}
 		}
 
+		void CPlayerTank::PackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
+		void CPlayerTank::UnpackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
 		void CPlayerTank::Serialize(uint32_t tick) {
 			float position_x, position_y;
 			GetPosition(position_x, position_y);
@@ -109,6 +125,22 @@ namespace NSEngine {
 			SetPosition(tank_record->position_x, tank_record->position_y);
 			SetVelocity(tank_record->velocity_x, tank_record->velocity_y);
 			SetMovement(tank_record->movement_x, tank_record->movement_y);
+		}
+
+		void CPlayerTank::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto player_tank_record = static_cast<pPlayerTankRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CPlayerTank::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto player_tank_record = static_cast<pPlayerTankRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CPlayerTank::HandleInput(uint32_t tick) {

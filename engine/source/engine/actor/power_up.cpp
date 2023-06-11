@@ -8,6 +8,14 @@ namespace NSEngine {
 
 		CPowerUpRecord::CPowerUpRecord(
 			uint32_t id
+		)
+			: NSEngine::NSCore::CRecord(id)
+			, position_x(0.0f), position_y(0.0f) {
+			actor_type = EActorType::POWER_UP;
+		}
+
+		CPowerUpRecord::CPowerUpRecord(
+			uint32_t id
 			, float position_x, float position_y
 		)
 			: NSEngine::NSCore::CRecord(id)
@@ -74,6 +82,12 @@ namespace NSEngine {
 			}
 		}
 
+		void CPowerUp::PackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
+		void CPowerUp::UnpackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
 		void CPowerUp::Serialize(uint32_t tick) {
 			float position_x, position_y;
 			GetPosition(position_x, position_y);
@@ -90,6 +104,22 @@ namespace NSEngine {
 		void CPowerUp::Deserialize(NSEngine::NSCore::pRecord record) {
 			auto power_up_record = static_cast<pPowerUpRecord>(record);
 			SetPosition(power_up_record->position_x, power_up_record->position_y);
+		}
+
+		void CPowerUp::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto power_up_record = static_cast<pPowerUpRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CPowerUp::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto player_tank_record = static_cast<pPowerUpRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CPowerUp::Update(float elapsed) {

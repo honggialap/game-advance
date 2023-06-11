@@ -12,10 +12,13 @@ namespace NSServer {
 		) {
 			uint32_t id = world->game_object_id++;
 			std::string name = data.at("name");
-
 			world->game_objects[id] = std::make_unique<CCreepBullet>(game, world, id, name);
 			world->dictionary[name] = id;
+
 			pCreepBullet creep_bullet = static_cast<pCreepBullet>(world->game_objects[id].get());
+
+			auto& physics_data = data.at("physics");
+			creep_bullet->CreatePhysics(physics_data);
 
 			std::string resource_path = data.at("resource_path");
 			creep_bullet->SetResourcePath(resource_path);

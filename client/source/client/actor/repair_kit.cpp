@@ -9,17 +9,12 @@ namespace NSClient {
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
 			, std::string name
-			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-
 			world->game_objects[id] = std::make_unique<CRepairKit>(game, world, id, name);
 			world->dictionary[name] = id;
+
 			pRepairKit repair_kit = static_cast<pRepairKit>(world->game_objects[id].get());
-
-			repair_kit->SetResourcePath(data_path);
-			repair_kit->Load(data_path);
-
 			return repair_kit;
 		}
 

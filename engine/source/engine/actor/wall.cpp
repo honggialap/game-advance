@@ -70,6 +70,14 @@ namespace NSEngine {
 			}
 		}
 
+		void CWall::PackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
+		void CWall::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
 		void CWall::Serialize(uint32_t tick) {
 			auto& records_container = world->records[tick];
 			records_container.push_back(
@@ -81,6 +89,22 @@ namespace NSEngine {
 
 		void CWall::Deserialize(NSEngine::NSCore::pRecord record) {
 			auto wall_record = static_cast<pWallRecord>(record);
+		}
+
+		void CWall::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto wall_record = static_cast<pWallRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CWall::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto wall_record = static_cast<pWallRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CWall::Update(float elapsed) {

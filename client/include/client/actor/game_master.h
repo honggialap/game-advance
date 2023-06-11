@@ -14,9 +14,8 @@ namespace NSClient {
 		public:
 			static CGameMaster* Create(
 				NSEngine::NSCore::pGame game
-				, NSEngine::NSCore::pWorld world,
-				std::string name,
-				std::string data_path
+				, NSEngine::NSCore::pWorld world
+				, std::string name
 				);
 
 			CGameMaster(

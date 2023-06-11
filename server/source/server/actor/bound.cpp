@@ -17,15 +17,8 @@ namespace NSServer {
 
 			pBound bound = static_cast<pBound>(world->game_objects[id].get());
 
-			auto& physics = data.at("physics");
-			b2BodyType body_type = b2BodyType(physics.at("body_type"));
-			float position_x = float(physics.at("x"));
-			float position_y = float(physics.at("y"));
-			float width = float(physics.at("width"));
-			float height = float(physics.at("height"));
-			uint16_t category_bits = uint16_t(physics.at("category_bits"));
-			uint16_t mask_bits = uint16_t(physics.at("mask_bits"));
-			bound->CreatePhysics(body_type, position_x, position_y, width, height, category_bits, mask_bits);
+			auto& physics_data = data.at("physics");
+			bound->CreatePhysics(physics_data);
 
 			return bound;
 		}

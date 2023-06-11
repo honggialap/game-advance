@@ -8,6 +8,15 @@ namespace NSEngine {
 
 		CPlayerBulletRecord::CPlayerBulletRecord(
 			uint32_t id
+		)
+			: NSEngine::NSCore::CRecord(id)
+			, position_x(0.0f), position_y(0.0f)
+			, velocity_x(0.0f), velocity_y(0.0f) {
+			actor_type = EActorType::PLAYER_BULLET;
+		}
+
+		CPlayerBulletRecord::CPlayerBulletRecord(
+			uint32_t id
 			, float position_x, float position_y
 			, float velocity_x, float velocity_y
 		)
@@ -76,6 +85,12 @@ namespace NSEngine {
 			}
 		}
 
+		void CPlayerBullet::PackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
+		void CPlayerBullet::UnpackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
 		void CPlayerBullet::Serialize(uint32_t tick) {
 			float position_x, position_y;
 			GetPosition(position_x, position_y);
@@ -97,6 +112,22 @@ namespace NSEngine {
 			auto player_bullet = static_cast<pPlayerBulletRecord>(record);
 			SetPosition(player_bullet->position_x, player_bullet->position_y);
 			SetVelocity(player_bullet->velocity_x, player_bullet->velocity_y);
+		}
+
+		void CPlayerBullet::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto player_bullet_record = static_cast<pPlayerBulletRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CPlayerBullet::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto player_bullet_record = static_cast<pPlayerBulletRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CPlayerBullet::Update(float elapsed) {

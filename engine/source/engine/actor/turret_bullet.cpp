@@ -8,6 +8,14 @@ namespace NSEngine {
 
 		CTurretBulletRecord::CTurretBulletRecord(
 			uint32_t id
+		) : NSEngine::NSCore::CRecord(id)
+			, position_x(0.0f), position_y(0.0f)
+			, velocity_x(0.0f), velocity_y(0.0f) {
+			actor_type = EActorType::TURRET_BULLET;
+		}
+
+		CTurretBulletRecord::CTurretBulletRecord(
+			uint32_t id
 			, float position_x, float position_y
 			, float velocity_x, float velocity_y
 		) : NSEngine::NSCore::CRecord(id)
@@ -75,6 +83,14 @@ namespace NSEngine {
 			}
 		}
 
+		void CTurretBullet::PackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
+		void CTurretBullet::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
 		void CTurretBullet::Serialize(uint32_t tick) {
 			float position_x, position_y;
 			GetPosition(position_x, position_y);
@@ -96,6 +112,22 @@ namespace NSEngine {
 			auto turret_bullet_record = static_cast<pTurretBulletRecord>(record);
 			SetPosition(turret_bullet_record->position_x, turret_bullet_record->position_y);
 			SetVelocity(turret_bullet_record->velocity_x, turret_bullet_record->velocity_y);
+		}
+
+		void CTurretBullet::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto turret_bullet_record = static_cast<pTurretBulletRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CTurretBullet::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto turret_bullet_record = static_cast<pTurretBulletRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CTurretBullet::Update(float elapsed) {

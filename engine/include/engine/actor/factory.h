@@ -18,7 +18,16 @@ namespace NSEngine {
 
 		struct CFactoryRecord 
 			: public NSEngine::NSCore::CRecord {
-			CFactoryRecord(uint32_t id);
+			float a;
+
+			CFactoryRecord(
+				uint32_t id
+			);
+
+			CFactoryRecord(
+				uint32_t id
+				, float a
+			);
 		};
 		typedef CFactoryRecord* pFactoryRecord;
 
@@ -44,8 +53,21 @@ namespace NSEngine {
 			void Load(std::string data_path) override;
 			void Unload() override;
 
+			void PackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+			void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+
 			void Serialize(uint32_t tick) override;
 			void Deserialize(NSEngine::NSCore::pRecord record) override;
+
+			void PackRecord(
+				NSEngine::NSNetworks::CPacket* packet
+				, NSEngine::NSCore::pRecord record
+			) override;
+
+			void UnpackRecord(
+				NSEngine::NSNetworks::CPacket* packet
+				, NSEngine::NSCore::pRecord record
+			) override;
 
 			void Update(float elapsed) override;
 			void Render(sf::RenderWindow& window) override;

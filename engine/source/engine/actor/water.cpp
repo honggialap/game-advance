@@ -65,6 +65,14 @@ namespace NSEngine {
 			}
 		}
 
+		void CWater::PackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
+		void CWater::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
 		void CWater::Update(float elapsed) {
 		}
 

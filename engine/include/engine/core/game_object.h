@@ -4,6 +4,7 @@
 
 #include "engine/common.h"
 #include "engine/shared.h"
+#include "engine/networks/packet.h"
 
 namespace NSEngine {
 	namespace NSCore {
@@ -44,6 +45,9 @@ namespace NSEngine {
 
 			void Destroy();
 			bool IsDestroyed();
+
+			virtual void PackLoad(NSEngine::NSNetworks::CPacket* packet) = 0;
+			virtual void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) = 0;
 		};
 		typedef CGameObject* pGameObject;
 		typedef std::unique_ptr<CGameObject> upGameObject;

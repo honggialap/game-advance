@@ -12,6 +12,17 @@ namespace NSEngine {
 			physics_world = nullptr;
 		}
 
+		void CPhysics::CreatePhysics(nlohmann::json& physics_data){
+			b2BodyType body_type = b2BodyType(physics_data.at("body_type"));
+			float position_x = float(physics_data.at("x"));
+			float position_y = float(physics_data.at("y"));
+			float width = float(physics_data.at("width"));
+			float height = float(physics_data.at("height"));
+			uint16_t category_bits = uint16_t(physics_data.at("category_bits"));
+			uint16_t mask_bits = uint16_t(physics_data.at("mask_bits"));
+			CreatePhysics(body_type, position_x, position_y, width, height, category_bits, mask_bits);
+		}
+
 		void CPhysics::CreatePhysics(
 			b2BodyType body_type
 			, float position_x, float position_y

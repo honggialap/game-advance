@@ -9,16 +9,12 @@ namespace NSClient {
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
 			, std::string name
-			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CTree>(game, world, id, name);
 			world->dictionary[name] = id;
+
 			pTree tree = static_cast<pTree>(world->game_objects[id].get());
-
-			tree->SetResourcePath(data_path);
-			tree->Load(data_path);
-
 			return tree;
 		}
 

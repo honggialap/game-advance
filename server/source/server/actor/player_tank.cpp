@@ -19,6 +19,9 @@ namespace NSServer {
 			world->dictionary[name] = id;
 			pPlayerTank player_tank = static_cast<pPlayerTank>(world->game_objects[id].get());
 
+			auto& physics_data = data.at("physics");
+			player_tank->CreatePhysics(physics_data);
+
 			std::string resource_path = data.at("resource_path");
 			player_tank->SetResourcePath(resource_path);
 			

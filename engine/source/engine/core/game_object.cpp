@@ -12,7 +12,9 @@ namespace NSEngine {
 			: game(game)
 			, world(world) 
 			, id(id)
-			, name(name) {
+			, name(name)
+			, is_active(true)
+			, is_destroyed(false) {
 			type = EActorType::INVALID_ACTOR;
 		}
 

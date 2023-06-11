@@ -26,6 +26,7 @@ namespace NSEngine {
 			CPhysics(b2World* world);
 			virtual ~CPhysics() = 0;
 
+			void CreatePhysics(nlohmann::json& physics_data);
 			void CreatePhysics(
 				b2BodyType body_type
 				, float position_x, float position_y

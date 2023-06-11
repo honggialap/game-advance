@@ -32,6 +32,9 @@ namespace NSEngine {
 			void Load(std::string data_path) override;
 			void Unload() override;
 
+			void PackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+			void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+
 			void Update(float elapsed) override;
 			void Render(sf::RenderWindow& window) override;
 

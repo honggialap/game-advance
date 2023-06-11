@@ -9,17 +9,12 @@ namespace NSClient {
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
 			, std::string name
-			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-
 			world->game_objects[id] = std::make_unique<CCreepTank>(game, world, id, name);
 			world->dictionary[name] = id;
+
 			pCreepTank creep_tank = static_cast<pCreepTank>(world->game_objects[id].get());
-
-			creep_tank->SetResourcePath(data_path);
-			creep_tank->Load(data_path);
-
 			return creep_tank;
 		}
 

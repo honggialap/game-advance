@@ -8,6 +8,14 @@ namespace NSEngine {
 
 		CRepairKitRecord::CRepairKitRecord(
 			uint32_t id
+		)
+			: NSEngine::NSCore::CRecord(id)
+			, position_x(0.0f), position_y(0.0f) {
+			actor_type = EActorType::REPAIR_KIT;
+		}
+
+		CRepairKitRecord::CRepairKitRecord(
+			uint32_t id
 			, float position_x, float position_y
 		)
 			: NSEngine::NSCore::CRecord(id)
@@ -75,6 +83,12 @@ namespace NSEngine {
 			}
 		}
 
+		void CRepairKit::PackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
+		void CRepairKit::UnpackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		}
+
 		void CRepairKit::Serialize(uint32_t tick) {
 			float position_x, position_y;
 			GetPosition(position_x, position_y);
@@ -91,6 +105,22 @@ namespace NSEngine {
 		void CRepairKit::Deserialize(NSEngine::NSCore::pRecord record) {
 			auto repair_kit_record = static_cast<pRepairKitRecord>(record);
 			SetPosition(repair_kit_record->position_x, repair_kit_record->position_y);
+		}
+
+		void CRepairKit::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto repair_kit_record = static_cast<pRepairKitRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CRepairKit::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto repair_kit_record = static_cast<pRepairKitRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CRepairKit::Update(float elapsed) {

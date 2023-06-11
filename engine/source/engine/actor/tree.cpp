@@ -55,6 +55,14 @@ namespace NSEngine {
 			}
 		}
 
+		void CTree::PackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
+		void CTree::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
 		void CTree::Update(float elapsed) {
 		}
 

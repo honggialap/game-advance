@@ -27,6 +27,10 @@ namespace NSEngine {
 
 			CPlayerTankRecord(
 				uint32_t id
+			);
+
+			CPlayerTankRecord(
+				uint32_t id
 				, float position_x, float position_y
 				, float velocity_x, float velocity_y
 				, int32_t movement_x, int32_t movement_y
@@ -90,6 +94,9 @@ namespace NSEngine {
 			void Load(std::string data_path) override;
 			void Unload() override;
 
+			void PackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+			void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+
 			void Serialize(uint32_t tick) override;
 			void Deserialize(NSEngine::NSCore::pRecord record) override;
 
@@ -98,6 +105,16 @@ namespace NSEngine {
 
 			void Update(float elapsed) override;
 			void Render(sf::RenderWindow& window) override;
+
+			void PackRecord(
+				NSEngine::NSNetworks::CPacket* packet
+				, NSEngine::NSCore::pRecord record
+			) override;
+
+			void UnpackRecord(
+				NSEngine::NSNetworks::CPacket* packet
+				, NSEngine::NSCore::pRecord record
+			) override;
 
 			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
 			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;

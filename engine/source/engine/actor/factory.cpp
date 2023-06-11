@@ -6,8 +6,20 @@
 namespace NSEngine {
 	namespace NSActor {
 
-		CFactoryRecord::CFactoryRecord(uint32_t id)
-			: NSEngine::NSCore::CRecord(id) {
+		CFactoryRecord::CFactoryRecord(
+			uint32_t id
+		)
+			: NSEngine::NSCore::CRecord(id)
+			, a(0.0f) {
+			actor_type = EActorType::FACTORY;
+		}
+
+		CFactoryRecord::CFactoryRecord(
+			uint32_t id
+			, float a
+		)
+			: NSEngine::NSCore::CRecord(id) 
+			, a(a) {
 			actor_type = EActorType::FACTORY;
 		}
 
@@ -70,6 +82,14 @@ namespace NSEngine {
 			}
 		}
 
+		void CFactory::PackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
+		void CFactory::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
+		{
+		}
+
 		void CFactory::Serialize(uint32_t tick) {
 			auto& records_container = world->records[tick];
 			records_container.push_back(
@@ -81,6 +101,22 @@ namespace NSEngine {
 
 		void CFactory::Deserialize(NSEngine::NSCore::pRecord record) {
 			auto factory_record = static_cast<pFactoryRecord>(record);
+		}
+
+		void CFactory::PackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto factory_record = static_cast<pFactoryRecord>(record);
+			//*packet << factory_record->a;
+		}
+
+		void CFactory::UnpackRecord(
+			NSEngine::NSNetworks::CPacket* packet
+			, NSEngine::NSCore::pRecord record
+		) {
+			auto factory_record = static_cast<pFactoryRecord>(record);
+			//*packet >> factory_record->a;
 		}
 
 		void CFactory::Update(float elapsed) {

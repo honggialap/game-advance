@@ -22,6 +22,9 @@ namespace NSEngine {
 			);
 			~CBound();
 
+			void PackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+			void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+
 			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
 			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};

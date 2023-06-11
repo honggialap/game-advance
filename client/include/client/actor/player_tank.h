@@ -21,7 +21,6 @@ namespace NSClient {
 				NSEngine::NSCore::pGame game
 				, NSEngine::NSCore::pWorld world
 				, std::string name
-				, std::string data_path
 			);
 
 			CPlayerTank(

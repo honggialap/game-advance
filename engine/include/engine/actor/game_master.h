@@ -13,7 +13,16 @@ namespace NSEngine {
 
 		struct CGameMasterRecord 
 			: public NSEngine::NSCore::CRecord {
-			CGameMasterRecord(uint32_t id);
+			float a = 0.0f;
+			
+			CGameMasterRecord(
+				uint32_t id
+			);
+
+			CGameMasterRecord(
+				uint32_t id
+				, float a
+			);
 		};
 		typedef CGameMasterRecord* pGameMasterRecord;
 
@@ -34,8 +43,21 @@ namespace NSEngine {
 			void Load(std::string data_path) override;
 			void Unload() override;
 
+			void PackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+			void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+
 			void Serialize(uint32_t tick) override;
 			void Deserialize(NSEngine::NSCore::pRecord record) override;
+
+			void PackRecord(
+				NSEngine::NSNetworks::CPacket* packet
+				, NSEngine::NSCore::pRecord record
+			) override;
+
+			void UnpackRecord(
+				NSEngine::NSNetworks::CPacket* packet
+				, NSEngine::NSCore::pRecord record
+			) override;
 
 			void Update(float elapsed) override;
 		};

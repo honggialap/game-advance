@@ -4,6 +4,7 @@
 
 #include "engine/common.h"
 #include "engine/core/game_object.h"
+#include "engine/core/record.h"
 
 namespace NSServer {
 	namespace NSCore {

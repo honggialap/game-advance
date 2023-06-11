@@ -9,17 +9,12 @@ namespace NSClient {
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
 			, std::string name
-			, std::string data_path
 		) {
 			uint32_t id = world->game_object_id++;
-
 			world->game_objects[id] = std::make_unique<CPlayerTank>(game, world, id, name);
 			world->dictionary[name] = id;
+
 			pPlayerTank player_tank = static_cast<pPlayerTank>(world->game_objects[id].get());
-
-			player_tank->SetResourcePath(data_path);
-			player_tank->Load(data_path);
-
 			return player_tank;
 		}
 

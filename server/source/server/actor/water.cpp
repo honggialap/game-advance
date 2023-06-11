@@ -12,10 +12,13 @@ namespace NSServer {
 		) {
 			uint32_t id = world->game_object_id++;
 			std::string name = data.at("name");
-
 			world->game_objects[id] = std::make_unique<CWater>(game, world, id, name);
 			world->dictionary[name] = id;
+
 			pWater water = static_cast<pWater>(world->game_objects[id].get());
+
+			auto& physics_data = data.at("physics");
+			water->CreatePhysics(physics_data);
 
 			std::string resource_path = data.at("resource_path");
 			water->SetResourcePath(resource_path);
