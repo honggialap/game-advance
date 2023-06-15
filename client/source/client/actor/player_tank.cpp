@@ -24,19 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CPlayerTank(game, world, id, name)
-			, NSClient::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world) 
+			, NSEngine::NSActor::CPlayerTank(game, world, id, name) {
 		}
 
 		CPlayerTank::~CPlayerTank() {
-		}
-
-		void CPlayerTank::Load(std::string data_path) {
-			NSEngine::NSActor::CPlayerTank::Load(data_path);
-		}
-
-		void CPlayerTank::Unload() {
-			NSEngine::NSActor::CPlayerTank::Unload();
 		}
 
 		void CPlayerTank::HandleInput(uint32_t tick) {
@@ -121,21 +113,6 @@ namespace NSClient {
 			}
 		}
 
-		void CPlayerTank::ExecuteCommand(NSEngine::NSCore::pCommand command) {
-			switch (command->command_type) {
-			case NSEngine::ECommandType::PLAYER_TANK_MOVE: {
-				auto move_command = static_cast<NSEngine::NSActor::pMoveCommand>(command);
-				SetMovement(move_command->x, move_command->y);
-				break;
-			}
-
-			case NSEngine::ECommandType::PLAYER_TANK_SHOOT: {
-				auto shoot_command = static_cast<NSEngine::NSActor::CShootCommand*>(command);
-				break;
-			}
-			}
-		}
-
 		void CPlayerTank::Update(float elapsed) {
 			b2Vec2 current_movement(
 				speed * movement.x / 30.0f,
@@ -172,14 +149,6 @@ namespace NSClient {
 			}
 
 			window.draw(sprite);
-		}
-
-		void CPlayerTank::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CPlayerTank::OnCollisionEnter(other);
-		}
-
-		void CPlayerTank::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CPlayerTank::OnCollisionExit(other);
 		}
 
 		void CPlayerTank::SendMoveCommand(uint32_t tick, NSEngine::NSActor::CMoveCommand move_command) {

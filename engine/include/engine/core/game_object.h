@@ -27,6 +27,9 @@ namespace NSEngine {
 			bool is_active;
 			bool is_destroyed;
 
+			uint32_t parent_id;
+			std::vector<uint32_t> children_id;
+
 		public:
 			CGameObject(
 				pGame game
@@ -45,9 +48,6 @@ namespace NSEngine {
 
 			void Destroy();
 			bool IsDestroyed();
-
-			virtual void PackLoad(NSEngine::NSNetworks::CPacket* packet) = 0;
-			virtual void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) = 0;
 		};
 		typedef CGameObject* pGameObject;
 		typedef std::unique_ptr<CGameObject> upGameObject;

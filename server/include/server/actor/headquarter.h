@@ -26,14 +26,6 @@ namespace NSServer {
 			);
 			~CHeadquarter();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
-
-			void Update(float elapsed) override;
-			void Render(sf::RenderWindow& window) override;
-
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};
 		typedef CHeadquarter* pHeadquarter;
 

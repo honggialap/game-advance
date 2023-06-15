@@ -22,8 +22,7 @@ namespace NSServer {
 
 			std::string resource_path = data.at("resource_path");
 			power_up->SetResourcePath(resource_path);
-			
-			power_up->Load(resource_path);
+			power_up->LoadResource();
 
 			return power_up;
 		}
@@ -34,43 +33,11 @@ namespace NSServer {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CPowerUp(game, world, id, name)
-			, NSServer::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CPowerUp(game, world, id, name) {
 		}
 
 		CPowerUp::~CPowerUp() {
-		}
-
-		void CPowerUp::Load(std::string data_path) {
-			NSEngine::NSActor::CPowerUp::Load(data_path);
-		}
-
-		void CPowerUp::Unload() {
-			NSEngine::NSActor::CPowerUp::Unload();
-		}
-
-		void CPowerUp::Update(float elapsed) {
-		}
-
-		void CPowerUp::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CPowerUp::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CPowerUp::OnCollisionEnter(other);
-		}
-
-		void CPowerUp::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CPowerUp::OnCollisionExit(other);
 		}
 
 	}

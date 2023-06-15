@@ -3,14 +3,16 @@
 #define __SERVER__ACTOR__CREEP_TANK_H__
 
 #include "engine/actor/creep_tank.h"
+#include "engine/component/input_handler.h"
 #include "server/core/game_object.h"
 
 namespace NSServer {
 	namespace NSActor {
 
 		class CCreepTank
-			: public NSEngine::NSActor::CCreepTank
-			, public NSServer::NSCore::CGameObject {
+			: public NSCore::CGameObject
+			, public NSEngine::NSActor::CCreepTank
+			, public NSEngine::NSComponent::CInputHandler {
 		public:
 			static CCreepTank* Create(
 				NSEngine::NSCore::pGame game
@@ -26,14 +28,8 @@ namespace NSServer {
 			);
 			~CCreepTank();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
+			void HandleInput(uint32_t tick) override;
 
-			void Update(float elapsed) override;
-			void Render(sf::RenderWindow& window) override;
-
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};
 		typedef CCreepTank* pCreepTank;
 

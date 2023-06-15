@@ -10,7 +10,7 @@ namespace NSServer {
 
 		class CBound
 			: public NSEngine::NSActor::CBound
-			, public NSServer::NSCore::CGameObject {
+			, public NSCore::CGameObject {
 		public:
 			static CBound* Create(
 				NSEngine::NSCore::pGame game
@@ -26,8 +26,6 @@ namespace NSServer {
 			);
 			~CBound();
 
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};
 		typedef CBound* pBound;
 

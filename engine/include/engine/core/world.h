@@ -14,6 +14,7 @@
 #include "engine/component/recordable.h"
 #include "engine/component/physics.h"
 #include "engine/component/player_control.h"
+#include "engine/component/input_handler.h"
 
 namespace NSEngine {
 	namespace NSCore {

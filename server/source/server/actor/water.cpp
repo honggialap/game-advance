@@ -22,8 +22,7 @@ namespace NSServer {
 
 			std::string resource_path = data.at("resource_path");
 			water->SetResourcePath(resource_path);
-
-			water->Load(resource_path);
+			water->LoadResource();
 
 			return water;
 		}
@@ -34,43 +33,11 @@ namespace NSServer {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CWater(game, world, id, name)
-			, NSServer::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CWater(game, world, id, name) {
 		}
 
 		CWater::~CWater() {
-		}
-
-		void CWater::Load(std::string data_path) {
-			NSEngine::NSActor::CWater::Load(data_path);
-		}
-
-		void CWater::Unload() {
-			NSEngine::NSActor::CWater::Unload();
-		}
-
-		void CWater::Update(float elapsed) {
-		}
-
-		void CWater::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CWater::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CWater::OnCollisionEnter(other);
-		}
-
-		void CWater::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CWater::OnCollisionExit(other);
 		}
 
 	}

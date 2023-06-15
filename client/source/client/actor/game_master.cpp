@@ -24,22 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CGameMaster(game, world, id, name)
-			, NSClient::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CGameMaster(game, world, id, name) {
 		}
 
 		CGameMaster::~CGameMaster() {
-		}
-
-		void CGameMaster::Load(std::string data_path) {
-			NSEngine::NSActor::CGameMaster::Load(data_path);
-		}
-
-		void CGameMaster::Unload() {
-			NSEngine::NSActor::CGameMaster::Unload();
-		}
-
-		void CGameMaster::Update(float elapsed) {
 		}
 
 	}

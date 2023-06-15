@@ -1,5 +1,4 @@
 #include "engine/actor/creep_bullet.h"
-
 #include "engine/core/game.h"
 #include "engine/core/world.h"
 
@@ -9,7 +8,7 @@ namespace NSEngine {
 		CCreepBulletRecord::CCreepBulletRecord(
 			uint32_t id
 		)
-			: NSEngine::NSCore::CRecord(id) 
+			: NSEngine::NSCore::CRecord(id)
 			, position_x(0.0f), position_y(0.0f)
 			, velocity_x(0.0f), velocity_y(0.0f) {
 			actor_type = EActorType::CREEP_BULLET;
@@ -32,7 +31,7 @@ namespace NSEngine {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSCore::CGameObject(game, world, id, name) 
+			: NSEngine::NSCore::CGameObject(game, world, id, name)
 			, NSEngine::NSComponent::CPhysics(world->GetPhysics()) {
 			type = EActorType::CREEP_BULLET;
 		}
@@ -40,22 +39,16 @@ namespace NSEngine {
 		CCreepBullet::~CCreepBullet() {
 		}
 
-		void CCreepBullet::Load(std::string data_path) {
-			//std::ifstream data_file(data_path);
-			//nlohmann::json data = nlohmann::json::parse(data_file);
+		void CCreepBullet::LoadResource(){
+			std::ifstream data_file(resource_path);
+			nlohmann::json data = nlohmann::json::parse(data_file);
 
 			texture.loadFromFile("data/resources/textures/sample_bullet1.png");
 			sprite.setTexture(texture);
 			sprite.setOrigin(16, 16);
 		}
 
-		void CCreepBullet::Unload() {
-		}
-
-		void CCreepBullet::PackLoad(NSEngine::NSNetworks::CPacket* packet){
-		}
-
-		void CCreepBullet::UnpackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		void CCreepBullet::UnloadResource() {
 		}
 
 		void CCreepBullet::Serialize(uint32_t tick) {
@@ -92,15 +85,17 @@ namespace NSEngine {
 			*packet << creep_bullet_record->velocity_y;
 		}
 
-		void CCreepBullet::UnpackRecord(
+		NSEngine::NSCore::pRecord CCreepBullet::UnpackRecord(
 			NSEngine::NSNetworks::CPacket* packet
-			, NSEngine::NSCore::pRecord record
 		) {
-			auto creep_bullet_record = static_cast<pCreepBulletRecord>(record);
-			*packet >> creep_bullet_record->position_x;
-			*packet >> creep_bullet_record->position_y;
-			*packet >> creep_bullet_record->velocity_x;
-			*packet >> creep_bullet_record->velocity_y;
+			auto record = new CCreepBulletRecord(id);
+
+			*packet >> record->position_x;
+			*packet >> record->position_y;
+			*packet >> record->velocity_x;
+			*packet >> record->velocity_y;
+
+			return record;
 		}
 
 		void CCreepBullet::Update(float elapsed) {
@@ -123,6 +118,16 @@ namespace NSEngine {
 		}
 
 		void CCreepBullet::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
+		}
+
+		void CCreepBullet::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			PackLoadPhysics(packet);
+			PackLoadResource(packet);
+		}
+
+		void CCreepBullet::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			UnpackLoadPhysics(packet);
+			UnpackLoadResource(packet);
 		}
 
 	}

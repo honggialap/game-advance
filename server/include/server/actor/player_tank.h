@@ -9,8 +9,8 @@ namespace NSServer {
 	namespace NSActor {
 
 		class CPlayerTank
-			: public NSEngine::NSActor::CPlayerTank
-			, public NSServer::NSCore::CGameObject {
+			: public NSCore::CGameObject
+			, public NSEngine::NSActor::CPlayerTank {
 		public:
 			static CPlayerTank* Create(
 				NSEngine::NSCore::pGame game
@@ -26,16 +26,6 @@ namespace NSServer {
 			);
 			~CPlayerTank();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
-
-			void HandleInput(uint32_t tick) override;
-
-			void Update(float elapsed) override;
-			void Render(sf::RenderWindow& window) override;
-
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};
 		typedef CPlayerTank* pPlayerTank;
 

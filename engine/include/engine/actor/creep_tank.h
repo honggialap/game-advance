@@ -4,12 +4,17 @@
 
 #include "engine/core/game_object.h"
 
-#include "engine/component/loadable.h"
+#include "engine/component/networks_loadable.h"
 #include "engine/component/updatable.h"
-#include "engine/component/renderable.h"
-#include "engine/component/recordable.h"
 #include "engine/component/physics.h"
+#include "engine/component/commandable.h"
+#include "engine/component/recordable.h"
+#include "engine/component/pooler.h"
+#include "engine/component/poolable.h"
+#include "engine/component/resource_loadable.h"
 #include "engine/component/sprite.h"
+#include "engine/component/renderable.h"
+#include "engine/component/ai_control.h"
 #include "engine/component/team.h"
 #include "engine/component/health.h"
 
@@ -17,7 +22,7 @@ namespace NSEngine {
 	namespace NSActor {
 
 		struct CCreepTankRecord
-			: public NSEngine::NSCore::CRecord {
+			: public NSCore::CRecord {
 			float position_x, position_y;
 			float velocity_x, velocity_y;
 
@@ -34,48 +39,55 @@ namespace NSEngine {
 		typedef CCreepTankRecord* pCreepTankRecord;
 
 		class CCreepTank
-			: public NSEngine::NSCore::CGameObject
-			, public NSEngine::NSComponent::CLoadable
-			, public NSEngine::NSComponent::CUpdatable
-			, public NSEngine::NSComponent::CRenderable
-			, public NSEngine::NSComponent::CRecordable
-			, public NSEngine::NSComponent::CPhysics
-			, public NSEngine::NSComponent::CSprite
-			, public NSEngine::NSComponent::CTeam
-			, public NSEngine::NSComponent::CHealth {
+			: public NSCore::CGameObject
+			, public NSComponent::CNetworksLoadable
+			, public NSComponent::CUpdatable
+			, public NSComponent::CPhysics
+			, public NSComponent::CCommandable
+			, public NSComponent::CRecordable
+			, public NSComponent::CPooler
+			, public NSComponent::CPoolable
+			, public NSComponent::CResourceLoadable
+			, public NSComponent::CSprite
+			, public NSComponent::CRenderable
+			, public NSComponent::CAIControl
+			, public NSComponent::CTeam
+			, public NSComponent::CHealth {
 		public:
 			CCreepTank(
-				NSEngine::NSCore::pGame game
-				, NSEngine::NSCore::pWorld world
+				NSCore::pGame game
+				, NSCore::pWorld world
 				, uint32_t id
 				, std::string name
 			);
 			~CCreepTank();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
-
-			void PackLoad(NSEngine::NSNetworks::CPacket* packet) override;
-			void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+			void LoadResource() override;
+			void UnloadResource() override;
 
 			void Serialize(uint32_t tick) override;
-			void Deserialize(NSEngine::NSCore::pRecord record) override;
+			void Deserialize(NSCore::pRecord record) override;
 
 			void PackRecord(
-				NSEngine::NSNetworks::CPacket* packet
-				, NSEngine::NSCore::pRecord record
+				NSNetworks::CPacket* packet
+				, NSCore::pRecord record
 			) override;
 
-			void UnpackRecord(
-				NSEngine::NSNetworks::CPacket* packet
-				, NSEngine::NSCore::pRecord record
+			NSCore::pRecord UnpackRecord(
+				NSNetworks::CPacket* packet
 			) override;
+
+			void ExecuteCommand(NSCore::pCommand command) override;
 
 			void Update(float elapsed) override;
 			void Render(sf::RenderWindow& window) override;
 
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
+			void OnCollisionEnter(NSComponent::pPhysics other) override;
+			void OnCollisionExit(NSComponent::pPhysics other) override;
+
+			void PackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
+			void UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
+
 		};
 		typedef CCreepTank* pCreepTank;
 

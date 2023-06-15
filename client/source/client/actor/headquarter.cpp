@@ -24,43 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CHeadquarter(game, world, id, name)
-			, NSClient::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world) 
+			, NSEngine::NSActor::CHeadquarter(game, world, id, name) {
 		}
 
 		CHeadquarter::~CHeadquarter() {
-		}
-
-		void CHeadquarter::Load(std::string data_path) {
-			NSEngine::NSActor::CHeadquarter::Load(data_path);
-		}
-
-		void CHeadquarter::Unload() {
-			NSEngine::NSActor::CHeadquarter::Unload();
-		}
-
-		void CHeadquarter::Update(float elapsed) {
-		}
-
-		void CHeadquarter::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CHeadquarter::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CHeadquarter::OnCollisionEnter(other);
-		}
-
-		void CHeadquarter::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CHeadquarter::OnCollisionExit(other);
 		}
 
 	}

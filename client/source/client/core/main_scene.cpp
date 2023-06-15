@@ -126,121 +126,99 @@ namespace NSClient {
 				*packet >> game_object_count;
 
 				for (uint32_t i = 0; i < game_object_count; i++) {
-					
+
 					uint32_t type;
 					*packet >> type;
 
 					std::string name;
 					*packet >> name;
 
+					NSEngine::NSCore::pGameObject game_object = nullptr;
 					switch (NSEngine::EActorType(type)) {
 
 					case NSEngine::EActorType::GAME_MASTER: {
-						auto game_master = NSClient::NSActor::CGameMaster::Create(game, world, name);
-						game_master->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CGameMaster::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::PLAYER_TANK: {
-						auto tank = NSClient::NSActor::CPlayerTank::Create(game, world, name);
-						tank->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CPlayerTank::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::PLAYER_BULLET: {
-						auto player_bullet = NSClient::NSActor::CPlayerBullet::Create(game, world, name);
-						player_bullet->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CPlayerBullet::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::CREEP_TANK: {
-						auto creep_tank = NSClient::NSActor::CCreepTank::Create(game, world, name);
-						creep_tank->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CCreepTank::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::CREEP_BULLET: {
-						auto creep_bullet = NSClient::NSActor::CCreepBullet::Create(game, world, name);
-						creep_bullet->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CCreepBullet::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::TURRET: {
-						auto turret = NSClient::NSActor::CTurret::Create(game, world, name);
-						turret->UnpackLoad(packet.get()); 
-
+						game_object = NSClient::NSActor::CTurret::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::TURRET_BULLET: {
-						auto turret_bullet = NSClient::NSActor::CTurretBullet::Create(game, world, name);
-						turret_bullet->UnpackLoad(packet.get()); 
-
+						game_object = NSClient::NSActor::CTurretBullet::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::HEADQUARTER: {
-						auto tank = NSClient::NSActor::CPlayerTank::Create(game, world, name);
-						tank->UnpackLoad(packet.get()); 
-						
+						game_object = NSClient::NSActor::CPlayerTank::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::FACTORY: {
-						auto factory = NSClient::NSActor::CFactory::Create(game, world, name);
-						factory->UnpackLoad(packet.get()); 
-						
+						game_object = NSClient::NSActor::CFactory::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::REPAIR_KIT: {
-						auto repair_kit = NSClient::NSActor::CRepairKit::Create(game, world, name);
-						repair_kit->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CRepairKit::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::POWER_UP: {
-						auto power_up = NSClient::NSActor::CPowerUp::Create(game, world, name);
-						power_up->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CPowerUp::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::BOUND: {
-						auto bound = NSClient::NSActor::CBound::Create(game, world, name);
-						bound->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CBound::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::WALL: {
-						auto wall = NSClient::NSActor::CWall::Create(game, world, name);
-						wall->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CWall::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::TREE: {
-						auto tree = NSClient::NSActor::CTree::Create(game, world, name);
-						tree->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CTree::Create(game, world, name);
 						break;
 					}
 
 					case NSEngine::EActorType::WATER: {
-						auto water = NSClient::NSActor::CWater::Create(game, world, name);
-						water->UnpackLoad(packet.get());
-
+						game_object = NSClient::NSActor::CWater::Create(game, world, name);
 						break;
 					}
 
 					}
+
+					if (game_object) {
+						if (dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)) {
+							dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)->UnpackNetworksLoadPacket(packet.get());					
+						}
+					}
+
 				}
 
 				SendLoadPacket();
@@ -277,127 +255,12 @@ namespace NSClient {
 					uint32_t id = 0;
 					*packet >> id;
 
-					switch (NSEngine::EActorType(type)) {
-					case NSEngine::EActorType::GAME_MASTER: {
-						auto game_master = static_cast<NSClient::NSActor::pGameMaster>(world->game_objects[id].get());
-						auto game_master_record = NSEngine::NSActor::CGameMasterRecord(id);
-
-						game_master->UnpackRecord(packet.get(), &game_master_record);
-						game_master->Deserialize(&game_master_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::PLAYER_TANK: {
-						auto player_tank = static_cast<NSClient::NSActor::pPlayerTank>(world->game_objects[id].get());
-						auto player_tank_record = NSEngine::NSActor::CPlayerTankRecord(id);
-
-						player_tank->UnpackRecord(packet.get(), &player_tank_record);
-						player_tank->Deserialize(&player_tank_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::PLAYER_BULLET: {
-						auto player_bullet = static_cast<NSClient::NSActor::pPlayerBullet>(world->game_objects[id].get());
-						auto player_bullet_record = NSEngine::NSActor::CPlayerBulletRecord(id);
-
-						player_bullet->UnpackRecord(packet.get(), &player_bullet_record);
-						player_bullet->Deserialize(&player_bullet_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::CREEP_TANK: {
-						auto creep_tank = static_cast<NSClient::NSActor::pCreepTank>(world->game_objects[id].get());
-						auto creep_tank_record = NSEngine::NSActor::CCreepTankRecord(id);
-
-						creep_tank->UnpackRecord(packet.get(), &creep_tank_record);
-						creep_tank->Deserialize(&creep_tank_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::CREEP_BULLET: {
-						auto creep_bullet = static_cast<NSClient::NSActor::pCreepBullet>(world->game_objects[id].get());
-						auto creep_bullet_record = NSEngine::NSActor::CCreepBulletRecord(id);
-
-						creep_bullet->UnpackRecord(packet.get(), &creep_bullet_record);
-						creep_bullet->Deserialize(&creep_bullet_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::TURRET: {
-						auto turret = static_cast<NSClient::NSActor::pTurret>(world->game_objects[id].get());
-						auto turret_record = NSEngine::NSActor::CTurretRecord(id);
-
-						turret->UnpackRecord(packet.get(), &turret_record);
-						turret->Deserialize(&turret_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::TURRET_BULLET: {
-						auto turret_bullet = static_cast<NSClient::NSActor::pTurretBullet>(world->game_objects[id].get());
-						auto turret_bullet_record = NSEngine::NSActor::CTurretBulletRecord(id);
-
-						turret_bullet->UnpackRecord(packet.get(), &turret_bullet_record);
-						turret_bullet->Deserialize(&turret_bullet_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::HEADQUARTER: {
-						auto headquarter = static_cast<NSClient::NSActor::pHeadquarter>(world->game_objects[id].get());
-						auto headquarter_record = NSEngine::NSActor::CHeadquarterRecord(id);
-
-						headquarter->UnpackRecord(packet.get(), &headquarter_record);
-						headquarter->Deserialize(&headquarter_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::FACTORY: {
-						auto factory = static_cast<NSClient::NSActor::pFactory>(world->game_objects[id].get());
-						auto factory_record = NSEngine::NSActor::CFactoryRecord(id);
-
-						factory->UnpackRecord(packet.get(), &factory_record);
-						factory->Deserialize(&factory_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::REPAIR_KIT: {
-						auto repair_kit = static_cast<NSClient::NSActor::pRepairKit>(world->game_objects[id].get());
-						auto repair_kit_record = NSEngine::NSActor::CRepairKitRecord(id);
-
-						repair_kit->UnpackRecord(packet.get(), &repair_kit_record);
-						repair_kit->Deserialize(&repair_kit_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::POWER_UP: {
-						auto power_up = static_cast<NSClient::NSActor::pPowerUp>(world->game_objects[id].get());
-						auto power_up_record = NSEngine::NSActor::CPowerUpRecord(id);
-
-						power_up->UnpackRecord(packet.get(), &power_up_record);
-						power_up->Deserialize(&power_up_record);
-
-						break;
-					}
-
-					case NSEngine::EActorType::WALL: {
-						auto wall = static_cast<NSClient::NSActor::pWall>(world->game_objects[id].get());
-						auto wall_record = NSEngine::NSActor::CWallRecord(id);
-
-						wall->UnpackRecord(packet.get(), &wall_record);
-						wall->Deserialize(&wall_record);
-
-						break;
-					}
-
+					auto game_object = world->game_objects[id].get();
+					if (dynamic_cast<NSEngine::NSComponent::pRecordable>(game_object)) {
+						auto recordable = dynamic_cast<NSEngine::NSComponent::pRecordable>(game_object);
+						auto record = recordable->UnpackRecord(packet.get());
+						recordable->Deserialize(record);
+						delete record;
 					}
 				}
 				return true;

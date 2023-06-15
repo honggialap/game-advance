@@ -226,98 +226,10 @@ namespace NSServer {
 				std::string name = game_object->GetName();
 				*server_load_packet << name;
 
-				switch (type) {
-
-				case NSEngine::EActorType::GAME_MASTER: {
-					NSServer::NSActor::pGameMaster game_master = static_cast<NSServer::NSActor::pGameMaster>(game_object);
-					game_master->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::PLAYER_TANK: {
-					NSServer::NSActor::pPlayerTank player_tank = static_cast<NSServer::NSActor::pPlayerTank>(game_object);
-					player_tank->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::PLAYER_BULLET: {
-					NSServer::NSActor::pPlayerBullet player_bullet = static_cast<NSServer::NSActor::pPlayerBullet>(game_object);
-					player_bullet->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::CREEP_TANK: {
-					NSServer::NSActor::pCreepTank creep_tank = static_cast<NSServer::NSActor::pCreepTank>(game_object);
-					creep_tank->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::CREEP_BULLET: {
-					NSServer::NSActor::pCreepBullet creep_bullet = static_cast<NSServer::NSActor::pCreepBullet>(game_object);
-					creep_bullet->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::TURRET: {
-					NSServer::NSActor::pTurret turret = static_cast<NSServer::NSActor::pTurret>(game_object);
-					turret->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::TURRET_BULLET: {
-					NSServer::NSActor::pTurretBullet turret_bullet = static_cast<NSServer::NSActor::pTurretBullet>(game_object);
-					turret_bullet->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::HEADQUARTER: {
-					NSServer::NSActor::pHeadquarter headquarter = static_cast<NSServer::NSActor::pHeadquarter>(game_object);
-					headquarter->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::FACTORY: {
-					NSServer::NSActor::pFactory factory = static_cast<NSServer::NSActor::pFactory>(game_object);
-					factory->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::REPAIR_KIT: {
-					NSServer::NSActor::pRepairKit repair_kit = static_cast<NSServer::NSActor::pRepairKit>(game_object);
-					repair_kit->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::POWER_UP: {
-					NSServer::NSActor::pPowerUp power_up = static_cast<NSServer::NSActor::pPowerUp>(game_object);
-					power_up->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::BOUND: {
-					NSServer::NSActor::pBound bound = static_cast<NSServer::NSActor::pBound>(game_object);
-					bound->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::WALL: {
-					NSServer::NSActor::pWall wall = static_cast<NSServer::NSActor::pWall>(game_object);
-					wall->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::TREE: {
-					NSServer::NSActor::pTree tree = static_cast<NSServer::NSActor::pTree>(game_object);
-					tree->PackLoad(server_load_packet.get());
-					break;
-				}
-
-				case NSEngine::EActorType::WATER: {
-					NSServer::NSActor::pWater water = static_cast<NSServer::NSActor::pWater>(game_object);
-					water->PackLoad(server_load_packet.get());
-					break;
-				}
-
+				if (game_object) {
+					if (dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)) {
+						dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)->PackNetworksLoadPacket(server_load_packet.get());
+					}
 				}
 
 			}
@@ -348,79 +260,10 @@ namespace NSServer {
 				uint32_t id = record->game_object_id;
 				*game_state_packet << id;
 
-				switch (NSEngine::EActorType(type)) {
-				case NSEngine::EActorType::GAME_MASTER: {
-					auto game_master = static_cast<NSEngine::NSActor::pGameMaster>(world->game_objects[id].get());
-					game_master->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::PLAYER_TANK: {
-					auto player_tank = static_cast<NSEngine::NSActor::pPlayerTank>(world->game_objects[id].get());
-					player_tank->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::PLAYER_BULLET: {
-					auto player_bullet = static_cast<NSEngine::NSActor::pPlayerBullet>(world->game_objects[id].get());
-					player_bullet->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::CREEP_TANK: {
-					auto creep_tank = static_cast<NSEngine::NSActor::pCreepTank>(world->game_objects[id].get());
-					creep_tank->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::CREEP_BULLET: {
-					auto creep_bullet = static_cast<NSEngine::NSActor::pCreepBullet>(world->game_objects[id].get());
-					creep_bullet->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::TURRET: {
-					auto turret = static_cast<NSEngine::NSActor::pTurret>(world->game_objects[id].get());
-					turret->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::TURRET_BULLET: {
-					auto turret_bullet = static_cast<NSEngine::NSActor::pTurretBullet>(world->game_objects[id].get());
-					turret_bullet->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::HEADQUARTER: {
-					auto headquarter = static_cast<NSEngine::NSActor::pHeadquarter>(world->game_objects[id].get());
-					headquarter->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::FACTORY: {
-					auto factory = static_cast<NSEngine::NSActor::pFactory>(world->game_objects[id].get());
-					factory->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::REPAIR_KIT: {
-					auto repair_kit = static_cast<NSEngine::NSActor::pRepairKit>(world->game_objects[id].get());
-					repair_kit->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::POWER_UP: {
-					auto power_up = static_cast<NSEngine::NSActor::pPowerUp>(world->game_objects[id].get());
-					power_up->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
-				case NSEngine::EActorType::WALL: {
-					auto wall = static_cast<NSEngine::NSActor::pWall>(world->game_objects[id].get());
-					wall->PackRecord(game_state_packet.get(), record.get());
-					break;
-				}
-
+				NSEngine::NSCore::pGameObject game_object = world->game_objects[id].get();
+				if (dynamic_cast<NSEngine::NSComponent::pRecordable>(game_object)) {
+					auto recordable = dynamic_cast<NSEngine::NSComponent::pRecordable>(game_object);
+					recordable->PackRecord(game_state_packet.get(), record.get());
 				}
 
 			}

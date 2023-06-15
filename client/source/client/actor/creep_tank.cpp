@@ -24,43 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CCreepTank(game, world, id, name)
-			, NSClient::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CCreepTank(game, world, id, name) {
 		}
 
 		CCreepTank::~CCreepTank() {
-		}
-
-		void CCreepTank::Load(std::string data_path) {
-			NSEngine::NSActor::CCreepTank::Load(data_path);
-		}
-
-		void CCreepTank::Unload() {
-			NSEngine::NSActor::CCreepTank::Unload();
-		}
-
-		void CCreepTank::Update(float elapsed) {
-		}
-
-		void CCreepTank::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CCreepTank::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CCreepTank::OnCollisionEnter(other);
-		}
-
-		void CCreepTank::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CCreepTank::OnCollisionExit(other);
 		}
 
 	}

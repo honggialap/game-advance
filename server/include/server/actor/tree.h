@@ -9,8 +9,8 @@ namespace NSServer {
 	namespace NSActor {
 
 		class CTree
-			: public NSEngine::NSActor::CTree
-			, public NSServer::NSCore::CGameObject {
+			: public NSCore::CGameObject
+			, public NSEngine::NSActor::CTree {
 		public:
 			static CTree* Create(
 				NSEngine::NSCore::pGame game
@@ -26,14 +26,6 @@ namespace NSServer {
 			);
 			~CTree();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
-
-			void Update(float elapsed) override;
-			void Render(sf::RenderWindow& window) override;
-
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};
 		typedef CTree* pTree;
 

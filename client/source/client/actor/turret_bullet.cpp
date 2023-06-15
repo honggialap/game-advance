@@ -24,43 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CTurretBullet(game, world, id, name)
-			, NSClient::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world) 
+			, NSEngine::NSActor::CTurretBullet(game, world, id, name) {
 		}
 
 		CTurretBullet::~CTurretBullet() {
-		}
-
-		void CTurretBullet::Load(std::string data_path) {
-			NSEngine::NSActor::CTurretBullet::Load(data_path);
-		}
-
-		void CTurretBullet::Unload() {
-			NSEngine::NSActor::CTurretBullet::Unload();
-		}
-
-		void CTurretBullet::Update(float elapsed) {
-		}
-
-		void CTurretBullet::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CTurretBullet::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CTurretBullet::OnCollisionEnter(other);
-		}
-
-		void CTurretBullet::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CTurretBullet::OnCollisionExit(other);
 		}
 
 	}

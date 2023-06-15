@@ -22,8 +22,7 @@ namespace NSServer {
 
 			std::string resource_path = data.at("resource_path");
 			player_bullet->SetResourcePath(resource_path);
-
-			player_bullet->Load(resource_path);
+			player_bullet->LoadResource();
 
 			return player_bullet;
 		}
@@ -34,43 +33,11 @@ namespace NSServer {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CPlayerBullet(game, world, id, name)
-			, NSServer::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CPlayerBullet(game, world, id, name) {
 		}
 
 		CPlayerBullet::~CPlayerBullet() {
-		}
-
-		void CPlayerBullet::Load(std::string data_path) {
-			NSEngine::NSActor::CPlayerBullet::Load(data_path);
-		}
-
-		void CPlayerBullet::Unload() {
-			NSEngine::NSActor::CPlayerBullet::Unload();
-		}
-
-		void CPlayerBullet::Update(float elapsed) {
-		}
-
-		void CPlayerBullet::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CPlayerBullet::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CPlayerBullet::OnCollisionEnter(other);
-		}
-
-		void CPlayerBullet::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CPlayerBullet::OnCollisionExit(other);
 		}
 
 	}

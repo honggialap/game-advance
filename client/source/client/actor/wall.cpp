@@ -24,43 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CWall(game, world, id, name)
-			, NSClient::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world) 
+			, NSEngine::NSActor::CWall(game, world, id, name) {
 		}
 
 		CWall::~CWall() {
-		}
-
-		void CWall::Load(std::string data_path) {
-			NSEngine::NSActor::CWall::Load(data_path);
-		}
-
-		void CWall::Unload() {
-			NSEngine::NSActor::CWall::Unload();
-		}
-
-		void CWall::Update(float elapsed) {
-		}
-
-		void CWall::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CWall::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CWall::OnCollisionEnter(other);
-		}
-
-		void CWall::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CWall::OnCollisionExit(other);
 		}
 
 	}

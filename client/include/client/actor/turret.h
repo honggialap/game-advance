@@ -9,8 +9,8 @@ namespace NSClient {
 	namespace NSActor {
 
 		class CTurret
-			: public NSEngine::NSActor::CTurret
-			, public NSClient::NSCore::CGameObject {
+			: public NSCore::CGameObject
+			, public NSEngine::NSActor::CTurret {
 		public:
 			static CTurret* Create(
 				NSEngine::NSCore::pGame game
@@ -26,14 +26,6 @@ namespace NSClient {
 			);
 			~CTurret();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
-
-			void Update(float elapsed) override;
-			void Render(sf::RenderWindow& window) override;
-
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};
 		typedef CTurret* pTurret;
 

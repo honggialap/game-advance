@@ -7,70 +7,29 @@ namespace NSEngine {
 	namespace NSActor {
 
 		CWater::CWater(
-			NSEngine::NSCore::pGame game
-			, NSEngine::NSCore::pWorld world
+			NSCore::pGame game
+			, NSCore::pWorld world
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSCore::CGameObject(game, world, id, name) 
-			, NSEngine::NSComponent::CPhysics(world->GetPhysics()) {
+			: NSCore::CGameObject(game, world, id, name) 
+			, NSComponent::CPhysics(world->GetPhysics()) {
 			type = EActorType::WATER;
 		}
 
 		CWater::~CWater() {
 		}
 
-		void CWater::Load(std::string data_path) {
-			//std::ifstream data_file(data_path);
-			//nlohmann::json data = nlohmann::json::parse(data_file);
+		void CWater::LoadResource() {
+			std::ifstream data_file(resource_path);
+			nlohmann::json data = nlohmann::json::parse(data_file);
 
 			texture.loadFromFile("data/resources/textures/sample_water.png");
 			sprite.setTexture(texture);
 			sprite.setOrigin(32, 32);
-
-			body_def.type = b2_kinematicBody;
-			body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
-
-			body = world->GetPhysics()->CreateBody(&body_def);
-
-			collider.SetAsBox(32.0f / 30, 32.0f / 30);
-
-			fixture_def.shape = &collider;
-			fixture_def.density = 100.0f;
-			fixture_def.friction = 0.0f;
-
-			fixture_def.filter.categoryBits = ECollisionFilter::FILTER_WATER;
-			fixture_def.filter.maskBits =
-				ECollisionFilter::FILTER_PLAYER_TANK
-				| ECollisionFilter::FILTER_CREEP_TANK
-				//| ECollisionFilter::FILTER_BULLET
-				//| ECollisionFilter::FILTER_STRUCTURE
-				//| ECollisionFilter::FILTER_WALL
-				//| ECollisionFilter::FILTER_WATER
-				//| ECollisionFilter::FILTER_TREE
-				//| ECollisionFilter::FILTER_PICK_UP
-				;
-
-			fixture = body->CreateFixture(&fixture_def);
 		}
 
-		void CWater::Unload() {
-			if (body != nullptr) {
-				if (fixture != nullptr) {
-					body->DestroyFixture(fixture);
-					fixture = nullptr;
-				}
-				world->GetPhysics()->DestroyBody(body);
-				body = nullptr;
-			}
-		}
-
-		void CWater::PackLoad(NSEngine::NSNetworks::CPacket* packet)
-		{
-		}
-
-		void CWater::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
-		{
+		void CWater::UnloadResource() {
 		}
 
 		void CWater::Update(float elapsed) {
@@ -89,10 +48,20 @@ namespace NSEngine {
 			window.draw(sprite);
 		}
 
-		void CWater::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
+		void CWater::OnCollisionEnter(NSComponent::pPhysics other) {
 		}
 
-		void CWater::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
+		void CWater::OnCollisionExit(NSComponent::pPhysics other) {
+		}
+
+		void CWater::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			PackLoadPhysics(packet);
+			PackLoadResource(packet);
+		}
+
+		void CWater::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			UnpackLoadPhysics(packet);
+			UnpackLoadResource(packet);
 		}
 
 	}

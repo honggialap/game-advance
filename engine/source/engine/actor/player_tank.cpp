@@ -11,7 +11,7 @@ namespace NSEngine {
 		CPlayerTankRecord::CPlayerTankRecord(
 			uint32_t id
 		)
-			: NSEngine::NSCore::CRecord(id)
+			: NSCore::CRecord(id)
 			, position_x(0.0f), position_y(0.0f)
 			, velocity_x(0.0f), velocity_y(0.0f)
 			, movement_x(0), movement_y(0) {
@@ -24,7 +24,7 @@ namespace NSEngine {
 			, float velocity_x, float velocity_y
 			, int32_t movement_x, int32_t movement_y
 		)
-			: NSEngine::NSCore::CRecord(id)
+			: NSCore::CRecord(id)
 			, position_x(position_x), position_y(position_y)
 			, velocity_x(velocity_x), velocity_y(velocity_y)
 			, movement_x(movement_x), movement_y(movement_y) {
@@ -32,71 +32,29 @@ namespace NSEngine {
 		}
 
 		CPlayerTank::CPlayerTank(
-			NSEngine::NSCore::pGame game
-			, NSEngine::NSCore::pWorld world
+			NSCore::pGame game
+			, NSCore::pWorld world
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSCore::CGameObject(game, world, id, name)
-			, NSEngine::NSComponent::CPhysics(world->GetPhysics()) {
+			: NSCore::CGameObject(game, world, id, name)
+			, NSComponent::CPhysics(world->GetPhysics()) {
 			type = EActorType::PLAYER_TANK;
 		}
 
 		CPlayerTank::~CPlayerTank() {
 		}
 
-		void CPlayerTank::Load(std::string data_path) {
-			//std::ifstream data_file(data_path);
-			//nlohmann::json data = nlohmann::json::parse(data_file);
+		void CPlayerTank::LoadResource() {
+			std::ifstream data_file(resource_path);
+			nlohmann::json data = nlohmann::json::parse(data_file);
 
 			texture.loadFromFile("data/resources/textures/sample_tank1.png");
 			sprite.setTexture(texture);
 			sprite.setOrigin(32, 32);
-
-			body_def.type = b2_dynamicBody;
-			body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
-
-			body = world->GetPhysics()->CreateBody(&body_def);
-
-			collider.SetAsBox(32.0f / 30, 32.0f / 30);
-
-			fixture_def.shape = &collider;
-			fixture_def.density = 100.0f;
-			fixture_def.friction = 0.0f;
-
-			fixture_def.filter.categoryBits = ECollisionFilter::FILTER_PLAYER_TANK;
-			fixture_def.filter.maskBits
-				= ECollisionFilter::FILTER_PLAYER_TANK
-				| ECollisionFilter::FILTER_CREEP_TANK
-				| ECollisionFilter::FILTER_BULLET
-				| ECollisionFilter::FILTER_STRUCTURE
-				| ECollisionFilter::FILTER_WALL
-				| ECollisionFilter::FILTER_WATER
-				//| ECollisionFilter::FILTER_TREE
-				| ECollisionFilter::FILTER_PICK_UP
-				;
-
-			fixture = body->CreateFixture(&fixture_def);
-
-			movement = sf::Vector2i(0, 0);
-			speed = 0.5f;
 		}
 
-		void CPlayerTank::Unload() {
-			if (body != nullptr) {
-				if (fixture != nullptr) {
-					body->DestroyFixture(fixture);
-					fixture = nullptr;
-				}
-				world->GetPhysics()->DestroyBody(body);
-				body = nullptr;
-			}
-		}
-
-		void CPlayerTank::PackLoad(NSEngine::NSNetworks::CPacket* packet) {
-		}
-
-		void CPlayerTank::UnpackLoad(NSEngine::NSNetworks::CPacket* packet) {
+		void CPlayerTank::UnloadResource() {
 		}
 
 		void CPlayerTank::Serialize(uint32_t tick) {
@@ -120,7 +78,7 @@ namespace NSEngine {
 			);
 		}
 
-		void CPlayerTank::Deserialize(NSEngine::NSCore::pRecord record) {
+		void CPlayerTank::Deserialize(NSCore::pRecord record) {
 			auto tank_record = static_cast<pPlayerTankRecord>(record);
 			SetPosition(tank_record->position_x, tank_record->position_y);
 			SetVelocity(tank_record->velocity_x, tank_record->velocity_y);
@@ -128,25 +86,24 @@ namespace NSEngine {
 		}
 
 		void CPlayerTank::PackRecord(
-			NSEngine::NSNetworks::CPacket* packet
-			, NSEngine::NSCore::pRecord record
+			NSNetworks::CPacket* packet
+			, NSCore::pRecord record
 		) {
 			auto player_tank_record = static_cast<pPlayerTankRecord>(record);
 			//*packet << factory_record->a;
 		}
 
-		void CPlayerTank::UnpackRecord(
-			NSEngine::NSNetworks::CPacket* packet
-			, NSEngine::NSCore::pRecord record
+		NSCore::pRecord CPlayerTank::UnpackRecord(
+			NSNetworks::CPacket* packet
 		) {
-			auto player_tank_record = static_cast<pPlayerTankRecord>(record);
+			auto record = new CPlayerTankRecord(id);
+
 			//*packet >> factory_record->a;
+
+			return record;
 		}
 
-		void CPlayerTank::HandleInput(uint32_t tick) {
-		}
-
-		void CPlayerTank::ExecuteCommand(NSEngine::NSCore::pCommand command) {
+		void CPlayerTank::ExecuteCommand(NSCore::pCommand command) {
 			switch (command->command_type) {
 			case ECommandType::PLAYER_TANK_MOVE: {
 				auto move_command = static_cast<pMoveCommand>(command);
@@ -182,16 +139,26 @@ namespace NSEngine {
 			window.draw(sprite);
 		}
 
-		void CPlayerTank::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			if (dynamic_cast<NSEngine::NSActor::pWall>(other)) {
+		void CPlayerTank::OnCollisionEnter(NSComponent::pPhysics other) {
+			if (dynamic_cast<NSActor::pWall>(other)) {
 				printf("TANK hit WALL.\n");
 			}
 		}
 
-		void CPlayerTank::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			if (dynamic_cast<NSEngine::NSActor::pWall>(other)) {
+		void CPlayerTank::OnCollisionExit(NSComponent::pPhysics other) {
+			if (dynamic_cast<NSActor::pWall>(other)) {
 				printf("TANK stop hit WALL.\n");
 			}
+		}
+
+		void CPlayerTank::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			PackLoadPhysics(packet);
+			PackLoadResource(packet);
+		}
+
+		void CPlayerTank::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			UnpackLoadPhysics(packet);
+			UnpackLoadResource(packet);
 		}
 
 	}

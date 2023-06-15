@@ -25,8 +25,8 @@ namespace NSEngine {
 		void CWorld::HandleInput(uint32_t tick) {
 			for (auto& game_object_container : game_objects) {
 				auto game_object = game_object_container.second.get();
-				if (dynamic_cast<NSComponent::pPlayerControl>(game_object)) {
-					dynamic_cast<NSComponent::pPlayerControl>(game_object)->HandleInput(tick);
+				if (dynamic_cast<NSComponent::pInputHandler>(game_object)) {
+					dynamic_cast<NSComponent::pInputHandler>(game_object)->HandleInput(tick);
 				}
 			}
 		}

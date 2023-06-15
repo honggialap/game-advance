@@ -21,8 +21,6 @@ namespace NSEngine {
 
 			void SetPlayerId(uint32_t value);
 			uint32_t GetPlayerId();
-
-			virtual void HandleInput(uint32_t tick) = 0;
 		};
 		typedef CPlayerControl* pPlayerControl;
 

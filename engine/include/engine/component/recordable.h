@@ -22,9 +22,8 @@ namespace NSEngine {
 				, NSEngine::NSCore::pRecord record
 			) = 0;
 
-			virtual void UnpackRecord(
+			virtual NSEngine::NSCore::pRecord UnpackRecord(
 				NSEngine::NSNetworks::CPacket* packet
-				, NSEngine::NSCore::pRecord record
 			) = 0;
 		};
 		typedef CRecordable* pRecordable;

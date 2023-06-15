@@ -24,19 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			:NSClient::NSCore::CGameObject(game, world)
+			: NSCore::CGameObject(game, world)
 			, NSEngine::NSActor::CBound(game, world, id, name) {
 		}
 
 		CBound::~CBound() {
-		}
-
-		void CBound::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CBound::OnCollisionEnter(other);
-		}
-
-		void CBound::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CBound::OnCollisionExit(other);
 		}
 
 	}

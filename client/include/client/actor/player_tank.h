@@ -3,14 +3,16 @@
 #define __CLIENT__ACTOR__PLAYER_TANK_H__
 
 #include "engine/actor/player_tank.h"
+#include "engine/component/input_handler.h"
 #include "client/core/game_object.h"
 
 namespace NSClient {
 	namespace NSActor {
 
 		class CPlayerTank
-			: public NSEngine::NSActor::CPlayerTank
-			, public NSClient::NSCore::CGameObject {
+			: public NSCore::CGameObject
+			, public NSEngine::NSActor::CPlayerTank 
+			, public NSEngine::NSComponent::CInputHandler {
 		public:
 			float last_known_x = 0;
 			float last_known_y = 0;
@@ -31,17 +33,10 @@ namespace NSClient {
 			);
 			~CPlayerTank();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
-
 			void HandleInput(uint32_t tick) override;
-			void ExecuteCommand(NSEngine::NSCore::pCommand command) override;
 
 			void Update(float elapsed) override;
 			void Render(sf::RenderWindow& window) override;
-
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 
 			void SendMoveCommand(uint32_t tick, NSEngine::NSActor::CMoveCommand move_command);
 		};

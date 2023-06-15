@@ -9,8 +9,8 @@ namespace NSServer {
 	namespace NSActor {
 
 		class CGameMaster
-			: public NSEngine::NSActor::CGameMaster
-			, public NSServer::NSCore::CGameObject {
+			: public NSCore::CGameObject
+			, public NSEngine::NSActor::CGameMaster {
 		public:
 			static CGameMaster* Create(
 				NSEngine::NSCore::pGame game
@@ -26,10 +26,6 @@ namespace NSServer {
 			);
 			~CGameMaster();
 
-			void Load(std::string data_path) override;
-			void Unload() override;
-
-			void Update(float elapsed) override;
 		};
 		typedef CGameMaster* pGameMaster;
 

@@ -9,8 +9,8 @@ namespace NSClient {
 	namespace NSActor {
 
 		class CBound
-			: public NSEngine::NSActor::CBound
-			, public NSClient::NSCore::CGameObject {
+			: public NSCore::CGameObject 
+			, public NSEngine::NSActor::CBound {
 		public:
 			static CBound* Create(
 				NSEngine::NSCore::pGame game
@@ -26,8 +26,6 @@ namespace NSClient {
 			);
 			~CBound();
 
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 		};
 		typedef CBound* pBound;
 

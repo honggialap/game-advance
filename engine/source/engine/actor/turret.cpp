@@ -7,75 +7,34 @@ namespace NSEngine {
 	namespace NSActor {
 
 		CTurretRecord::CTurretRecord(uint32_t id)
-			: NSEngine::NSCore::CRecord(id) {
+			: NSCore::CRecord(id) {
 			actor_type = EActorType::TURRET;
 		}
 
 		CTurret::CTurret(
-			NSEngine::NSCore::pGame game
-			, NSEngine::NSCore::pWorld world
+			NSCore::pGame game
+			, NSCore::pWorld world
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSCore::CGameObject(game, world, id, name) 
-			, NSEngine::NSComponent::CPhysics(world->GetPhysics()) {
+			: NSCore::CGameObject(game, world, id, name) 
+			, NSComponent::CPhysics(world->GetPhysics()) {
 			type = EActorType::TURRET;
 		}
 
 		CTurret::~CTurret() {
 		}
 
-		void CTurret::Load(std::string data_path) {
-			//std::ifstream data_file(data_path);
-			//nlohmann::json data = nlohmann::json::parse(data_file);
+		void CTurret::LoadResource() {
+			std::ifstream data_file(resource_path);
+			nlohmann::json data = nlohmann::json::parse(data_file);
 
 			texture.loadFromFile("data/resources/textures/sample_turret1.png");
 			sprite.setTexture(texture);
 			sprite.setOrigin(32, 32);
-
-			body_def.type = b2_kinematicBody;
-			body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
-
-			body = world->GetPhysics()->CreateBody(&body_def);
-
-			collider.SetAsBox(32.0f / 30, 32.0f / 30);
-
-			fixture_def.shape = &collider;
-			fixture_def.density = 100.0f;
-			fixture_def.friction = 0.0f;
-
-			fixture_def.filter.categoryBits = ECollisionFilter::FILTER_STRUCTURE;
-			fixture_def.filter.maskBits =
-				ECollisionFilter::FILTER_PLAYER_TANK
-				| ECollisionFilter::FILTER_CREEP_TANK
-				| ECollisionFilter::FILTER_BULLET
-				//| ECollisionFilter::FILTER_STRUCTURE
-				//| ECollisionFilter::FILTER_WALL
-				//| ECollisionFilter::FILTER_WATER
-				//| ECollisionFilter::FILTER_TREE
-				//| ECollisionFilter::FILTER_PICK_UP
-				;
-
-			fixture = body->CreateFixture(&fixture_def);
 		}
 
-		void CTurret::Unload() {
-			if (body != nullptr) {
-				if (fixture != nullptr) {
-					body->DestroyFixture(fixture);
-					fixture = nullptr;
-				}
-				world->GetPhysics()->DestroyBody(body);
-				body = nullptr;
-			}
-		}
-
-		void CTurret::PackLoad(NSEngine::NSNetworks::CPacket* packet)
-		{
-		}
-
-		void CTurret::UnpackLoad(NSEngine::NSNetworks::CPacket* packet)
-		{
+		void CTurret::UnloadResource() {
 		}
 
 		void CTurret::Serialize(uint32_t tick) {
@@ -87,24 +46,29 @@ namespace NSEngine {
 			);
 		}
 
-		void CTurret::Deserialize(NSEngine::NSCore::pRecord record) {
+		void CTurret::Deserialize(NSCore::pRecord record) {
 			auto turret_record = static_cast<pTurretRecord>(record);
 		}
 
 		void CTurret::PackRecord(
-			NSEngine::NSNetworks::CPacket* packet
-			, NSEngine::NSCore::pRecord record
+			NSNetworks::CPacket* packet
+			, NSCore::pRecord record
 		) {
 			auto turret_record = static_cast<pTurretRecord>(record);
 			//*packet << factory_record->a;
 		}
 
-		void CTurret::UnpackRecord(
-			NSEngine::NSNetworks::CPacket* packet
-			, NSEngine::NSCore::pRecord record
+		NSCore::pRecord CTurret::UnpackRecord(
+			NSNetworks::CPacket* packet
 		) {
-			auto turret_record = static_cast<pTurretRecord>(record);
+			auto record = new CTurretRecord(id);
+
 			//*packet >> factory_record->a;
+
+			return record;
+		}
+
+		void CTurret::ExecuteCommand(NSCore::pCommand command) {
 		}
 
 		void CTurret::Update(float elapsed) {
@@ -123,10 +87,20 @@ namespace NSEngine {
 			window.draw(sprite);
 		}
 
-		void CTurret::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
+		void CTurret::OnCollisionEnter(NSComponent::pPhysics other) {
 		}
 
-		void CTurret::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
+		void CTurret::OnCollisionExit(NSComponent::pPhysics other) {
+		}
+
+		void CTurret::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			PackLoadPhysics(packet);
+			PackLoadResource(packet);
+		}
+
+		void CTurret::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
+			UnpackLoadPhysics(packet);
+			UnpackLoadResource(packet);
 		}
 
 	}

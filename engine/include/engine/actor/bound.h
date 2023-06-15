@@ -3,30 +3,30 @@
 #define __ENGINE__ACTOR__BOUND_H__
 
 #include "engine/core/game_object.h"
-
-#include "engine/component/loadable.h"
 #include "engine/component/physics.h"
+#include "engine/component/networks_loadable.h"
 
 namespace NSEngine {
 	namespace NSActor {
 
 		class CBound
-			: public NSEngine::NSCore::CGameObject
-			, public NSEngine::NSComponent::CPhysics {
+			: public NSCore::CGameObject
+			, public NSComponent::CPhysics 
+			, public NSComponent::CNetworksLoadable {
 		public:
 			CBound(
-				NSEngine::NSCore::pGame game
-				, NSEngine::NSCore::pWorld world
+				NSCore::pGame game
+				, NSCore::pWorld world
 				, uint32_t id
 				, std::string name
 			);
 			~CBound();
 
-			void PackLoad(NSEngine::NSNetworks::CPacket* packet) override;
-			void UnpackLoad(NSEngine::NSNetworks::CPacket* packet) override;
+			void OnCollisionEnter(NSComponent::pPhysics other) override;
+			void OnCollisionExit(NSComponent::pPhysics other) override;
 
-			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
-			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
+			void PackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
+			void UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
 		};
 		typedef CBound* pBound;
 

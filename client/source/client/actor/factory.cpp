@@ -24,43 +24,11 @@ namespace NSClient {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CFactory(game, world, id, name)
-			, NSClient::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CFactory(game, world, id, name) {
 		}
 
 		CFactory::~CFactory() {
-		}
-
-		void CFactory::Load(std::string data_path) {
-			NSEngine::NSActor::CFactory::Load(data_path);
-		}
-
-		void CFactory::Unload() {
-			NSEngine::NSActor::CFactory::Unload();
-		}
-
-		void CFactory::Update(float elapsed) {
-		}
-
-		void CFactory::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CFactory::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CFactory::OnCollisionEnter(other);
-		}
-
-		void CFactory::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CFactory::OnCollisionExit(other);
 		}
 
 	}

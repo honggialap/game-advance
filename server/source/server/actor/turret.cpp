@@ -22,8 +22,7 @@ namespace NSServer {
 
 			std::string resource_path = data.at("resource_path");
 			turret->SetResourcePath(resource_path);
-
-			turret->Load(resource_path);
+			turret->LoadResource();
 
 			return turret;
 		}
@@ -34,44 +33,11 @@ namespace NSServer {
 			, uint32_t id
 			, std::string name
 		)
-			: NSEngine::NSActor::CTurret(game, world, id, name)
-			, NSServer::NSCore::CGameObject(game, world) {
+			: NSCore::CGameObject(game, world)
+			, NSEngine::NSActor::CTurret(game, world, id, name) {
 		}
 
 		CTurret::~CTurret() {
-		}
-
-
-		void CTurret::Load(std::string data_path) {
-			NSEngine::NSActor::CTurret::Load(data_path);
-		}
-
-		void CTurret::Unload() {
-			NSEngine::NSActor::CTurret::Unload();
-		}
-
-		void CTurret::Update(float elapsed) {
-		}
-
-		void CTurret::Render(sf::RenderWindow& window) {
-			float render_x = 0.0f;
-			float render_y = 0.0f;
-			GetPosition(render_x, render_y);
-
-			sprite.setPosition(
-				render_x,
-				-render_y + window.getSize().y
-			);
-
-			window.draw(sprite);
-		}
-
-		void CTurret::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CTurret::OnCollisionEnter(other);
-		}
-
-		void CTurret::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
-			NSEngine::NSActor::CTurret::OnCollisionExit(other);
 		}
 
 	}
