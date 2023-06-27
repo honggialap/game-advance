@@ -10,12 +10,15 @@ namespace NSClient {
 			, NSEngine::NSCore::pWorld world
 			, std::string name
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CPowerUp>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pPowerUp power_up = static_cast<pPowerUp>(world->game_objects[id].get());
-			return power_up;
+			return static_cast<pPowerUp>(world->game_objects[id].get());
 		}
 
 		CPowerUp::CPowerUp(

@@ -4,7 +4,9 @@ namespace NSEngine {
 	namespace NSComponent {
 
 		CPhysics::CPhysics(b2World* physics_world)
-			: physics_world(physics_world) {
+			: CDataLoadable()
+			, CNetworksLoadable()
+			, physics_world(physics_world) {
 		}
 
 		CPhysics::~CPhysics() {
@@ -12,30 +14,17 @@ namespace NSEngine {
 			physics_world = nullptr;
 		}
 
-		void CPhysics::CreatePhysics(nlohmann::json& physics_data){
-			b2BodyType body_type = b2BodyType(physics_data.at("body_type"));
-			float position_x = float(physics_data.at("x"));
-			float position_y = float(physics_data.at("y"));
-			float width = float(physics_data.at("width"));
-			float height = float(physics_data.at("height"));
-			uint16_t category_bits = uint16_t(physics_data.at("category_bits"));
-			uint16_t mask_bits = uint16_t(physics_data.at("mask_bits"));
-			CreatePhysics(body_type, position_x, position_y, width, height, category_bits, mask_bits);
-		}
-
 		void CPhysics::CreatePhysics(
 			b2BodyType body_type
-			, float position_x, float position_y
 			, float width, float height
 			, uint16_t category_bits, uint16_t mask_bits
-		){
+		) {
 			body_def.type = body_type;
 			body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
 			body = physics_world->CreateBody(&body_def);
-			body->SetTransform(b2Vec2(position_x / PIXEL_PER_METER, position_y / PIXEL_PER_METER), 0);
 
-			collider.SetAsBox(width / PIXEL_PER_METER, height / PIXEL_PER_METER);
+			collider.SetAsBox((width / 2.0f) / PIXEL_PER_METER, (height / 2.0f) / PIXEL_PER_METER);
 			this->width = width;
 			this->height = height;
 
@@ -47,7 +36,7 @@ namespace NSEngine {
 			fixture = body->CreateFixture(&fixture_def);
 		}
 
-		void CPhysics::DestroyPhysics(){
+		void CPhysics::DestroyPhysics() {
 			if (body != nullptr) {
 				if (fixture != nullptr) {
 					body->DestroyFixture(fixture);
@@ -74,13 +63,22 @@ namespace NSEngine {
 			vx = body->GetPosition().x * PIXEL_PER_METER; vy = body->GetPosition().y * PIXEL_PER_METER;
 		}
 
-		void CPhysics::PackLoadPhysics(NSEngine::NSNetworks::CPacket* packet) {
+		void CPhysics::LoadData(nlohmann::json& data) {
+			if (data.contains("physics")) {
+				auto& physics_data = data.at("physics");
+
+				b2BodyType body_type = b2BodyType(physics_data.at("body_type"));
+				float width = float(physics_data.at("width"));
+				float height = float(physics_data.at("height"));
+				uint16_t category_bits = uint16_t(physics_data.at("category_bits"));
+				uint16_t mask_bits = uint16_t(physics_data.at("mask_bits"));
+				CreatePhysics(body_type, width, height, category_bits, mask_bits);
+			}
+		}
+
+		void CPhysics::PackLoad(NSNetworks::CPacket* packet) {
 			uint32_t body_type = uint32_t(body_def.type);
 			*packet << body_type;
-
-			float position_x, position_y;
-			GetPosition(position_x, position_y);
-			*packet << position_x << position_y;
 
 			float width = this->width;
 			float height = this->height;
@@ -91,14 +89,15 @@ namespace NSEngine {
 
 			uint16_t mask_bits = fixture_def.filter.maskBits;
 			*packet << mask_bits;
-		}
-
-		void CPhysics::UnpackLoadPhysics(NSEngine::NSNetworks::CPacket* packet) {
-			uint32_t body_type;
-			*packet >> body_type;
 
 			float position_x, position_y;
-			*packet >> position_x >> position_y;
+			GetPosition(position_x, position_y);
+			*packet << position_x << position_y;
+		}
+
+		void CPhysics::UnpackLoad(NSNetworks::CPacket* packet) {
+			uint32_t body_type;
+			*packet >> body_type;
 
 			float width, height;
 			*packet >> width >> height;
@@ -111,11 +110,14 @@ namespace NSEngine {
 
 			CreatePhysics(
 				b2BodyType(body_type)
-				, position_x, position_y
 				, width, height
 				, category_bits
 				, mask_bits
 			);
+
+			float position_x, position_y;
+			*packet >> position_x >> position_y;
+			SetPosition(position_x, position_y);
 		}
 
 	}

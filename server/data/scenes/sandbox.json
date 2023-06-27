@@ -1,165 +1,72 @@
 {
   "world": {
+
     "game_master": {
       "name": "game_master",
-      "x": 0.0,
-      "y": 0.0,
-      "layer": 1,
-      "data_path": "bla"
+      "match_time": 300.0
     },
-    "player_tanks": [
-      {
-        "name": "player_tank1",
-        "x": 100.0,
-        "y": 100.0,
-        "layer": 1,
-        "data_path": "bla",
-        "player_id": 1,
-        "team": 1,
-        "bullets": [
-          {
-            "name": "player_tank1_bullet1",
-            "x": -100.0,
-            "y": -100.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 1,
-            "parent": "player_tank1"
-          },
-          {
-            "name": "player_tank1_bullet2",
-            "x": -100.0,
-            "y": -120.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 1,
-            "parent": "player_tank1"
-          },
-          {
-            "name": "player_tank1_bullet3",
-            "x": -100.0,
-            "y": -140.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 1,
-            "parent": "player_tank1"
-          }
-        ]
+
+    "player_tanks": {
+
+      "shared": {
+        "parent": "game_master",
+        "resource_path": "data/actors/player_tank.json",
+        "physics": {
+          "body_type": 1,
+          "width": 32.0,
+          "height": 32.0,
+          "category_bits": 1,
+          "mask_bits": 1
+        },
+        "health": 100.0
       },
-      {
-        "name": "player_tank2",
-        "x": 200.0,
-        "y": 200.0,
-        "layer": 1,
-        "data_path": "bla",
-        "player_id": 2,
-        "team": 1,
-        "bullets": [
-          {
-            "name": "player_tank2_bullet1",
-            "x": -200.0,
-            "y": -100.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 1,
-            "parent": "player_tank2"
-          },
-          {
-            "name": "player_tank2_bullet2",
-            "x": -200.0,
-            "y": -120.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 1,
-            "parent": "player_tank2"
-          },
-          {
-            "name": "player_tank2_bullet3",
-            "x": -200.0,
-            "y": -140.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 1,
-            "parent": "player_tank2"
-          }
-        ]
+
+      "bullets": {
+        "count": 3,
+        "name": "bullet",
+        "resource_path": "data/actors/player_bullet.json",
+        "physics": {
+          "body_type": 1,
+          "width": 32.0,
+          "height": 32.0,
+          "category_bits": 1,
+          "mask_bits": 1
+        },
+        "damage": 10.0
       },
-      {
-        "name": "player_tank3",
-        "x": 300.0,
-        "y": 300.0,
-        "layer": 1,
-        "data_path": "bla",
-        "player_id": 3,
-        "team": 2,
-        "bullets": [
-          {
-            "name": "player_tank3_bullet1",
-            "x": -300.0,
-            "y": -100.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 2,
-            "parent": "player_tank3"
-          },
-          {
-            "name": "player_tank3_bullet2",
-            "x": -300.0,
-            "y": -120.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 2,
-            "parent": "player_tank3"
-          },
-          {
-            "name": "player_tank3_bullet3",
-            "x": -300.0,
-            "y": -140.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 2,
-            "parent": "player_tank3"
-          }
-        ]
-      },
-      {
-        "name": "player_tank4",
-        "x": 400.0,
-        "y": 400.0,
-        "layer": 1,
-        "data_path": "bla",
-        "player_id": 4,
-        "team": 2,
-        "bullets": [
-          {
-            "name": "player_tank4_bullet1",
-            "x": -400.0,
-            "y": -100.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 2,
-            "parent": "player_tank4"
-          },
-          {
-            "name": "player_tank4_bullet2",
-            "x": -400.0,
-            "y": -120.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 2,
-            "parent": "player_tank4"
-          },
-          {
-            "name": "player_tank4_bullet3",
-            "x": -400.0,
-            "y": -140.0,
-            "layer": 1,
-            "data_path": "bla",
-            "team": 2,
-            "parent": "player_tank4"
-          }
-        ]
-      }
-    ]
+
+      "individual": [
+        {
+          "name": "east_player_tank_1",
+          "x": 100.0,
+          "y": 100.0,
+          "team": 1001,
+          "player_id": 1
+        },
+        {
+          "name": "east_player_tank_2",
+          "x": 200.0,
+          "y": 200.0,
+          "team": 1001,
+          "player_id": 2
+        },
+        {
+          "name": "west_player_tank_1",
+          "x": 300.0,
+          "y": 300.0,
+          "team": 1002,
+          "player_id": 3
+        },
+        {
+          "name": "west_player_tank_2",
+          "x": 400.0,
+          "y": 400.0,
+          "team": 1002,
+          "player_id": 4
+        }
+      ]
+
+    }
+
   }
 }

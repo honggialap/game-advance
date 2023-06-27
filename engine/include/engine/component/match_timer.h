@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __ENGINE__COMPONENT__DAMAGE_H__
-#define __ENGINE__COMPONENT__DAMAGE_H__
+#ifndef __ENGINE__COMPONENT__MATCH_TIMER_H__
+#define __ENGINE__COMPONENT__MATCH_TIMER_H__
 
 #include "engine/common.h"
 #include "engine/component/data_loadable.h"
@@ -9,27 +9,30 @@
 namespace NSEngine {
 	namespace NSComponent {
 
-		class CDamage 
+		class CMatchTimer
 			: public CDataLoadable
 			, public CNetworksLoadable {
 		protected:
-			float damage = 0.0f;
+			float match_time = 0.0f;
 
 		public:
-			CDamage();
-			virtual ~CDamage() = 0;
+			CMatchTimer();
+			virtual ~CMatchTimer() = 0;
 
-			void SetDamage(float value);
-			float GetDamage();
+			void SetMatchTime(float value);
+			float GetMatchTime();
+
+			void UpdateMatchTime(float elapsed);
+			bool IsMatchTimeUp();
 
 			void LoadData(nlohmann::json& data) final;
 
 			void PackLoad(NSNetworks::CPacket* packet) final;
 			void UnpackLoad(NSNetworks::CPacket* packet) final;
 		};
-		typedef CDamage* pDamage;
+		typedef CMatchTimer* pMatchTimer;
 
 	}
 }
 
-#endif // !__ENGINE__COMPONENT__DAMAGE_H__
+#endif // !__ENGINE__COMPONENT__MATCH_TIMER_H__

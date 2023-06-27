@@ -10,12 +10,15 @@ namespace NSClient {
 			, NSEngine::NSCore::pWorld world
 			, std::string name
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CTurretBullet>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pTurretBullet turret_bullet = static_cast<pTurretBullet>(world->game_objects[id].get());
-			return turret_bullet;
+			return static_cast<pTurretBullet>(world->game_objects[id].get());
 		}
 
 		CTurretBullet::CTurretBullet(

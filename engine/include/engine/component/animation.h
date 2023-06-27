@@ -3,11 +3,13 @@
 #define __ENGINE__COMPONENT__ANIMATION_H__
 
 #include "engine/common.h"
+#include "engine/component/sprite.h"
 
 namespace NSEngine {
 	namespace NSComponent {
 
-		class CAnimation {
+		class CAnimation
+			: public CSprite {
 		protected:
 		public:
 			CAnimation();

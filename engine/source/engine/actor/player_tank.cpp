@@ -151,15 +151,5 @@ namespace NSEngine {
 			}
 		}
 
-		void CPlayerTank::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-			PackLoadResource(packet);
-		}
-
-		void CPlayerTank::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-			UnpackLoadResource(packet);
-		}
-
 	}
 }

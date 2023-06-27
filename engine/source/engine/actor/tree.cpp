@@ -54,15 +54,5 @@ namespace NSEngine {
 		void CTree::OnCollisionExit(NSComponent::pPhysics other) {
 		}
 
-		void CTree::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-			PackLoadResource(packet);
-		}
-
-		void CTree::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-			UnpackLoadResource(packet);
-		}
-
 	}
 }

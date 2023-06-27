@@ -4,13 +4,11 @@
 
 #include "engine/core/game_object.h"
 
-#include "engine/component/networks_loadable.h"
 #include "engine/component/updatable.h"
 #include "engine/component/physics.h"
 #include "engine/component/recordable.h"
-#include "engine/component/poolable.h"
 #include "engine/component/resource_loadable.h"
-#include "engine/component/sprite.h"
+#include "engine/component/animation.h"
 #include "engine/component/renderable.h"
 
 namespace NSEngine {
@@ -33,13 +31,11 @@ namespace NSEngine {
 
 		class CPowerUp
 			: public NSCore::CGameObject
-			, public NSComponent::CNetworksLoadable
 			, public NSComponent::CUpdatable
 			, public NSComponent::CPhysics
 			, public NSComponent::CRecordable
-			, public NSComponent::CPoolable
 			, public NSComponent::CResourceLoadable
-			, public NSComponent::CSprite 
+			, public NSComponent::CAnimation 
 			, public NSComponent::CRenderable {
 		public:
 			CPowerUp(
@@ -70,9 +66,6 @@ namespace NSEngine {
 
 			void OnCollisionEnter(NSComponent::pPhysics other) override;
 			void OnCollisionExit(NSComponent::pPhysics other) override;
-
-			void PackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
-			void UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
 		};
 		typedef CPowerUp* pPowerUp;
 

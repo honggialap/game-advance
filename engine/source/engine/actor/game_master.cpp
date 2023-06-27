@@ -10,16 +10,16 @@ namespace NSEngine {
 			uint32_t id
 		)
 			: NSCore::CRecord(id) 
-			, a(0.0f) {
+			, match_time(0.0f) {
 			actor_type = EActorType::GAME_MASTER;
 		}
 
 		CGameMasterRecord::CGameMasterRecord(
 			uint32_t id
-			, float a
+			, float match_time
 		)
 			: NSCore::CRecord(id) 
-			, a(a) {
+			, match_time(match_time) {
 			actor_type = EActorType::GAME_MASTER;
 		}
 
@@ -40,13 +40,14 @@ namespace NSEngine {
 			auto& records_container = world->records[tick];
 			records_container.push_back(
 				std::make_unique<CGameMasterRecord>(
-					id
+					id, match_time
 				)
 			);
 		}
 
 		void CGameMaster::Deserialize(NSCore::pRecord record) {
 			auto game_master_record = static_cast<pGameMasterRecord>(record);
+			SetMatchTime(game_master_record->match_time);
 		}
 
 		void CGameMaster::PackRecord(
@@ -54,26 +55,19 @@ namespace NSEngine {
 			, NSCore::pRecord record
 		) {
 			auto game_master_record = static_cast<pGameMasterRecord>(record);
-			//*packet << factory_record->a;
+			*packet << game_master_record->match_time;
 		}
 
 		NSCore::pRecord CGameMaster::UnpackRecord(
 			NSNetworks::CPacket* packet
 		) {
 			auto record = new CGameMasterRecord(id);
-
-			//*packet >> factory_record->a;
+			*packet >> record->match_time;
 
 			return record;
 		}
 
 		void CGameMaster::Update(float elapsed) {
-		}
-
-		void CGameMaster::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-		}
-
-		void CGameMaster::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
 		}
 
 	}

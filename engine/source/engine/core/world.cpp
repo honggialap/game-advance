@@ -24,9 +24,10 @@ namespace NSEngine {
 
 		void CWorld::HandleInput(uint32_t tick) {
 			for (auto& game_object_container : game_objects) {
-				auto game_object = game_object_container.second.get();
-				if (dynamic_cast<NSComponent::pInputHandler>(game_object)) {
-					dynamic_cast<NSComponent::pInputHandler>(game_object)->HandleInput(tick);
+				pGameObject game_object = game_object_container.second.get();
+				auto input_handler = dynamic_cast<NSComponent::pInputHandler>(game_object);
+				if (input_handler) {
+					input_handler->HandleInput(tick);
 				}
 			}
 		}
@@ -35,27 +36,34 @@ namespace NSEngine {
 			if (commands.find(tick) != commands.end()) {
 				auto& commands_at_tick = commands.at(tick);
 				for (auto& command : commands_at_tick) {
-					auto game_object = game_objects[command->game_object_id].get();
-					if (dynamic_cast<NSComponent::pCommandable>(game_object)) {
-						dynamic_cast<NSComponent::pCommandable>(game_object)->ExecuteCommand(command.get());
+					pGameObject game_object = game_objects[command->game_object_id].get();
+					auto commandable = dynamic_cast<NSComponent::pCommandable>(game_object);
+					if (commandable) {
+						commandable->ExecuteCommand(command.get());
 					}
 				}
 			}
 
 			for (auto& game_object_container : game_objects) {
-				auto game_object = game_object_container.second.get();
-				if (dynamic_cast<NSComponent::pUpdatable>(game_object)) {
-					dynamic_cast<NSComponent::pUpdatable>(game_object)->Update(elapsed);
+				pGameObject game_object = game_object_container.second.get();
+				auto updatable = dynamic_cast<NSComponent::pUpdatable>(game_object);
+				if (updatable) {
+					if (updatable->IsActive()) {
+						updatable->Update(elapsed);
+					}
 				}
 			}
 			physics_world->Step(elapsed, 8, 3);
 		}
 
 		void CWorld::Render(sf::RenderWindow& window) {
-			for (auto& game_object_container : game_objects) {
-				auto game_object = game_object_container.second.get();
-				if (dynamic_cast<NSComponent::pRenderable>(game_object)) {
-					dynamic_cast<NSComponent::pRenderable>(game_object)->Render(window);
+			for (auto& render_queue_element : render_queue) {
+				pGameObject game_object = game_objects[render_queue_element.second].get();
+				auto renderable = dynamic_cast<NSComponent::pRenderable>(game_object);
+				if (renderable) {
+					if (renderable->IsVisible()) {
+						renderable->Render(window);
+					}
 				}
 			}
 		}
@@ -102,9 +110,10 @@ namespace NSEngine {
 
 		void CWorld::Serialize(uint32_t tick) {
 			for (auto& game_object_container : game_objects) {
-				auto game_object = game_object_container.second.get();
-				if (dynamic_cast<NSComponent::pRecordable>(game_object)) {
-					dynamic_cast<NSComponent::pRecordable>(game_object)->Serialize(tick);
+				pGameObject game_object = game_object_container.second.get();
+				auto recordable = dynamic_cast<NSComponent::pRecordable>(game_object);
+				if (recordable) {
+					recordable->Serialize(tick);
 				}
 			}
 		}
@@ -112,9 +121,10 @@ namespace NSEngine {
 		void CWorld::Deserialize(uint32_t tick) {
 			auto& records_container = records[tick];
 			for (auto& record : records_container) {
-				auto game_object = game_objects[record->game_object_id].get();
-				if (dynamic_cast<NSComponent::pRecordable>(game_object)) {
-					dynamic_cast<NSComponent::pRecordable>(game_object)->Deserialize(record.get());
+				pGameObject game_object = game_objects[record->game_object_id].get();
+				auto recordable = dynamic_cast<NSComponent::pRecordable>(game_object);
+				if (recordable) {
+					recordable->Deserialize(record.get());
 				}
 			}
 		}

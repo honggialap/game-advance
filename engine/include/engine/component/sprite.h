@@ -11,14 +11,10 @@ namespace NSEngine {
 		protected:
 			sf::Texture texture;
 			sf::Sprite sprite;
-			uint32_t layer;
 
 		public:
 			CSprite();
 			virtual ~CSprite() = 0;
-
-			void SetLayer(uint32_t value);
-			uint32_t GetLayer();
 		};
 		typedef CSprite* pSprite;
 

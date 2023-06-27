@@ -54,15 +54,5 @@ namespace NSEngine {
 		void CWater::OnCollisionExit(NSComponent::pPhysics other) {
 		}
 
-		void CWater::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-			PackLoadResource(packet);
-		}
-
-		void CWater::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-			UnpackLoadResource(packet);
-		}
-
 	}
 }

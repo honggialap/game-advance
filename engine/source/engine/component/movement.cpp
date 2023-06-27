@@ -3,7 +3,9 @@
 namespace NSEngine {
 	namespace NSComponent {
 
-		CMovement::CMovement() {
+		CMovement::CMovement()
+			: CDataLoadable()
+			, CNetworksLoadable() {
 		}
 
 		CMovement::~CMovement() {
@@ -28,6 +30,24 @@ namespace NSEngine {
 
 		float CMovement::GetSpeed() {
 			return speed;
+		}
+
+		void CMovement::LoadData(nlohmann::json& data) {
+			if (data.contains("speed")) {
+				float speed_value = data.at("speed");
+				SetSpeed(speed_value);
+			}
+		}
+
+		void CMovement::PackLoad(NSNetworks::CPacket* packet) {
+			float send_speed = GetSpeed();
+			*packet << send_speed;
+		}
+
+		void CMovement::UnpackLoad(NSNetworks::CPacket* packet) {
+			float receive_speed;
+			*packet >> receive_speed;
+			SetSpeed(receive_speed);
 		}
 
 	}

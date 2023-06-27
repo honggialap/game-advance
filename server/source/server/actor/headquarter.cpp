@@ -8,21 +8,21 @@ namespace NSServer {
 		pHeadquarter CHeadquarter::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, nlohmann::json& data
+			, std::string name
+			, nlohmann::json& components_data
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
-			std::string name = data.at("data");
 			world->game_objects[id] = std::make_unique<CHeadquarter>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pHeadquarter headquarter = static_cast<pHeadquarter>(world->game_objects[id].get());
+			auto headquarter = static_cast<pHeadquarter>(world->game_objects[id].get());
+			headquarter->LoadComponents(components_data);
 
-			auto& physics_data = data.at("physics");
-			headquarter->CreatePhysics(physics_data);
-
-			std::string resource_path = data.at("resource_path");
-			headquarter->SetResourcePath(resource_path);
-			headquarter->LoadResource();
+			world->render_queue.emplace(headquarter->layer, id);
 
 			return headquarter;
 		}

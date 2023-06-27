@@ -3,7 +3,7 @@
 namespace NSEngine {
 	namespace NSComponent {
 
-		CRecordable::CRecordable(){
+		CRecordable::CRecordable() {
 		}
 
 		CRecordable::~CRecordable() {

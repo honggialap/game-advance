@@ -3,12 +3,15 @@
 #define __ENGINE__COMPONENT__PHYSICS_H__
 
 #include "engine/common.h"
-#include "engine/networks/packet.h"
+#include "engine/component/data_loadable.h"
+#include "engine/component/networks_loadable.h"
 
 namespace NSEngine {
 	namespace NSComponent {
 
-		class CPhysics {
+		class CPhysics
+			: public CDataLoadable
+			, public CNetworksLoadable {
 		protected:
 			b2World* physics_world = nullptr;
 
@@ -26,10 +29,8 @@ namespace NSEngine {
 			CPhysics(b2World* world);
 			virtual ~CPhysics() = 0;
 
-			void CreatePhysics(nlohmann::json& physics_data);
 			void CreatePhysics(
 				b2BodyType body_type
-				, float position_x, float position_y
 				, float width, float height
 				, uint16_t category_bits
 				, uint16_t mask_bits
@@ -42,11 +43,13 @@ namespace NSEngine {
 			void SetVelocity(float vx, float vy);
 			void GetVelocity(float& vx, float& vy);
 
-			void PackLoadPhysics(NSEngine::NSNetworks::CPacket* packet);
-			void UnpackLoadPhysics(NSEngine::NSNetworks::CPacket* packet);
-
 			virtual void OnCollisionEnter(CPhysics* other) = 0;
 			virtual void OnCollisionExit(CPhysics* other) = 0;
+
+			void LoadData(nlohmann::json& data) final;
+
+			void PackLoad(NSNetworks::CPacket* packet) final;
+			void UnpackLoad(NSNetworks::CPacket* packet) final;
 		};
 		typedef CPhysics* pPhysics;
 

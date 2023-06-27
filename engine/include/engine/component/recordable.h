@@ -18,12 +18,12 @@ namespace NSEngine {
 			virtual void Deserialize(NSCore::pRecord record) = 0;
 
 			virtual void PackRecord(
-				NSEngine::NSNetworks::CPacket* packet
-				, NSEngine::NSCore::pRecord record
+				NSNetworks::CPacket* packet
+				, NSCore::pRecord record
 			) = 0;
 
-			virtual NSEngine::NSCore::pRecord UnpackRecord(
-				NSEngine::NSNetworks::CPacket* packet
+			virtual NSCore::pRecord UnpackRecord(
+				NSNetworks::CPacket* packet
 			) = 0;
 		};
 		typedef CRecordable* pRecordable;

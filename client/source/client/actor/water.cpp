@@ -10,12 +10,15 @@ namespace NSClient {
 			, NSEngine::NSCore::pWorld world
 			, std::string name
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CWater>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pWater water = static_cast<pWater>(world->game_objects[id].get());
-			return water;
+			return static_cast<pWater>(world->game_objects[id].get());
 		}
 
 		CWater::CWater(

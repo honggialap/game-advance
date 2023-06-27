@@ -120,15 +120,5 @@ namespace NSEngine {
 		void CCreepBullet::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
 		}
 
-		void CCreepBullet::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-			PackLoadResource(packet);
-		}
-
-		void CCreepBullet::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-			UnpackLoadResource(packet);
-		}
-
 	}
 }

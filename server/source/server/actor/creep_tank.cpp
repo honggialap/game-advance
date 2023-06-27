@@ -8,21 +8,21 @@ namespace NSServer {
 		pCreepTank CCreepTank::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, nlohmann::json& data
+			, std::string name
+			, nlohmann::json& components_data
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
-			std::string name = data.at("name");
 			world->game_objects[id] = std::make_unique<CCreepTank>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pCreepTank creep_tank = static_cast<pCreepTank>(world->game_objects[id].get());
+			auto creep_tank = static_cast<pCreepTank>(world->game_objects[id].get());
+			creep_tank->LoadComponents(components_data);
 
-			auto& physics_data = data.at("physics");
-			creep_tank->CreatePhysics(physics_data);
-
-			std::string resource_path = data.at("resource_path");
-			creep_tank->SetResourcePath(resource_path);
-			creep_tank->LoadResource();
+			world->render_queue.emplace(creep_tank->layer, id);
 
 			return creep_tank;
 		}

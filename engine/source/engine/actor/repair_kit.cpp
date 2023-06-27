@@ -108,11 +108,5 @@ namespace NSEngine {
 		void CRepairKit::OnCollisionExit(NSComponent::pPhysics other) {
 		}
 
-		void CRepairKit::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-		}
-
-		void CRepairKit::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-		}
-
 	}
 }

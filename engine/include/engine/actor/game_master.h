@@ -4,35 +4,34 @@
 
 #include "engine/core/game_object.h"
 
-#include "engine/component/networks_loadable.h"
 #include "engine/component/updatable.h"
 #include "engine/component/recordable.h"
-#include "engine/component/pooler.h"
+#include "engine/component/match_timer.h"
 
 namespace NSEngine {
 	namespace NSActor {
 
-		struct CGameMasterRecord 
+		struct CGameMasterRecord
 			: public NSCore::CRecord {
-			float a = 0.0f;
-			
+
+			float match_time = 0.0f;
+
 			CGameMasterRecord(
 				uint32_t id
 			);
 
 			CGameMasterRecord(
 				uint32_t id
-				, float a
+				, float match_time
 			);
 		};
 		typedef CGameMasterRecord* pGameMasterRecord;
 
 		class CGameMaster
 			: public NSCore::CGameObject
-			, public NSComponent::CNetworksLoadable
 			, public NSComponent::CUpdatable
 			, public NSComponent::CRecordable
-			, public NSComponent::CPooler {
+			, public NSComponent::CMatchTimer {
 		public:
 			CGameMaster(
 				NSCore::pGame game
@@ -55,9 +54,6 @@ namespace NSEngine {
 			) override;
 
 			void Update(float elapsed) override;
-
-			void PackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
-			void UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
 		};
 		typedef CGameMaster* pGameMaster;
 

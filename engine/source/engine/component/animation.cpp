@@ -3,7 +3,8 @@
 namespace NSEngine {
 	namespace NSComponent {
 
-		CAnimation::CAnimation() {
+		CAnimation::CAnimation() 
+			: CSprite() {
 		}
 
 		CAnimation::~CAnimation() {

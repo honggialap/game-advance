@@ -115,15 +115,5 @@ namespace NSEngine {
 		void CPlayerBullet::OnCollisionExit(NSComponent::pPhysics other) {
 		}
 
-		void CPlayerBullet::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-			PackLoadResource(packet);
-		}
-
-		void CPlayerBullet::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-			UnpackLoadResource(packet);
-		}
-
 	}
 }

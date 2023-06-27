@@ -226,12 +226,7 @@ namespace NSServer {
 				std::string name = game_object->GetName();
 				*server_load_packet << name;
 
-				if (game_object) {
-					if (dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)) {
-						dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)->PackNetworksLoadPacket(server_load_packet.get());
-					}
-				}
-
+				game_object->PackLoadPacket(server_load_packet.get());
 			}
 
 			game_server->SendAll(server_load_packet);

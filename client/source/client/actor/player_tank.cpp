@@ -10,12 +10,15 @@ namespace NSClient {
 			, NSEngine::NSCore::pWorld world
 			, std::string name
 		) {
+			if (world->dictionary.find(name) != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CPlayerTank>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pPlayerTank player_tank = static_cast<pPlayerTank>(world->game_objects[id].get());
-			return player_tank;
+			return static_cast<pPlayerTank>(world->game_objects[id].get());
 		}
 
 		CPlayerTank::CPlayerTank(
@@ -163,6 +166,12 @@ namespace NSClient {
 				<< move_command.y
 				;
 			game_client->Send(move_command_packet);
+		}
+
+		void CPlayerTank::UnpackLoadPacket(NSEngine::NSNetworks::CPacket* packet) {
+			NSEngine::NSCore::CGameObject::UnpackLoadPacket(packet);
+
+			AssignPlayerControl(game_client->GetPlayerId());
 		}
 
 	}

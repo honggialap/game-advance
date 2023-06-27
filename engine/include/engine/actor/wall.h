@@ -4,7 +4,6 @@
 
 #include "engine/core/game_object.h"
 
-#include "engine/component/networks_loadable.h"
 #include "engine/component/updatable.h"
 #include "engine/component/physics.h"
 #include "engine/component/recordable.h"
@@ -24,7 +23,6 @@ namespace NSEngine {
 
 		class CWall
 			: public NSCore::CGameObject
-			, public NSComponent::CNetworksLoadable
 			, public NSComponent::CUpdatable
 			, public NSComponent::CPhysics
 			, public NSComponent::CRecordable
@@ -61,10 +59,6 @@ namespace NSEngine {
 
 			void OnCollisionEnter(NSComponent::pPhysics other) override;
 			void OnCollisionExit(NSComponent::pPhysics other) override;
-
-			void PackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
-			void UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
-
 		};
 		typedef CWall* pWall;
 

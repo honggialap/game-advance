@@ -8,21 +8,21 @@ namespace NSServer {
 		pTurret CTurret::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, nlohmann::json& data
+			, std::string name
+			, nlohmann::json& components_data
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
-			std::string name = data.at("name");
 			world->game_objects[id] = std::make_unique<CTurret>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pTurret turret = static_cast<pTurret>(world->game_objects[id].get());
+			auto turret = static_cast<pTurret>(world->game_objects[id].get());
+			turret->LoadComponents(components_data);
 
-			auto& physics_data = data.at("physics");
-			turret->CreatePhysics(physics_data);
-
-			std::string resource_path = data.at("resource_path");
-			turret->SetResourcePath(resource_path);
-			turret->LoadResource();
+			world->render_queue.emplace(turret->layer, id);
 
 			return turret;
 		}

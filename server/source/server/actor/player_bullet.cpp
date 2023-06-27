@@ -8,21 +8,21 @@ namespace NSServer {
 		pPlayerBullet CPlayerBullet::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, nlohmann::json& data
+			, std::string name
+			, nlohmann::json& components_data
 		) {
+			if (world->dictionary.find(name) != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
-			std::string name = data.at("name");
 			world->game_objects[id] = std::make_unique<CPlayerBullet>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pPlayerBullet player_bullet = static_cast<pPlayerBullet>(world->game_objects[id].get());
+			auto player_bullet = static_cast<pPlayerBullet>(world->game_objects[id].get());
+			player_bullet->LoadComponents(components_data);
 
-			auto& physics_data = data.at("physics");
-			player_bullet->CreatePhysics(physics_data);
-
-			std::string resource_path = data.at("resource_path");
-			player_bullet->SetResourcePath(resource_path);
-			player_bullet->LoadResource();
+			world->render_queue.emplace(player_bullet->layer, id);
 
 			return player_bullet;
 		}

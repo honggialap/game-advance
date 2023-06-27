@@ -8,15 +8,19 @@ namespace NSServer {
 		pGameMaster CGameMaster::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, nlohmann::json& data
+			, std::string name
+			, nlohmann::json& components_data
 		) {
-			uint32_t id = world->game_object_id++;
-			std::string name = data.at("name");
+			if (world->dictionary.find(name) != world->dictionary.end()) {
+				return nullptr;
+			}
 
+			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CGameMaster>(game, world, id, name);
 			world->dictionary[name] = id;
-			pGameMaster game_master = static_cast<pGameMaster>(world->game_objects[id].get());
 
+			auto game_master = static_cast<pGameMaster>(world->game_objects[id].get());
+			game_master->LoadComponents(components_data);
 			return game_master;
 		}
 

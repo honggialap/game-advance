@@ -2,7 +2,7 @@
 
 namespace NSEngine {
 	namespace NSComponent {
-		
+
 		CRemoteObject::CRemoteObject() {
 		}
 
@@ -11,3 +11,4 @@ namespace NSEngine {
 
 	}
 }
+

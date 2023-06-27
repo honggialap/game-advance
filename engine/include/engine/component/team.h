@@ -4,11 +4,15 @@
 
 #include "engine/common.h"
 #include "engine/shared.h"
+#include "engine/component/data_loadable.h"
+#include "engine/component/networks_loadable.h"
 
 namespace NSEngine {
 	namespace NSComponent {
 
-		class CTeam {
+		class CTeam 
+			: public CDataLoadable
+			, public CNetworksLoadable {
 		protected:
 			ETeam team = ETeam::INVALID_TEAM;
 
@@ -18,7 +22,13 @@ namespace NSEngine {
 
 			void SetTeam(ETeam value);
 			ETeam GetTeam();
+
+			void LoadData(nlohmann::json& data) final;
+
+			void PackLoad(NSNetworks::CPacket* packet) final;
+			void UnpackLoad(NSNetworks::CPacket* packet) final;
 		};
+		typedef CTeam* pTeam;
 
 	}
 }

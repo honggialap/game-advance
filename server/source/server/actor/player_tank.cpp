@@ -10,21 +10,21 @@ namespace NSServer {
 		pPlayerTank CPlayerTank::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, nlohmann::json& data
+			, std::string name
+			, nlohmann::json& components_data
 		) {
-			uint32_t id = world->game_object_id++;
-			std::string name = data.at("name");
+			if (world->dictionary.find(name) != world->dictionary.end()) {
+				return nullptr;
+			}
 
+			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CPlayerTank>(game, world, id, name);
 			world->dictionary[name] = id;
-			pPlayerTank player_tank = static_cast<pPlayerTank>(world->game_objects[id].get());
 
-			auto& physics_data = data.at("physics");
-			player_tank->CreatePhysics(physics_data);
+			auto player_tank = static_cast<pPlayerTank>(world->game_objects[id].get());
+			player_tank->LoadComponents(components_data);
 
-			std::string resource_path = data.at("resource_path");
-			player_tank->SetResourcePath(resource_path);
-			player_tank->LoadResource();
+			world->render_queue.emplace(player_tank->layer, id);
 
 			return player_tank;
 		}

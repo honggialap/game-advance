@@ -213,10 +213,11 @@ namespace NSClient {
 
 					}
 
-					if (game_object) {
-						if (dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)) {
-							dynamic_cast<NSEngine::NSComponent::pNetworksLoadable>(game_object)->UnpackNetworksLoadPacket(packet.get());					
-						}
+					game_object->UnpackLoadPacket(packet.get());
+
+					if (dynamic_cast<NSEngine::NSComponent::pRenderable>(game_object)) {
+						auto renderable = dynamic_cast<NSEngine::NSComponent::pRenderable>(game_object);
+						world->render_queue.emplace(renderable->GetLayer(), game_object->GetId());
 					}
 
 				}

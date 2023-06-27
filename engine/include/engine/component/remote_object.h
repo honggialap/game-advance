@@ -2,6 +2,8 @@
 #ifndef __ENGINE__COMPONENT__REMOTE_OBJECT_H__
 #define __ENGINE__COMPONENT__REMOTE_OBJECT_H__
 
+#include "engine/common.h"
+
 namespace NSEngine {
 	namespace NSComponent {
 
@@ -10,7 +12,6 @@ namespace NSEngine {
 		public:
 			CRemoteObject();
 			virtual ~CRemoteObject() = 0;
-
 		};
 		typedef CRemoteObject* pRemoteObject;
 

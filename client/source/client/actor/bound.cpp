@@ -10,12 +10,15 @@ namespace NSClient {
 			, NSEngine::NSCore::pWorld world
 			, std::string name
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CBound>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pBound bound = static_cast<pBound>(world->game_objects[id].get());
-			return bound;
+			return static_cast<pBound>(world->game_objects[id].get());
 		}
 
 		CBound::CBound(

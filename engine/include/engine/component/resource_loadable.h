@@ -3,12 +3,15 @@
 #define __ENGINE__COMPONENT__RESOURCE_LOADABLE_H__
 
 #include "engine/common.h"
-#include "engine/networks/packet.h"
+#include "engine/component/data_loadable.h"
+#include "engine/component/networks_loadable.h"
 
 namespace NSEngine {
 	namespace NSComponent {
 
-		class CResourceLoadable {
+		class CResourceLoadable
+			: public CDataLoadable
+			, public CNetworksLoadable {
 		protected:
 			std::string resource_path;
 
@@ -19,11 +22,13 @@ namespace NSEngine {
 			void SetResourcePath(std::string value);
 			std::string GetResourcePath();
 
-			void PackLoadResource(NSEngine::NSNetworks::CPacket* packet);
-			void UnpackLoadResource(NSEngine::NSNetworks::CPacket* packet);
-
 			virtual void LoadResource() = 0;
 			virtual void UnloadResource() = 0;
+
+			void LoadData(nlohmann::json& data) final;
+
+			void PackLoad(NSNetworks::CPacket* packet) final;
+			void UnpackLoad(NSNetworks::CPacket* packet) final;
 		};
 		typedef CResourceLoadable* pResourceLoadable;
 

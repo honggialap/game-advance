@@ -10,12 +10,15 @@ namespace NSClient {
 			, NSEngine::NSCore::pWorld world
 			, std::string name
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
 			world->game_objects[id] = std::make_unique<CWall>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pWall wall = static_cast<pWall>(world->game_objects[id].get());
-			return wall;
+			return static_cast<pWall>(world->game_objects[id].get());
 		}
 
 		CWall::CWall(

@@ -23,16 +23,17 @@
     <ClInclude Include="include\engine\common.h" />
     <ClInclude Include="include\engine\component\ai_control.h" />
     <ClInclude Include="include\engine\component\animation.h" />
+    <ClInclude Include="include\engine\component\data_loadable.h" />
+    <ClInclude Include="include\engine\component\networks_loadable.h" />
     <ClInclude Include="include\engine\component\damage.h" />
     <ClInclude Include="include\engine\component\health.h" />
     <ClInclude Include="include\engine\component\input_handler.h" />
-    <ClInclude Include="include\engine\component\networks_loadable.h" />
+    <ClInclude Include="include\engine\component\match_timer.h" />
+    <ClInclude Include="include\engine\component\remote_object.h" />
     <ClInclude Include="include\engine\component\resource_loadable.h" />
     <ClInclude Include="include\engine\component\movement.h" />
     <ClInclude Include="include\engine\component\physics.h" />
     <ClInclude Include="include\engine\component\player_control.h" />
-    <ClInclude Include="include\engine\component\poolable.h" />
-    <ClInclude Include="include\engine\component\pooler.h" />
     <ClInclude Include="include\engine\component\renderable.h" />
     <ClInclude Include="include\engine\component\sprite.h" />
     <ClInclude Include="include\engine\component\team.h" />
@@ -67,21 +68,20 @@
     <ClInclude Include="include\engine\shared.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\engine\component\remote_object.h" />
     <ClCompile Include="source\engine\actor\bound.cpp" />
     <ClCompile Include="source\engine\component\ai_control.cpp" />
     <ClCompile Include="source\engine\component\animation.cpp" />
     <ClCompile Include="source\engine\component\damage.cpp" />
+    <ClCompile Include="source\engine\component\data_loadable.cpp" />
     <ClCompile Include="source\engine\component\health.cpp" />
     <ClCompile Include="source\engine\component\input_handler.cpp" />
+    <ClCompile Include="source\engine\component\match_timer.cpp" />
     <ClCompile Include="source\engine\component\networks_loadable.cpp" />
     <ClCompile Include="source\engine\component\remote_object.cpp" />
     <ClCompile Include="source\engine\component\resource_loadable.cpp" />
     <ClCompile Include="source\engine\component\movement.cpp" />
     <ClCompile Include="source\engine\component\physics.cpp" />
     <ClCompile Include="source\engine\component\player_control.cpp" />
-    <ClCompile Include="source\engine\component\poolable.cpp" />
-    <ClCompile Include="source\engine\component\pooler.cpp" />
     <ClCompile Include="source\engine\component\renderable.cpp" />
     <ClCompile Include="source\engine\component\sprite.cpp" />
     <ClCompile Include="source\engine\component\team.cpp" />

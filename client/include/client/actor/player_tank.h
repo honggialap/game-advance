@@ -4,6 +4,7 @@
 
 #include "engine/actor/player_tank.h"
 #include "engine/component/input_handler.h"
+#include "engine/component/remote_object.h"
 #include "client/core/game_object.h"
 
 namespace NSClient {
@@ -11,8 +12,9 @@ namespace NSClient {
 
 		class CPlayerTank
 			: public NSCore::CGameObject
-			, public NSEngine::NSActor::CPlayerTank 
-			, public NSEngine::NSComponent::CInputHandler {
+			, public NSEngine::NSActor::CPlayerTank
+			, public NSEngine::NSComponent::CInputHandler
+			, public NSEngine::NSComponent::CRemoteObject {
 		public:
 			float last_known_x = 0;
 			float last_known_y = 0;
@@ -39,6 +41,8 @@ namespace NSClient {
 			void Render(sf::RenderWindow& window) override;
 
 			void SendMoveCommand(uint32_t tick, NSEngine::NSActor::CMoveCommand move_command);
+
+			void UnpackLoadPacket(NSEngine::NSNetworks::CPacket* packet) override;
 		};
 		typedef CPlayerTank* pPlayerTank;
 

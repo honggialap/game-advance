@@ -30,6 +30,7 @@ namespace NSEngine {
 			uint32_t game_object_id = 1000;
 			std::map<std::string, uint32_t> dictionary;
 			std::map<uint32_t, upGameObject> game_objects;
+			std::multimap<uint32_t, uint32_t> render_queue;
 			std::map<uint32_t, std::vector<upCommand>> commands;
 			std::map<uint32_t, std::vector<upRecord>> records;
 

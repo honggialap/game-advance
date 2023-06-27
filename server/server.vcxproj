@@ -200,9 +200,19 @@
     <ClInclude Include="include\server\actor\water.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\actors\bullet.json" />
-    <None Include="data\actors\tank.json" />
+    <None Include="data\actors\creep_bullet.json" />
+    <None Include="data\actors\creep_tank.json" />
+    <None Include="data\actors\factory.json" />
+    <None Include="data\actors\headquarter.json" />
+    <None Include="data\actors\player_bullet.json" />
+    <None Include="data\actors\player_tank.json" />
+    <None Include="data\actors\power_up.json" />
+    <None Include="data\actors\repair_kit.json" />
+    <None Include="data\actors\tree.json" />
+    <None Include="data\actors\turret.json" />
+    <None Include="data\actors\turret_bullet.json" />
     <None Include="data\actors\wall.json" />
+    <None Include="data\actors\water.json" />
     <None Include="data\game_data.json" />
     <None Include="data\scenes\lobby.json" />
     <None Include="data\scenes\sandbox.json" />

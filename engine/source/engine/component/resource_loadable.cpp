@@ -3,7 +3,9 @@
 namespace NSEngine {
 	namespace NSComponent {
 
-		CResourceLoadable::CResourceLoadable() {
+		CResourceLoadable::CResourceLoadable()
+			: CDataLoadable()
+			, CNetworksLoadable() {
 		}
 
 		CResourceLoadable::~CResourceLoadable() {
@@ -17,11 +19,19 @@ namespace NSEngine {
 			return resource_path;
 		}
 
-		void CResourceLoadable::PackLoadResource(NSEngine::NSNetworks::CPacket* packet) {
+		void CResourceLoadable::LoadData(nlohmann::json& data) {
+			if (data.contains("resource_path")) {
+				std::string resource_path_value = data.at("resource_path");
+				SetResourcePath(resource_path_value);
+				LoadResource();
+			}
+		}
+
+		void CResourceLoadable::PackLoad(NSNetworks::CPacket* packet) {
 			*packet << resource_path;
 		}
 
-		void CResourceLoadable::UnpackLoadResource(NSEngine::NSNetworks::CPacket* packet) {
+		void CResourceLoadable::UnpackLoad(NSNetworks::CPacket* packet) {
 			*packet >> resource_path;
 			LoadResource();
 		}

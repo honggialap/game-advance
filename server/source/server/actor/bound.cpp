@@ -8,17 +8,19 @@ namespace NSServer {
 		pBound CBound::Create(
 			NSEngine::NSCore::pGame game
 			, NSEngine::NSCore::pWorld world
-			, nlohmann::json& data
+			, std::string name
+			, nlohmann::json& components_data
 		) {
+			if (world->dictionary.find("name") != world->dictionary.end()) {
+				return nullptr;
+			}
+
 			uint32_t id = world->game_object_id++;
-			std::string name = data.at("name");
 			world->game_objects[id] = std::make_unique<CBound>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			pBound bound = static_cast<pBound>(world->game_objects[id].get());
-
-			auto& physics_data = data.at("physics");
-			bound->CreatePhysics(physics_data);
+			auto bound = static_cast<pBound>(world->game_objects[id].get());
+			bound->LoadComponents(components_data);
 
 			return bound;
 		}

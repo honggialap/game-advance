@@ -90,15 +90,5 @@ namespace NSEngine {
 		void CWall::OnCollisionExit(NSComponent::pPhysics other) {
 		}
 
-		void CWall::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-			PackLoadResource(packet);
-		}
-
-		void CWall::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-			UnpackLoadResource(packet);
-		}
-
 	}
 }

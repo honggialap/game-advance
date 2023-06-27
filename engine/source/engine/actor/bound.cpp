@@ -25,13 +25,5 @@ namespace NSEngine {
 		void CBound::OnCollisionExit(NSComponent::pPhysics other) {
 		}
 
-		void CBound::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-		}
-
-		void CBound::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-		}
-
 	}
 }

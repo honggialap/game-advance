@@ -4,15 +4,13 @@
 
 #include "engine/core/game_object.h"
 #include "engine/component/physics.h"
-#include "engine/component/networks_loadable.h"
 
 namespace NSEngine {
 	namespace NSActor {
 
 		class CBound
 			: public NSCore::CGameObject
-			, public NSComponent::CPhysics 
-			, public NSComponent::CNetworksLoadable {
+			, public NSComponent::CPhysics {
 		public:
 			CBound(
 				NSCore::pGame game
@@ -24,9 +22,6 @@ namespace NSEngine {
 
 			void OnCollisionEnter(NSComponent::pPhysics other) override;
 			void OnCollisionExit(NSComponent::pPhysics other) override;
-
-			void PackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
-			void UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) override;
 		};
 		typedef CBound* pBound;
 

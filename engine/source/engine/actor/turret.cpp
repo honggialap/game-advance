@@ -93,15 +93,5 @@ namespace NSEngine {
 		void CTurret::OnCollisionExit(NSComponent::pPhysics other) {
 		}
 
-		void CTurret::PackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			PackLoadPhysics(packet);
-			PackLoadResource(packet);
-		}
-
-		void CTurret::UnpackNetworksLoadPacket(NSNetworks::CPacket* packet) {
-			UnpackLoadPhysics(packet);
-			UnpackLoadResource(packet);
-		}
-
 	}
 }
