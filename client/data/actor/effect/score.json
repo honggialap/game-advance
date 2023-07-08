@@ -1,0 +1,21 @@
+{
+
+  "texture": [
+    {
+      "id": 0,
+      "source": ""
+    }
+  ],
+
+  "sprite": [
+    {
+      "id": 0,
+      "texture": 0
+    }
+  ],
+
+  "animation": [
+
+  ]
+
+}

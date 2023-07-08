@@ -40,37 +40,43 @@ namespace NSEngine {
 
 	enum EActorType
 		: uint32_t {
-		INVALID_ACTOR			=	0,
+		INVALID_ACTOR	=	0,
 
-		GAME_MASTER				=	0001,
+		GAME_MASTER		=	1001,
+		HEADQUARTER		=	2001,
 
-		PLAYER_TANK				=	1001,
-		PLAYER_BULLET			=	1002,
+		PLAYER_TANK		=	3011,
+		BASIC_TANK		=	3012,
+		FAST_TANK		=	3013,
+		POWER_TANK		=	3014,
+		ARMOR_TANK		=	3015,
+		BULLET			=	3021,
 
-		CREEP_TANK				=	2001,
-		CREEP_BULLET			=	2002,
+		GRENADE			=	4001,
+		HELMET			=	4002,
+		SHOVEL			=	4003,
+		STAR			=	4004,
+		TANK			=	4005,
+		TIMER			=	4006,
 
-		TURRET					=	3001,
-		TURRET_BULLET			=	3002,
+		BOUND			=	5001,
+		BRICK			=	5002,
+		STEEL			=	5003,
+		TREE			=	5004,
+		WATER			=	5005,
+		ICE				=	5006,
 
-		HEADQUARTER				=	4001,
-		FACTORY					=	4002,
-		
-		REPAIR_KIT				=	5001,
-		POWER_UP				=	5002,
-
-		BOUND					=	6001,
-		WALL					=	6002,
-		TREE					=	6003,
-		WATER					=	6004,
+		SCORE			=	6001,
+		IMPACT			=	6002,
+		EXPLOSION		=	6003
 	};
 
 	enum ECommandType 
 		: uint32_t {
 		INVALID_COMMAND			=	0,
-								
-		PLAYER_TANK_MOVE		=	1001,
-		PLAYER_TANK_SHOOT		=	1002,
+
+		TANK_MOVE				=	1001,
+		TANK_SHOOT				=	1002
 	};
 
 	enum ECollisionFilter 
@@ -89,8 +95,8 @@ namespace NSEngine {
 	enum ETeam : uint32_t {
 		INVALID_TEAM = 0,
 
-		WEST = 1001,
-		EAST = 1002,
+		PLAYER = 1001,
+		AI = 1002,
 	};
 
 }

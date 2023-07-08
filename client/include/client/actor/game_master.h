@@ -10,7 +10,8 @@ namespace NSClient {
 
 		class CGameMaster
 			: public NSCore::CGameObject
-			, public NSEngine::NSActor::CGameMaster {
+			, public NSEngine::NSActor::CGameMaster 
+		{
 		public:
 			static CGameMaster* Create(
 				NSEngine::NSCore::pGame game
@@ -26,6 +27,7 @@ namespace NSClient {
 			);
 			~CGameMaster();
 
+			void UnpackLoadPacket(NSEngine::NSNetworks::CPacket* packet) final;
 		};
 		typedef CGameMaster* pGameMaster;
 

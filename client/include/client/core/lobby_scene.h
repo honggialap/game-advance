@@ -17,6 +17,8 @@ namespace NSClient {
 			};
 			EState state = EState::Connecting;
 
+			sf::Texture texture;
+			sf::Sprite sprite;
 			sf::Font font;
 			sf::Text text;
 

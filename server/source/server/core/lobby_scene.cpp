@@ -15,8 +15,18 @@ namespace NSServer {
 			std::ifstream data_file(data_path);
 			nlohmann::json data = nlohmann::json::parse(data_file);
 
-			font.loadFromFile("data/resources/fonts/arial.ttf");
+			std::string texture_source = data.at("texture");
+			texture.loadFromFile(texture_source);
+			sprite.setTexture(texture);
+			sprite.setPosition(sf::Vector2f(0.0f, 0.0f));
+
+			std::string font_source = data.at("font");
+			font.loadFromFile(font_source);
 			text.setFont(font);
+			text.setPosition(sf::Vector2f(
+				game->GetWindow().getSize().x / 2.0f
+				, game->GetWindow().getSize().y / 3.0f * 2.0f
+			));
 
 			state = EState::Picking;
 			count_down = 1000;
@@ -78,6 +88,12 @@ namespace NSServer {
 		}
 
 		void CLobbyScene::Render(sf::RenderWindow& window) {
+			text.setOrigin(
+				text.getLocalBounds().width / 2.0f
+				, text.getLocalBounds().height / 2.0f
+			);
+
+			window.draw(sprite);
 			window.draw(text);
 		}
 

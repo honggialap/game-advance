@@ -1,8 +1,8 @@
 {
   "window": {
     "title": "Client",
-    "width": 800,
-    "height": 600,
+    "width": 768,
+    "height": 720,
     "update_rate": 64.0,
     "render_rate": 64.0
   },
@@ -11,18 +11,56 @@
     "port": 27015,
     "tick_per_ping": 8
   },
+  "textures": [
+    {
+      "id": 1001,
+      "source": "data/resource/texture/lobby.png"
+    },
+    {
+      "id": 1002,
+      "source": "data/resource/texture/main_ui_frame.png"
+    },
+    {
+      "id": 1011,
+      "source": "data/resource/texture/player_1_tank.png"
+    },
+    {
+      "id": 1012,
+      "source": "data/resource/texture/player_2_tank.png"
+    },
+    {
+      "id": 1013,
+      "source": "data/resource/texture/enemy_tank_base.png"
+    },
+    {
+      "id": 1014,
+      "source": "data/resource/texture/enemy_tank_red.png"
+    },
+    {
+      "id": 1015,
+      "source": "data/resource/texture/bullet.png"
+    },
+    {
+      "id": 1021,
+      "source": "data/resource/texture/terrain.png"
+    },
+    {
+      "id": 1022,
+      "source": "data/resource/texture/headquarter.png"
+    }
+  ],
   "scenes": {
     "start_scene_id": 0,
     "scene_list": [
       {
         "id": 0,
         "type": 1001,
-        "data_path": "data/scenes/lobby.json"
+        "data_path": "data/scene/lobby.json"
       },
       {
         "id": 1,
         "type": 1002,
-        "data_path": "data/scenes/main.json"
+        "data_path": "data/scene/main.json"
       }
     ]
   }

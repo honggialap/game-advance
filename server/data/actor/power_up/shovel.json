@@ -1,0 +1,7 @@
+{
+  "texture": "data/resource/texture/shovel.png",
+  "sprite": {
+    "origin_x": 24.0,
+    "origin_y": 24.0
+  }
+}

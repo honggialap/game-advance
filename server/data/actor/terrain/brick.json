@@ -1,0 +1,50 @@
+{
+  "texture": 1021,
+  "sprites": [
+    {
+      "id": 1001,
+      "left": 0,
+      "top": 0,
+      "width": 24,
+      "height": 24,
+      "origin_x": 12.0,
+      "origin_y": 12.0
+    },
+    {
+      "id": 1002,
+      "left": 24,
+      "top": 0,
+      "width": 24,
+      "height": 24,
+      "origin_x": 12.0,
+      "origin_y": 12.0
+    },
+    {
+      "id": 1003,
+      "left": 48,
+      "top": 0,
+      "width": 24,
+      "height": 24,
+      "origin_x": 12.0,
+      "origin_y": 12.0
+    },
+    {
+      "id": 1004,
+      "left": 72,
+      "top": 0,
+      "width": 24,
+      "height": 24,
+      "origin_x": 12.0,
+      "origin_y": 12.0
+    },
+    {
+      "id": 1005,
+      "left": 96,
+      "top": 0,
+      "width": 24,
+      "height": 24,
+      "origin_x": 12.0,
+      "origin_y": 12.0
+    }
+  ]
+}

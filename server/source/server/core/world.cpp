@@ -1,20 +1,32 @@
 #include "server/core/world.h"
 
 #include "server/actor/game_master.h"
-#include "server/actor/player_tank.h"
-#include "server/actor/player_bullet.h"
-#include "server/actor/creep_tank.h"
-#include "server/actor/creep_bullet.h"
-#include "server/actor/turret.h"
-#include "server/actor/turret_bullet.h"
 #include "server/actor/headquarter.h"
-#include "server/actor/factory.h"
-#include "server/actor/repair_kit.h"
-#include "server/actor/power_up.h"
-#include "server/actor/bound.h"
-#include "server/actor/wall.h"
-#include "server/actor/tree.h"
-#include "server/actor/water.h"
+
+#include "server/actor/tank/player_tank.h"
+#include "server/actor/tank/basic_tank.h"
+#include "server/actor/tank/fast_tank.h"
+#include "server/actor/tank/power_tank.h"
+#include "server/actor/tank/armor_tank.h"
+#include "server/actor/tank/bullet.h"
+
+#include "server/actor/power_up/grenade.h"
+#include "server/actor/power_up/helmet.h"
+#include "server/actor/power_up/shovel.h"
+#include "server/actor/power_up/star.h"
+#include "server/actor/power_up/tank.h"
+#include "server/actor/power_up/timer.h"
+
+#include "server/actor/terrain/bound.h"
+#include "server/actor/terrain/brick.h"
+#include "server/actor/terrain/ice.h"
+#include "server/actor/terrain/steel.h"
+#include "server/actor/terrain/tree.h"
+#include "server/actor/terrain/water.h"
+
+#include "server/actor/effect/explosion.h"
+#include "server/actor/effect/impact.h"
+#include "server/actor/effect/score.h"
 
 namespace NSServer {
 	namespace NSCore {
@@ -45,283 +57,473 @@ namespace NSServer {
 
 		void CWorld::Load(nlohmann::json& data) {
 
-			if (data.contains("game_master")) {
-				auto& game_master_data = data.at("game_master");
-				std::string game_master_name = game_master_data.at("name");
-				NSActor::CGameMaster::Create(game, this, game_master_name, game_master_data);
+			// Game Master
+			auto& game_master_data = data.at("actors").at("game_master");
+			std::string game_master_name = game_master_data.at("name");
+			auto game_master = NSActor::CGameMaster::Create(game, this, game_master_name, game_master_data);
+
+			// Pickups
+			/*
+			{
+				auto& grenade_data = data.at("actors").at("grenade");
+				std::string grenade_name = grenade_data.at("name");
+				auto grenade = NSActor::CGrenade::Create(game, this, grenade_name, grenade_data);
+				grenade->AddGameMaster(game_master_name);
+
+				auto& helmet_data = data.at("actors").at("helmet");
+				std::string helmet_name = helmet_data.at("name");
+				auto helmet = NSActor::CHelmet::Create(game, this, helmet_name, helmet_data);
+				helmet->AddGameMaster(game_master_name);
+
+				auto& shovel_data = data.at("actors").at("shovel");
+				std::string shovel_name = shovel_data.at("name");
+				auto shovel = NSActor::CShovel::Create(game, this, shovel_name, shovel_data);
+				shovel->AddGameMaster(game_master_name);
+
+				auto& star_data = data.at("actors").at("star");
+				std::string star_name = star_data.at("name");
+				auto star = NSActor::CStar::Create(game, this, star_name, star_data);
+				star->AddGameMaster(game_master_name);
+
+				auto& tank_data = data.at("actors").at("tank");
+				std::string tank_name = tank_data.at("name");
+				auto tank = NSActor::CTank::Create(game, this, tank_name, tank_data);
+				tank->AddGameMaster(game_master_name);
+
+				auto& timer_data = data.at("actors").at("timer");
+				std::string timer_name = timer_data.at("name");
+				auto timer = NSActor::CTimer::Create(game, this, timer_name, timer_data);
+				timer->AddGameMaster(game_master_name);
 			}
+			*/
 
-			if (data.contains("repair_kits")) {
-				auto& repair_kit_data = data.at("repair_kits");
-				uint32_t repair_kit_count = repair_kit_data.at("count");
+			// Headquarter
+			{
+				auto& headquarter_data = data.at("actors").at("headquarter");
+				std::string headquarter_name = headquarter_data.at("name");
+				auto headquarter = NSActor::CHeadquarter::Create(game, this, headquarter_name, headquarter_data);
+				headquarter->AddGameMaster(game_master_name);
 
-				for (uint32_t sub_id = 1; sub_id <= repair_kit_count; sub_id++) {
-					std::stringstream name;
-					std::string repair_kit_name = repair_kit_data.at("name");
-					name << repair_kit_name << "_" << sub_id;
-					auto repair_kit = NSActor::CRepairKit::Create(game, this, name.str(), repair_kit_data);
+				float x = headquarter_data.at("x");
+				float y = headquarter_data.at("y");
+				headquarter->SetPosition(x, y);
 
-					std::string parent_name = repair_kit_data.at("parent");
-					repair_kit->AddParent(parent_name);
+				auto& brick_data = data.at("actors").at("brick");
+				//auto& steel_data = data.at("actors").at("steel");
 
-					//repair_kit->SetActive(false);
-					//repair_kit->SetVisible(false);
+				uint32_t counter_id = 0;
+				for (auto& iterator : headquarter_data.at("bounds")) {
+					float x = iterator.at("x");
+					float y = iterator.at("y");
+
+					std::string brick_default_name = brick_data.at("name");
+					std::stringstream brick_name_stream;
+					brick_name_stream
+						<< headquarter_name
+						<< "_" << brick_default_name
+						<< "_" << counter_id;
+					std::string brick_name = brick_name_stream.str();
+
+					auto brick = NSActor::CBrick::Create(game, this, brick_name, brick_data);
+					brick->SetPosition(x, y);
+					brick->AddHeadquarter(headquarter_name);
+
+					//std::string steel_default_name = steel_data.at("name");
+					//std::stringstream steel_name_stream;
+					//steel_name_stream
+					//	<< headquarter_name
+					//	<< "_" << steel_default_name
+					//	<< "_" << counter_id;
+					//std::string steel_name = steel_name_stream.str();
+					//
+					//auto steel = NSActor::CSteel::Create(game, this, steel_name, steel_data);
+					//steel->SetPosition(x, y);
+					//steel->AddHeadquarter(headquarter_name);
+					//steel->SetVisible(false);
+					//steel->SetActive(false);
+					//steel->SetBodyEnable(false);
+					
+					counter_id += 1;
 				}
 			}
 
-			if (data.contains("power_ups")) {
-				auto& power_up_data = data.at("power_ups");
-				uint32_t power_up_count = power_up_data.at("count");
-
-				for (uint32_t sub_id = 1; sub_id <= power_up_count; sub_id++) {
-					std::stringstream name;
-					std::string power_up_name = power_up_data.at("name");
-					name << power_up_name << "_" << sub_id;
-					auto power_up = NSActor::CPowerUp::Create(game, this, name.str(), power_up_data);
-
-					std::string parent_name = power_up_data.at("parent");
-					power_up->AddParent(parent_name);
-
-					//power_up->SetActive(false);
-					//power_up->SetVisible(false);
-				}
-			}
-
-			if (data.contains("player_tanks")) {
-				for (auto& player_tank_data : data.at("player_tanks").at("individual")) {
-					auto shared = data.at("player_tanks").at("shared");
-					player_tank_data.insert(shared.begin(), shared.end());
-
+			// Players tank
+			{
+				for (auto& player_tank_data : data.at("actors").at("player_tanks")) {
 					std::string player_tank_name = player_tank_data.at("name");
 					auto player_tank = NSActor::CPlayerTank::Create(game, this, player_tank_name, player_tank_data);
+					player_tank->AddGameMaster(game_master_name);
 
-					float x = player_tank_data.at("x");
-					float y = player_tank_data.at("y");
-					player_tank->SetPosition(x, y);
+					// Effect
+					/*
+					{
+						auto& explosion_data = data.at("actors").at("explosion");
+						std::string explosion_default_name = explosion_data.at("name");
+						std::stringstream explosion_name_stream;
+						explosion_name_stream
+							<< player_tank_name
+							<< "_" << explosion_default_name;
+						std::string explosion_name = explosion_name_stream.str();
 
-					std::string parent_name = player_tank_data.at("parent");
-					player_tank->AddParent(parent_name);
+						auto explosion = NSActor::CExplosion::Create(game, this, explosion_name, explosion_data);
+						explosion->AddBaseTank(player_tank_name);
+					}
+					*/
 
-					auto bullet_data = data.at("player_tanks").at("bullets");
-					uint32_t bullet_count = bullet_data.at("count");
-					std::string player_bullet_default_name = bullet_data.at("name");
+					// Bullet
+					{
+						auto& bullet_data = data.at("actors").at("player_bullet");
+						std::string bullet_default_name = bullet_data.at("name");
 
-					for (uint32_t i = 1; i <= bullet_count; i++) {
-						std::stringstream player_bullet_name_stream;
-						player_bullet_name_stream << player_tank_name <<
-							"_" << player_bullet_default_name <<
-							"_" << i;
+						//auto& impact_data = data.at("actors").at("impact");
+						//std::string impact_default_name = impact_data.at("name");
 
-						std::string player_bullet_name = player_bullet_name_stream.str();
-						auto player_bullet = NSActor::CPlayerBullet::Create(game, this, player_bullet_name, bullet_data);
-						player_bullet->AddParent(player_tank_name);
+						for (uint32_t bullet_id = 0; bullet_id < 1; bullet_id++) {
+
+							std::stringstream bullet_name_stream;
+							bullet_name_stream
+								<< player_tank_name
+								<< "_" << bullet_default_name
+								<< "_" << bullet_id;
+							std::string bullet_name = bullet_name_stream.str();
+
+							auto bullet = NSActor::CBullet::Create(game, this, bullet_name, bullet_data);
+							bullet->AddBaseTank(player_tank_name);
+
+							//std::stringstream impact_name_stream;
+							//impact_name_stream
+							//	<< bullet_name
+							//	<< "_" << impact_default_name;
+							//std::string impact_name = impact_name_stream.str();
+							//
+							//auto impact = NSActor::CImpact::Create(game, this, impact_name, impact_data);
+							//impact->AddBullet(bullet_name);
+						}
 					}
 				}
 			}
 
-			if (data.contains("headquarter")) {
-				for (auto& headquarter_data : data.at("headquarters").at("individual")) {
-					auto shared = data.at("headquarters").at("shared");
-					headquarter_data.insert(shared.begin(), shared.end());
+			// Enemy tanks
+			{
+				auto& basic_tank_data = data.at("actors").at("basic_tank");
+				auto& basic_tank_red_data = data.at("actors").at("basic_tank_red");
 
-					std::string headquarter_name = headquarter_data.at("name");
-					auto headquarter = NSActor::CHeadquarter::Create(game, this, headquarter_name, headquarter_data);
+				auto& fast_tank_data = data.at("actors").at("fast_tank");
+				auto& fast_tank_red_data = data.at("actors").at("fast_tank_red");
 
-					float x = headquarter_data.at("x");
-					float y = headquarter_data.at("y");
-					headquarter->SetPosition(x, y);
+				auto& power_tank_data = data.at("actors").at("power_tank");
+				auto& power_tank_red_data = data.at("actors").at("power_tank_red");
 
-					std::string parent_name = headquarter_data.at("parent");
-					headquarter->AddParent(parent_name);
+				auto& armor_tank_data = data.at("actors").at("armor_tank");
+				auto& armor_tank_red_data = data.at("actors").at("armor_tank_red");
+
+				auto& enemy_bullet_data = data.at("actors").at("enemy_bullet");
+
+				std::vector<int32_t> waves;
+				for (auto& wave : data.at("wave")) {
+					waves.push_back(wave);
 				}
-			}
 
-			if (data.contains("factory")) {
-				for (auto& factory_data : data.at("factories").at("individual")) {
-					auto shared = data.at("factories").at("shared");
-					factory_data.insert(shared.begin(), shared.end());
+				for (int32_t wave_counter = 0; wave_counter < waves.size(); wave_counter++) {
+					NSEngine::NSActor::pEnemyTank enemy_tank = nullptr;
 
-					std::string factory_name = factory_data.at("name");
-					auto factory = NSActor::CFactory::Create(game, this, factory_name, factory_data);
+					int32_t enemy_type = waves[wave_counter];
+					switch (enemy_type) {
 
-					float x = factory_data.at("x");
-					float y = factory_data.at("y");
-					factory->SetPosition(x, y);
+					case 1: { // BASIC
+						std::string enemy_tank_default_name = basic_tank_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
 
-					std::string parent_name = factory_data.at("parent");
-					factory->AddParent(parent_name);
-				}
-			}
+						enemy_tank = NSActor::CBasicTank::Create(game, this, enemy_tank_name, basic_tank_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
 
-			if (data.contains("turrets")) {
-				for (auto& turret_data : data.at("turrets").at("individual")) {
-					auto shared = data.at("turrets").at("shared");
-					turret_data.insert(shared.begin(), shared.end());
+					case 2: { // BASIC_RED
+						std::string enemy_tank_default_name = basic_tank_red_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
+						enemy_tank = NSActor::CBasicTank::Create(game, this, enemy_tank_name, basic_tank_red_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
 
-					std::string turret_name = turret_data.at("name");
-					auto turret = NSActor::CTurret::Create(game, this, turret_name, turret_data);
+					case 3: { // FAST
+						std::string enemy_tank_default_name = fast_tank_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
+						enemy_tank = NSActor::CFastTank::Create(game, this, enemy_tank_name, fast_tank_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
 
-					float x = turret_data.at("x");
-					float y = turret_data.at("y");
-					turret->SetPosition(x, y);
+					case 4: { // FAST_RED
+						std::string enemy_tank_default_name = fast_tank_red_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
+						enemy_tank = NSActor::CFastTank::Create(game, this, enemy_tank_name, fast_tank_red_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
 
-					std::string parent_name = turret_data.at("parent");
-					turret->AddParent(parent_name);
+					case 5: { // POWER
+						std::string enemy_tank_default_name = power_tank_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
+						enemy_tank = NSActor::CPowerTank::Create(game, this, enemy_tank_name, power_tank_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
 
-					auto bullet_data = data.at("turrets").at("bullets");
-					uint32_t bullet_count = bullet_data.at("count");
-					std::string turret_bullet_default_name = bullet_data.at("name");
+					case 6: { // POWER_RED
+						std::string enemy_tank_default_name = power_tank_red_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
+						enemy_tank = NSActor::CBasicTank::Create(game, this, enemy_tank_name, power_tank_red_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
 
-					for (uint32_t i = 1; i <= bullet_count; i++) {
-						std::stringstream turret_bullet_name_stream;
-						turret_bullet_name_stream << turret_name <<
-							"_" << turret_bullet_default_name <<
-							"_" << i;
+					case 7: { // ARMOR
+						std::string enemy_tank_default_name = armor_tank_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
+						enemy_tank = NSActor::CBasicTank::Create(game, this, enemy_tank_name, armor_tank_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
 
-						std::string turret_bullet_name = turret_bullet_name_stream.str();
-						auto turret_bullet = NSActor::CTurretBullet::Create(game, this, turret_bullet_name, bullet_data);
-						turret_bullet->AddParent(turret_name);
+					case 8: { // ARMOR_RED
+						std::string enemy_tank_default_name = armor_tank_red_data.at("name");
+						std::stringstream name_stream;
+						name_stream
+							<< enemy_tank_default_name
+							<< "_" << wave_counter;
+						std::string enemy_tank_name = name_stream.str();
+						enemy_tank = NSActor::CBasicTank::Create(game, this, enemy_tank_name, armor_tank_red_data);
+						enemy_tank->SetWave(wave_counter);
+						enemy_tank->AddGameMaster(game_master_name);
+						break;
+					}
+
+					}
+
+					if (enemy_tank != nullptr) {
+						std::string enemy_tank_name = enemy_tank->GetName();
+
+						// Effect
+						/*
+						{
+							auto& explosion_data = data.at("actors").at("explosion");
+							std::string explosion_default_name = explosion_data.at("name");
+							std::stringstream explosion_name_stream;
+							explosion_name_stream
+								<< enemy_tank_name
+								<< "_" << explosion_default_name;
+							std::string explosion_name = explosion_name_stream.str();
+
+							auto explosion = NSActor::CExplosion::Create(game, this, explosion_name, explosion_data);
+							explosion->AddBaseTank(enemy_tank_name);
+						}
+
+						// Score
+						{
+							auto& score_data = data.at("actors").at("score");
+							std::string score_default_name = score_data.at("name");
+							std::stringstream score_name_stream;
+							score_name_stream
+								<< enemy_tank_name
+								<< "_" << score_default_name;
+							std::string score_name = score_name_stream.str();
+
+							auto score = NSActor::CScore::Create(game, this, score_name, score_data);
+							score->AddEnemyTank(enemy_tank_name);
+						}
+						*/
+
+						// Bullet
+						{
+							auto& bullet_data = data.at("actors").at("enemy_bullet");
+							std::string bullet_default_name = bullet_data.at("name");
+
+							//auto& impact_data = data.at("actors").at("impact");
+							//std::string impact_default_name = impact_data.at("name");
+
+							for (uint32_t bullet_id = 0; bullet_id < 1; bullet_id++) {
+
+								std::stringstream bullet_name_stream;
+								bullet_name_stream
+									<< enemy_tank_name
+									<< "_" << bullet_default_name
+									<< "_" << bullet_id;
+								std::string bullet_name = bullet_name_stream.str();
+
+								auto bullet = NSActor::CBullet::Create(game, this, bullet_name, bullet_data);
+								bullet->AddBaseTank(enemy_tank_name);
+
+								//std::stringstream impact_name_stream;
+								//impact_name_stream
+								//	<< bullet_name
+								//	<< "_" << impact_default_name;
+								//std::string impact_name = impact_name_stream.str();
+								//
+								//auto impact = NSActor::CImpact::Create(game, this, impact_name, impact_data);
+								//impact->AddBullet(bullet_name);
+							}
+						}
+
 					}
 				}
 			}
 
-			if (data.contains("creep_tanks")) {
-				for (auto& creep_tank_data : data.at("creep_tanks").at("individual")) {
-					auto shared = data.at("creep_tanks").at("shared");
-					creep_tank_data.insert(shared.begin(), shared.end());
+			// Terrain
+			{
+				for (auto& bound_data : data.at("map_bounds")) {
+					std::string name = bound_data.at("name");
+					float x = bound_data.at("x");
+					float y = bound_data.at("y");
 
-					std::string creep_tank_name = creep_tank_data.at("name");
-					auto creep_tank = NSActor::CCreepTank::Create(game, this, creep_tank_name, creep_tank_data);
+					auto bound = NSActor::CBound::Create(game, this, name, bound_data);
+					bound->SetPosition(x, y);
+				}
 
-					float x = creep_tank_data.at("x");
-					float y = creep_tank_data.at("y");
-					creep_tank->SetPosition(x, y);
+				/*
 
-					std::string parent_name = creep_tank_data.at("parent");
-					creep_tank->AddParent(parent_name);
+				auto& brick_data = data.at("actors").at("brick");
+				auto& steel_data = data.at("actors").at("steel");
+				auto& ice_data = data.at("actors").at("ice");
+				auto& tree_data = data.at("actors").at("tree");
+				auto& water_data = data.at("actors").at("water");
 
-					auto bullet_data = data.at("creep_tanks").at("bullets");
-					uint32_t bullet_count = bullet_data.at("count");
-					std::string creep_bullet_default_name = bullet_data.at("name");
+				auto& map_data = data.at("map_terrain");
+				uint32_t columns = uint32_t(map_data.at("columns"));
+				uint32_t rows = uint32_t(map_data.at("rows"));
+				float tile_width = float(map_data.at("tile_width"));
+				float tile_height = float(map_data.at("tile_height"));
+				float offset_x = float(map_data.at("offset_x"));
+				float offset_y = float(map_data.at("offset_y"));
 
-					for (uint32_t i = 1; i <= bullet_count; i++) {
-						std::stringstream creep_bullet_name_stream;
-						creep_bullet_name_stream << creep_tank_name <<
-							"_" << creep_bullet_default_name <<
-							"_" << i;
+				std::vector<int32_t> tiles;
+				for (auto& tile : map_data.at("data")) {
+					tiles.push_back(tile);
+				}
 
-						std::string creep_bullet_name = creep_bullet_name_stream.str();
-						auto creep_bullet = NSActor::CCreepBullet::Create(game, this, creep_bullet_name, bullet_data);
-						creep_bullet->AddParent(creep_tank_name);
+				for (int32_t tile = 0; tile < tiles.size(); tile++) {
+					int32_t x = tile % columns;
+					int32_t y = rows - (tile / columns) - 1;
+
+					float position_x = (x * tile_width) + offset_x;
+					float position_y = (y * tile_height) + offset_y;
+
+					int32_t type = tiles[tile];
+					switch (type) {
+
+					case 0: { // BLANK
+						break;
+					}
+
+					case 1: { // BRICK
+						std::stringstream terrain_name_stream;
+						std::string default_name = brick_data.at("name");
+						terrain_name_stream
+							<< default_name
+							<< "_" << tile;
+						std::string terrain_name = terrain_name_stream.str();
+
+						auto terrain = NSActor::CBrick::Create(game, this, terrain_name, brick_data);
+						terrain->SetPosition(position_x, position_y);
+						break;
+					}
+
+					case 2: { // STEEL
+						std::stringstream terrain_name_stream;
+						std::string default_name = steel_data.at("name");
+						terrain_name_stream
+							<< default_name
+							<< "_" << tile;
+						std::string terrain_name = terrain_name_stream.str();
+
+						auto terrain = NSActor::CSteel::Create(game, this, terrain_name, steel_data);
+						terrain->SetPosition(position_x, position_y);
+						break;
+					}
+
+					case 3: { // TREE
+						std::stringstream terrain_name_stream;
+						std::string default_name = tree_data.at("name");
+						terrain_name_stream
+							<< default_name
+							<< "_" << tile;
+						std::string terrain_name = terrain_name_stream.str();
+
+						auto terrain = NSActor::CTree::Create(game, this, terrain_name, tree_data);
+						terrain->SetPosition(position_x, position_y);
+						break;
+					}
+
+					case 4: { // WATER
+						std::stringstream terrain_name_stream;
+						std::string default_name = water_data.at("name");
+						terrain_name_stream
+							<< default_name
+							<< "_" << tile;
+						std::string terrain_name = terrain_name_stream.str();
+
+						auto terrain = NSActor::CWater::Create(game, this, terrain_name, water_data);
+						terrain->SetPosition(position_x, position_y);
+						break;
+					}
+
+					case 5: { // ICE
+						std::stringstream terrain_name_stream;
+						std::string default_name = ice_data.at("name");
+						terrain_name_stream
+							<< default_name
+							<< "_" << tile;
+						std::string terrain_name = terrain_name_stream.str();
+
+						auto terrain = NSActor::CIce::Create(game, this, terrain_name, ice_data);
+						terrain->SetPosition(position_x, position_y);
+						break;
+					}
+
+					default: {
+						break;
+					}
+
 					}
 				}
+				*/
 			}
-
-			//
-			//if (data.contains("terrain")) {
-			//	auto& terrain_data = data.at("terrain");
-			//
-			//	uint32_t horizontal_bound_count = 0;
-			//	auto& horizontal_bound_data = terrain_data.at("horizontal_bound");
-			//
-			//	uint32_t vertical_bound_count = 0;
-			//	auto& vertical_bound_data = terrain_data.at("vertical_bound");
-			//
-			//	uint32_t wall_count = 0;
-			//	auto& wall_data = terrain_data.at("wall");
-			//
-			//	uint32_t water_count = 0;
-			//	auto& water_data = terrain_data.at("water");
-			//
-			//	uint32_t tree_count = 0;
-			//	auto& tree_data = terrain_data.at("tree");
-			//
-			//	auto& map_data = terrain_data.at("map");
-			//	uint32_t columns = uint32_t(map_data.at("columns"));
-			//	uint32_t rows = uint32_t(map_data.at("rows"));
-			//	float tile_width = float(map_data.at("tile_width"));
-			//	float tile_height = float(map_data.at("tile_height"));
-			//
-			//	std::vector<int32_t> tiles;
-			//	for (auto& tile : map_data.at("data")) {
-			//		tiles.push_back(tile);
-			//	}
-			//
-			//	for (int32_t i = 0; i < tiles.size(); i++) {
-			//		int32_t x = i % columns;
-			//		int32_t y = rows - (i / columns) - 1;
-			//
-			//		float position_x = x * tile_width;
-			//		float position_y = y * tile_height;
-			//
-			//		int32_t type = tiles[i];
-			//		switch (type) {
-			//			// horizontal bound
-			//		case 10: {
-			//			std::stringstream name;
-			//			std::string bound_name = horizontal_bound_data.at("name");
-			//			uint32_t sub_id = horizontal_bound_count++;
-			//			name << bound_name << "_" << sub_id;
-			//			auto bound = NSActor::CBound::Create(game, this, name.str(), horizontal_bound_data);
-			//			bound->SetPosition(position_x, position_y);
-			//			break;
-			//		}
-			//
-			//			   // vertical bound
-			//		case 11: {
-			//			std::stringstream name;
-			//			std::string bound_name = vertical_bound_data.at("name");
-			//			uint32_t sub_id = vertical_bound_count++;
-			//			name << bound_name << "_" << sub_id;
-			//			auto bound = NSActor::CBound::Create(game, this, name.str(), vertical_bound_data);
-			//			bound->SetPosition(position_x, position_y);
-			//			break;
-			//		}
-			//
-			//			   // wall
-			//		case 20: {
-			//			std::stringstream name;
-			//			std::string wall_name = wall_data.at("name");
-			//			uint32_t sub_id = wall_count++;
-			//			name << wall_name << "_" << sub_id;
-			//			auto wall = NSActor::CWall::Create(game, this, name.str(), wall_data);
-			//			wall->SetPosition(position_x, position_y);
-			//			break;
-			//		}
-			//
-			//			   // water
-			//		case 30: {
-			//			std::stringstream name;
-			//			std::string water_name = water_data.at("name");
-			//			uint32_t sub_id = water_count++;
-			//			name << water_name << "_" << sub_id;
-			//			auto water = NSActor::CWater::Create(game, this, name.str(), water_data);
-			//			water->SetPosition(position_x, position_y);
-			//			break;
-			//		}
-			//
-			//			   // tree
-			//		case 40: {
-			//			std::stringstream name;
-			//			std::string tree_name = tree_data.at("name");
-			//			uint32_t sub_id = tree_count++;
-			//			name << tree_name << "_" << sub_id;
-			//			auto tree = NSActor::CTree::Create(game, this, name.str(), water_data);
-			//			tree->SetPosition(position_x, position_y);
-			//			break;
-			//		}
-			//
-			//		default: {
-			//			break;
-			//		}
-			//
-			//		}
-			//	}
-			//
-			//
-			//
-			//}
-
 
 		}
 

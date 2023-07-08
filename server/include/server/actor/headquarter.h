@@ -2,15 +2,16 @@
 #ifndef __SERVER__ACTOR__HEADQUARTER_H__
 #define __SERVER__ACTOR__HEADQUARTER_H__
 
-#include "engine/actor/headquarter.h"
 #include "server/core/game_object.h"
+#include "engine/actor/headquarter.h"
 
 namespace NSServer {
 	namespace NSActor {
 
 		class CHeadquarter
-			: public NSEngine::NSActor::CHeadquarter
-			, public NSServer::NSCore::CGameObject {
+			: public NSCore::CGameObject 
+			, public NSEngine::NSActor::CHeadquarter
+		{
 		public:
 			static CHeadquarter* Create(
 				NSEngine::NSCore::pGame game
@@ -26,6 +27,11 @@ namespace NSServer {
 				, std::string name
 			);
 			~CHeadquarter();
+
+			void Update(float elapsed) override;
+
+			void OnCollisionEnter(NSEngine::NSComponent::pPhysics other) override;
+			void OnCollisionExit(NSEngine::NSComponent::pPhysics other) override;
 
 		};
 		typedef CHeadquarter* pHeadquarter;

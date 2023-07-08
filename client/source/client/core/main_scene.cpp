@@ -2,20 +2,32 @@
 #include "client/core/game.h"
 
 #include "client/actor/game_master.h"
-#include "client/actor/player_tank.h"
-#include "client/actor/player_bullet.h"
-#include "client/actor/creep_tank.h"
-#include "client/actor/creep_bullet.h"
-#include "client/actor/turret.h"
-#include "client/actor/turret_bullet.h"
 #include "client/actor/headquarter.h"
-#include "client/actor/factory.h"
-#include "client/actor/repair_kit.h"
-#include "client/actor/power_up.h"
-#include "client/actor/bound.h"
-#include "client/actor/wall.h"
-#include "client/actor/tree.h"
-#include "client/actor/water.h"
+
+#include "client/actor/tank/player_tank.h"
+#include "client/actor/tank/basic_tank.h"
+#include "client/actor/tank/fast_tank.h"
+#include "client/actor/tank/power_tank.h"
+#include "client/actor/tank/armor_tank.h"
+#include "client/actor/tank/bullet.h"
+
+#include "client/actor/power_up/grenade.h"
+#include "client/actor/power_up/helmet.h"
+#include "client/actor/power_up/shovel.h"
+#include "client/actor/power_up/star.h"
+#include "client/actor/power_up/tank.h"
+#include "client/actor/power_up/timer.h"
+
+#include "client/actor/terrain/bound.h"
+#include "client/actor/terrain/brick.h"
+#include "client/actor/terrain/ice.h"
+#include "client/actor/terrain/steel.h"
+#include "client/actor/terrain/tree.h"
+#include "client/actor/terrain/water.h"
+
+#include "client/actor/effect/explosion.h"
+#include "client/actor/effect/impact.h"
+#include "client/actor/effect/score.h"
 
 namespace NSClient {
 	namespace NSCore {
@@ -36,7 +48,7 @@ namespace NSClient {
 			camera.reset(sf::FloatRect(0, 0, window_width, window_height));
 			camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
-			font.loadFromFile("data/resources/fonts/arial.ttf");
+			font.loadFromFile("data/resource/font/arial.ttf");
 			text.setFont(font);
 
 			world = new CWorld(game);
@@ -141,53 +153,68 @@ namespace NSClient {
 						break;
 					}
 
+					case NSEngine::EActorType::HEADQUARTER: {
+						game_object = NSClient::NSActor::CHeadquarter::Create(game, world, name);
+						break;
+					}
+
 					case NSEngine::EActorType::PLAYER_TANK: {
 						game_object = NSClient::NSActor::CPlayerTank::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::PLAYER_BULLET: {
-						game_object = NSClient::NSActor::CPlayerBullet::Create(game, world, name);
+					case NSEngine::EActorType::BASIC_TANK: {
+						game_object = NSClient::NSActor::CBasicTank::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::CREEP_TANK: {
-						game_object = NSClient::NSActor::CCreepTank::Create(game, world, name);
+					case NSEngine::EActorType::FAST_TANK: {
+						game_object = NSClient::NSActor::CFastTank::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::CREEP_BULLET: {
-						game_object = NSClient::NSActor::CCreepBullet::Create(game, world, name);
+					case NSEngine::EActorType::POWER_TANK: {
+						game_object = NSClient::NSActor::CPowerTank::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::TURRET: {
-						game_object = NSClient::NSActor::CTurret::Create(game, world, name);
+					case NSEngine::EActorType::ARMOR_TANK: {
+						game_object = NSClient::NSActor::CArmorTank::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::TURRET_BULLET: {
-						game_object = NSClient::NSActor::CTurretBullet::Create(game, world, name);
+					case NSEngine::EActorType::BULLET: {
+						game_object = NSClient::NSActor::CBullet::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::HEADQUARTER: {
-						game_object = NSClient::NSActor::CPlayerTank::Create(game, world, name);
+					case NSEngine::EActorType::GRENADE: {
+						game_object = NSClient::NSActor::CGrenade::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::FACTORY: {
-						game_object = NSClient::NSActor::CFactory::Create(game, world, name);
+					case NSEngine::EActorType::HELMET: {
+						game_object = NSClient::NSActor::CHelmet::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::REPAIR_KIT: {
-						game_object = NSClient::NSActor::CRepairKit::Create(game, world, name);
+					case NSEngine::EActorType::SHOVEL: {
+						game_object = NSClient::NSActor::CShovel::Create(game, world, name);
 						break;
 					}
 
-					case NSEngine::EActorType::POWER_UP: {
-						game_object = NSClient::NSActor::CPowerUp::Create(game, world, name);
+					case NSEngine::EActorType::STAR: {
+						game_object = NSClient::NSActor::CStar::Create(game, world, name);
+						break;
+					}
+
+					case NSEngine::EActorType::TANK: {
+						game_object = NSClient::NSActor::CTank::Create(game, world, name);
+						break;
+					}
+
+					case NSEngine::EActorType::TIMER: {
+						game_object = NSClient::NSActor::CTimer::Create(game, world, name);
 						break;
 					}
 
@@ -196,8 +223,18 @@ namespace NSClient {
 						break;
 					}
 
-					case NSEngine::EActorType::WALL: {
-						game_object = NSClient::NSActor::CWall::Create(game, world, name);
+					case NSEngine::EActorType::BRICK: {
+						game_object = NSClient::NSActor::CBrick::Create(game, world, name);
+						break;
+					}
+
+					case NSEngine::EActorType::ICE: {
+						game_object = NSClient::NSActor::CIce::Create(game, world, name);
+						break;
+					}
+
+					case NSEngine::EActorType::STEEL: {
+						game_object = NSClient::NSActor::CSteel::Create(game, world, name);
 						break;
 					}
 
@@ -208,6 +245,21 @@ namespace NSClient {
 
 					case NSEngine::EActorType::WATER: {
 						game_object = NSClient::NSActor::CWater::Create(game, world, name);
+						break;
+					}
+
+					case NSEngine::EActorType::EXPLOSION: {
+						game_object = NSClient::NSActor::CExplosion::Create(game, world, name);
+						break;
+					}
+
+					case NSEngine::EActorType::IMPACT: {
+						game_object = NSClient::NSActor::CImpact::Create(game, world, name);
+						break;
+					}
+
+					case NSEngine::EActorType::SCORE: {
+						game_object = NSClient::NSActor::CScore::Create(game, world, name);
 						break;
 					}
 
@@ -285,6 +337,29 @@ namespace NSClient {
 				NSEngine::NSActor::CMoveCommand move_command(game_object_id, x, y);
 				world->commands[tick].push_back(
 					std::make_unique<NSEngine::NSActor::CMoveCommand>(move_command)
+				);
+
+				return true;
+			}
+
+			case NSEngine::EPacketType::PLAYER_SHOOT: {
+				uint32_t tick;
+				uint32_t game_object_id;
+				uint32_t command_type;
+				int32_t x;
+				int32_t y;
+
+				*packet
+					>> tick
+					>> game_object_id
+					>> command_type
+					>> x
+					>> y
+					;
+
+				NSEngine::NSActor::CShootCommand shoot_command(game_object_id, x, y);
+				world->commands[tick].push_back(
+					std::make_unique<NSEngine::NSActor::CShootCommand>(shoot_command)
 				);
 
 				return true;

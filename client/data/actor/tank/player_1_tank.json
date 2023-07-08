@@ -1,0 +1,162 @@
+{
+  "tank_texture": 1011,
+  "tank_sprites": [
+    {
+      "id": 1001,
+      "left": 0,
+      "top": 0,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 1002,
+      "left": 96,
+      "top": 0,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 1003,
+      "left": 192,
+      "top": 0,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 1004,
+      "left": 288,
+      "top": 0,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+
+    {
+      "id": 2001,
+      "left": 0,
+      "top": 48,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 2002,
+      "left": 96,
+      "top": 48,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 2003,
+      "left": 192,
+      "top": 48,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 2004,
+      "left": 288,
+      "top": 48,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+
+    {
+      "id": 3001,
+      "left": 0,
+      "top": 96,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 3002,
+      "left": 96,
+      "top": 96,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 3003,
+      "left": 192,
+      "top": 96,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 3004,
+      "left": 288,
+      "top": 96,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+
+    {
+      "id": 4001,
+      "left": 0,
+      "top": 144,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 4002,
+      "left": 96,
+      "top": 144,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 4003,
+      "left": 192,
+      "top": 144,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 4004,
+      "left": 288,
+      "top": 144,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    }
+  ],
+
+  "shield_texture": "data/resource/texture/shield_effect.png",
+  "shield_sprite": {
+    "left": 0,
+    "top": 0,
+    "width": 48,
+    "height": 48,
+    "origin_x": 24.0,
+    "origin_y": 24.0
+  }
+}

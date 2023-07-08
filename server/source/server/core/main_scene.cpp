@@ -2,20 +2,33 @@
 #include "server/core/game.h"
 
 #include "server/actor/game_master.h"
-#include "server/actor/player_tank.h"
-#include "server/actor/player_bullet.h"
-#include "server/actor/creep_tank.h"
-#include "server/actor/creep_bullet.h"
-#include "server/actor/turret.h"
-#include "server/actor/turret_bullet.h"
 #include "server/actor/headquarter.h"
-#include "server/actor/factory.h"
-#include "server/actor/repair_kit.h"
-#include "server/actor/power_up.h"
-#include "server/actor/bound.h"
-#include "server/actor/wall.h"
-#include "server/actor/tree.h"
-#include "server/actor/water.h"
+
+#include "server/actor/tank/player_tank.h"
+#include "server/actor/tank/basic_tank.h"
+#include "server/actor/tank/fast_tank.h"
+#include "server/actor/tank/power_tank.h"
+#include "server/actor/tank/armor_tank.h"
+#include "server/actor/tank/bullet.h"
+
+#include "server/actor/power_up/grenade.h"
+#include "server/actor/power_up/helmet.h"
+#include "server/actor/power_up/shovel.h"
+#include "server/actor/power_up/star.h"
+#include "server/actor/power_up/tank.h"
+#include "server/actor/power_up/timer.h"
+
+#include "server/actor/terrain/bound.h"
+#include "server/actor/terrain/brick.h"
+#include "server/actor/terrain/ice.h"
+#include "server/actor/terrain/steel.h"
+#include "server/actor/terrain/tree.h"
+#include "server/actor/terrain/water.h"
+
+#include "server/actor/effect/explosion.h"
+#include "server/actor/effect/impact.h"
+#include "server/actor/effect/score.h"
+
 
 namespace NSServer {
 	namespace NSCore {
@@ -36,7 +49,7 @@ namespace NSServer {
 			camera.reset(sf::FloatRect(0, 0, window_width, window_height));
 			camera.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
-			font.loadFromFile("data/resources/fonts/arial.ttf");
+			font.loadFromFile("data/resource/font/arial.ttf");
 			text.setFont(font);
 
 			world = new CWorld(game);

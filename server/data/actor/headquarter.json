@@ -1,0 +1,23 @@
+{
+  "texture": 1022,
+  "sprites": [
+    {
+      "id": 1001,
+      "left": 0,
+      "top": 0,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    },
+    {
+      "id": 1002,
+      "left": 48,
+      "top": 0,
+      "width": 48,
+      "height": 48,
+      "origin_x": 24.0,
+      "origin_y": 24.0
+    }
+  ]
+}

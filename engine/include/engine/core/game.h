@@ -25,6 +25,8 @@ namespace NSEngine {
 			bool load_scene = false;
 			upScene scene;
 
+			std::map<uint32_t, sf::Texture> textures;
+
 		public:
 			sf::RenderWindow& GetWindow();
 
@@ -36,6 +38,8 @@ namespace NSEngine {
 
 			void PlayScene(uint32_t scene_id);
 			void LoadScene();
+
+			sf::Texture& GetTexture(uint32_t id);
 
 			virtual CScene* CreateScene(ESceneType scene_type) = 0;
 		};

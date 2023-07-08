@@ -3,7 +3,6 @@
 #define __CLIENT__CORE__WORLD_H__
 
 #include "engine/core/world.h"
-
 #include "client/core/game.h"
 
 namespace NSClient {

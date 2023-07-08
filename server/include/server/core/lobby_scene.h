@@ -16,6 +16,8 @@ namespace NSServer {
 			};
 			EState state = EState::Picking;
 
+			sf::Texture texture;
+			sf::Sprite sprite;
 			sf::Font font;
 			sf::Text text;
 

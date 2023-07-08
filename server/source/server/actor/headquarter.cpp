@@ -2,6 +2,9 @@
 #include "server/core/game.h"
 #include "server/core/world.h"
 
+#include "server/actor/game_master.h"
+#include "server/actor/tank/bullet.h"
+
 namespace NSServer {
 	namespace NSActor {
 
@@ -19,12 +22,12 @@ namespace NSServer {
 			world->game_objects[id] = std::make_unique<CHeadquarter>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			auto headquarter = static_cast<pHeadquarter>(world->game_objects[id].get());
-			headquarter->LoadComponents(components_data);
+			auto game_object = static_cast<pHeadquarter>(world->game_objects[id].get());
+			game_object->LoadComponents(components_data);
 
-			world->render_queue.emplace(headquarter->layer, id);
+			world->render_queue.emplace(game_object->layer, id);
 
-			return headquarter;
+			return game_object;
 		}
 
 		CHeadquarter::CHeadquarter(
@@ -38,6 +41,24 @@ namespace NSServer {
 		}
 
 		CHeadquarter::~CHeadquarter() {
+		}
+
+		void CHeadquarter::Update(float elapsed) {
+			if (is_shovel_activated) {
+				shovel_timer -= elapsed;
+				if (shovel_timer < 0.0f)
+					DeactivateShovel();
+			}
+		}
+
+		void CHeadquarter::OnCollisionEnter(NSEngine::NSComponent::pPhysics other) {
+			if (dynamic_cast<NSEngine::NSActor::pBullet>(other)) {
+				is_alive = false;
+				//game_master->GameLost();
+			}
+		}
+
+		void CHeadquarter::OnCollisionExit(NSEngine::NSComponent::pPhysics other) {
 		}
 
 	}

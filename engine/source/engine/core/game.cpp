@@ -27,6 +27,14 @@ namespace NSEngine {
 			elapsed_ms_per_update = 1000.0f / update_rate;
 			elapsed_ms_per_render = 1000.0f / render_rate;
 
+			for (auto& texture_data : data.at("textures")) {
+				uint32_t id = texture_data.at("id");
+				std::string source = texture_data.at("source");
+
+				textures[id] = sf::Texture();
+				textures[id].loadFromFile(source);
+			}
+
 			auto& scenes = data.at("scenes");
 			for (auto& scene : scenes.at("scene_list")) {
 				uint32_t id = scene.at("id");
@@ -72,6 +80,10 @@ namespace NSEngine {
 
 			update_elapsed_ms = 0.0f;
 			render_elapsed_ms = 0.0f;
+		}
+
+		sf::Texture& CGame::GetTexture(uint32_t id) {
+			return textures[id];
 		}
 
 	}

@@ -8,13 +8,13 @@
 #include "engine/core/game.h"
 #include "engine/core/game_object.h"
 
-#include "engine/component/updatable.h"
-#include "engine/component/renderable.h"
-#include "engine/component/commandable.h"
-#include "engine/component/recordable.h"
-#include "engine/component/physics.h"
-#include "engine/component/player_control.h"
-#include "engine/component/input_handler.h"
+#include "engine/component/system/updatable.h"
+#include "engine/component/system/physics.h"
+#include "engine/component/system/recordable.h"
+#include "engine/component/system/commandable.h"
+#include "engine/component/system/input_handler.h"
+
+#include "engine/component/render/renderable.h"
 
 namespace NSEngine {
 	namespace NSCore {

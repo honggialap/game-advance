@@ -19,9 +19,12 @@ namespace NSServer {
 			world->game_objects[id] = std::make_unique<CGameMaster>(game, world, id, name);
 			world->dictionary[name] = id;
 
-			auto game_master = static_cast<pGameMaster>(world->game_objects[id].get());
-			game_master->LoadComponents(components_data);
-			return game_master;
+			auto game_object = static_cast<pGameMaster>(world->game_objects[id].get());
+			game_object->LoadComponents(components_data);
+
+			world->render_queue.emplace(game_object->layer, id);
+
+			return game_object;
 		}
 
 		CGameMaster::CGameMaster(
@@ -35,6 +38,25 @@ namespace NSServer {
 		}
 
 		CGameMaster::~CGameMaster() {
+		}
+
+		void CGameMaster::Update(float elapsed) {
+			if (!started) {
+				started = true;
+
+				SpawnPlayerTank(1);
+				SpawnPlayerTank(2);
+
+				SpawnEnemyTank(0, 0);
+				SpawnEnemyTank(1, 1);
+				SpawnEnemyTank(2, 2);
+				
+				//SpawnPowerUp(NSEngine::STAR, 4);
+			}
+		}
+
+		void CGameMaster::PackLoadPacket(NSEngine::NSNetworks::CPacket* packet) {
+			NSEngine::NSCore::CGameObject::PackLoadPacket(packet);
 		}
 
 	}

@@ -2,15 +2,16 @@
 #ifndef __CLIENT__ACTOR__HEADQUARTER_H__
 #define __CLIENT__ACTOR__HEADQUARTER_H__
 
-#include "engine/actor/headquarter.h"
 #include "client/core/game_object.h"
+#include "engine/actor/headquarter.h"
 
 namespace NSClient {
 	namespace NSActor {
 
 		class CHeadquarter
-			: public NSEngine::NSActor::CHeadquarter
-			, public NSClient::NSCore::CGameObject {
+			: public NSCore::CGameObject 
+			, public NSEngine::NSActor::CHeadquarter
+		{
 		public:
 			static CHeadquarter* Create(
 				NSEngine::NSCore::pGame game

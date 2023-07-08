@@ -2,15 +2,16 @@
 #ifndef __SERVER__ACTOR__GAME_MASTER_H__
 #define __SERVER__ACTOR__GAME_MASTER_H__
 
-#include "engine/actor/game_master.h"
 #include "server/core/game_object.h"
+#include "engine/actor/game_master.h"
 
 namespace NSServer {
 	namespace NSActor {
 
 		class CGameMaster
 			: public NSCore::CGameObject
-			, public NSEngine::NSActor::CGameMaster {
+			, public NSEngine::NSActor::CGameMaster 
+		{
 		public:
 			static CGameMaster* Create(
 				NSEngine::NSCore::pGame game
@@ -27,6 +28,9 @@ namespace NSServer {
 			);
 			~CGameMaster();
 
+			void Update(float elapsed) override;
+
+			void PackLoadPacket(NSEngine::NSNetworks::CPacket* packet) final;
 		};
 		typedef CGameMaster* pGameMaster;
 
